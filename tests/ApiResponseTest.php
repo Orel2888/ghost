@@ -111,4 +111,14 @@ class ApiResponseTest extends TestCase
         $this->assertEquals(401, $response->getStatusCode());
     }
 
+    public function test_is_fails()
+    {
+        $this->apiResponse->ok();
+
+        $this->assertEquals(['status' => 'ok'], $this->apiResponse->toArray());
+
+        $this->apiResponse->fail();
+
+        $this->assertTrue($this->apiResponse->isFails());
+    }
 }

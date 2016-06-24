@@ -112,6 +112,11 @@ class ApiResponse implements Jsonable, Arrayable, JsonSerializable
         return $this->statusCode;
     }
 
+    public function isFails()
+    {
+        return $this->responseData['status'] == 'fail';
+    }
+
     public function toArray()
     {
         $dataArray = $this->responseData;
