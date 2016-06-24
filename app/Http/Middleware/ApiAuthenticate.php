@@ -23,7 +23,7 @@ class ApiAuthenticate
 
         $apiGuard = new ApiGuard();
 
-        if (!$apiGuard->hasAccessToken($request->input('access_token'))) {
+        if (!$apiGuard->hasAccessToken($request->input('access_token'), $role)) {
             return response()->json(['status' => 'fail', 'middleware' => true], 401);
         }
 

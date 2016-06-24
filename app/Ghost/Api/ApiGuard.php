@@ -4,6 +4,7 @@ namespace App\Ghost\Api;
 
 use Cache;
 use Carbon\Carbon;
+use App\Admin;
 
 class ApiGuard
 {
@@ -31,9 +32,24 @@ class ApiGuard
         return false;
     }
 
-    public function hasAccessToken($token)
+    public function authenticateAdmin($key, $tgUsername)
     {
-        return Cache::has('api_token_'. $token);
+        if (!$auth = $this->authenticate($key)) {
+            return false;
+        }
+
+        if (is_null(Admin::whereLogin($tgUsername)->first())) {
+            return false;
+        }
+
+        Cache::put('api_admin_token_'. $auth['access_token'], $auth, $auth['expires_unix']);
+
+        return $auth;
+    }
+
+    public function hasAccessToken($token, $role = null)
+    {
+        return $role == 'admin' ? Cache::has('api_admin_token_'. $token) : Cache::has('api_token_'. $token);
     }
 
     public function getInfoAccessToken($token)

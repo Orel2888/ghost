@@ -19,7 +19,7 @@ class AuthenticateApiController extends BaseApiController
         $this->apiGuard = new ApiGuard();
     }
 
-    public function postAuthenticate()
+    public function postAuthenticate($tgUsername = null)
     {
         $valid = Validator::make($this->request->all(), [
             'key'   => 'required|alpha_num'
@@ -29,8 +29,15 @@ class AuthenticateApiController extends BaseApiController
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        if (!$auth = $this->apiGuard->authenticate($this->request->input('key'))) {
-            return response()->json($this->apiResponse->fail(['messages' => 'Unauthorized']), 401);
+        if (!is_null($tgUsername)) {
+            // Authenticate admin
+            if (!$auth = $this->apiGuard->authenticateAdmin($this->request->input('key'), $tgUsername)) {
+                $this->apiResponse->fail(['message' => 'Unauthorized'])->setStatusCode(401);
+            }
+        } else {
+            if (!$auth = $this->apiGuard->authenticate($this->request->input('key'))) {
+                return response()->json($this->apiResponse->fail(['messages' => 'Unauthorized']), 401);
+            }
         }
 
         return response()->json($this->apiResponse->ok($auth));

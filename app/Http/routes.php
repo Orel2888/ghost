@@ -19,7 +19,7 @@ Route::group(['middleware' => 'web'], function () {
 
 Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], function () {
 
-    Route::post('authenticate', 'AuthenticateApiController@postAuthenticate');
+    Route::post('authenticate/{admin?}', 'AuthenticateApiController@postAuthenticate');
 
     Route::group(['middleware' => 'api'], function () {
         Route::get('users.find', 'UsersApiController@getFind');

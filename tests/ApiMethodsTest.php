@@ -5,6 +5,7 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Container\Container;
 use App\Client;
+use App\Admin;
 
 class ApiMethodsTest extends TestCase
 {
