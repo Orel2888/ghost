@@ -29,7 +29,7 @@ class ApiRequestTest extends TestCase
     {
         $response = $this->call('POST', 'api/authenticate');
 
-        $this->assertEquals(403, $response->getStatusCode());
+        $this->assertEquals(400, $response->getStatusCode());
 
         $response = $this->call('GET', 'api/users.find', ['access_token' => 123]);
 
