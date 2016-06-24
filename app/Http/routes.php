@@ -30,8 +30,8 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
      * Admin methods
      */
 
-    Route::group(['prefix' => 'admin', 'middleware' => 'api:admin'], function () {
-        Route::post('qiwi-transaction', 'AdminApiController@getQiwiTransaction');
+    Route::group(['prefix' => 'admin'], function () {
+        Route::get('qiwi-transaction', 'AdminApiController@getQiwiTransaction');
     });
 
 });

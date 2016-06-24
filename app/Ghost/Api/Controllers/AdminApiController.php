@@ -8,7 +8,7 @@ class AdminApiController extends BaseApiController
 {
     public function getQiwiTransaction()
     {
-        $transactions = QiwiTransaction::orderBy('id', 'DESC')->orderBy('id', 'ASC')->limit(10)->all();
+        $transactions = QiwiTransaction::orderBy('id', 'DESC')->limit(10)->get()->reverse();
 
         return response()->json($this->apiResponse->ok(['data' => $transactions->toArray()]));
     }

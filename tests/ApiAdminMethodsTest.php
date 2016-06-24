@@ -35,6 +35,21 @@ class ApiAdminMethodsTest extends TestCase
         static::$container['access_token'] = json_decode($response->getContent())->access_token;
 
         $admin->delete();
+    }
+
+    public function test_qiwi_transaction()
+    {
+        $response = $this->call('GET', 'api/admin/qiwi-transaction', ['access_token' => static::$container['access_token']]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $receivedData = json_decode($response->getContent());
+        
+        $this->assertNotEmpty($receivedData->data);
+    }
+
+    public function test_end()
+    {
         $this->cacheFlush();
     }
 
