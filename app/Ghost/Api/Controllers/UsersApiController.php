@@ -52,7 +52,7 @@ class UsersApiController extends BaseApiController
         try {
             $this->clientManager->findByTgChatId($this->request->input('tg_chatid'));
 
-            return response()->json($this->apiResponse->error('message', 'Client is already registered'), 400);
+            return response()->json($this->apiResponse->fail(['message' => 'Client is already registered']), 400);
         } catch (ModelNotFoundException $e) {
 
         }
