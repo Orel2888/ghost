@@ -1,23 +1,25 @@
 'use strict';
 
 const config = require('../config');
-const tg     = require('telegram-node-bot')(config.get('TGBOT_TOKEN'));
+const Telegram = require('telegram-node-bot');
+const TelegramBaseController = Telegram.TelegramBaseController;
+const tg = new Telegram.Telegram(config.get('TGBOT_TOKEN'));
+
+class PingController extends TelegramBaseController {
+
+    /**
+     * @param {Scope} $
+     */
+    pingHandler($) {
+        $.sendMessage('pong')
+    }
+
+    get routes() {
+        return {
+            'ping': 'pingHandler'
+        }
+    }
+}
 
 tg.router
-    .when(['ping'], 'PingController')
-    .otherwise('OtherwiseController');
-
-tg.controller('PingController', ($) => {
-    tg.for('ping', () => {
-        $.sendMessage('Pong');
-    });
-});
-
-tg.controller('OtherwiseController', ($) => {
-    let priceList = `
-Добро пожаловать в круглосуточный Ghost 👀 SHOP
-
-⭐ В наличии
-    `;
-    $.sendMessage(priceList.trim());
-});
+    .when(['ping'], new PingController());
