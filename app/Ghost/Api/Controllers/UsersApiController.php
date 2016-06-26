@@ -56,7 +56,7 @@ class UsersApiController extends BaseApiController
         } catch (ModelNotFoundException $e) {
 
         }
-        
+
         $client = Client::create($this->request->only('name', 'tg_username', 'tg_chatid') + ['comment' => $this->request->input('tg_username')]);
 
         return response()->json($this->apiResponse->ok(['client_id' => $client->id]), 201);
