@@ -15,6 +15,6 @@
     "fs-jetpack": "^0.9.1",
     "qiwimas": "^1.0.7",
     "request-promise": "^3.0.0",
-    "telegram-node-bot": "^3.0.1"
+    "telegram-node-bot": "^3.0.3"
   }
 }
