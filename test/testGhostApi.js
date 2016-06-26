@@ -24,11 +24,6 @@ describe('Test GhostApi class', function () {
         });
     });
 
-
-    /**
-     * Admin methods
-     */
-
     it ('Method users.reg', () => {
         return ghostApi.api('users.reg', 'POST', {
             name: 'Vasya',
@@ -36,6 +31,8 @@ describe('Test GhostApi class', function () {
             tg_chatid: 1234
         }).then(response => {
             console.log(response);
+        }).catch(err => {
+            assert.equal(err.response.body.message, 'Client is already registered');
         });
     });
 
@@ -45,4 +42,25 @@ describe('Test GhostApi class', function () {
         });
     });
 
+    /**
+     * Admin methods
+     */
+
+    it ('Authentication admin', () => {
+        return ghostApi.authenticationAdmin('vasechka').then(response => {
+            console.log(response);
+        });
+    });
+
+    it ('Method admin/qiwi-transaction', () => {
+        return ghostApi.api('admin/qiwi-transaction').then(response => {
+
+        });
+    });
+
+    it ('Method admin/goods-price', () => {
+        return ghostApi.api('admin/goods-price').then(response => {
+            console.log(response);
+        });
+    });
 });
