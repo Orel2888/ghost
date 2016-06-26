@@ -33,7 +33,6 @@ class ShopReporterTest extends TestCase
 
         var_dump($priceList);
 
-        echo (1575 % 100);
         self::$endTest = true;
     }
 

@@ -8,6 +8,8 @@ use App\Admin;
 
 class ApiAdminMethodsTest extends TestCase
 {
+    use BaseTestsHelper;
+
     /**
      * @var Container
      */
@@ -44,8 +46,25 @@ class ApiAdminMethodsTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
 
         $receivedData = json_decode($response->getContent());
-        
+
         $this->assertNotEmpty($receivedData->data);
+    }
+
+    public function test_goods_price()
+    {
+        $this->createData();
+
+        $response = $this->call('GET', 'api/admin/goods-price', ['access_token' => static::$container['access_token']]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $responseData = json_decode($response->getContent())->data;
+
+        $this->assertNotEmpty($responseData);
+
+        var_dump($responseData);
+
+        $this->removeData();
     }
 
     public function test_end()

@@ -23,4 +23,9 @@ class Goods extends Model
     {
         return $this->hasMany('App\GoodsPrice');
     }
+
+    public function city()
+    {
+        return $this->belongsTo('App\City', 'city_id', 'id');
+    }
 }
