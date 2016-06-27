@@ -39,7 +39,7 @@ class AuthenticateApiController extends BaseApiController
                 return response()->json($this->apiResponse->fail(['messages' => 'Unauthorized']), 401);
             }
         }
-
+        
         return response()->json($this->apiResponse->ok($auth));
     }
 }

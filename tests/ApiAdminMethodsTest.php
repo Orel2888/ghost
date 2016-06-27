@@ -46,7 +46,7 @@ class ApiAdminMethodsTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
 
         $receivedData = json_decode($response->getContent());
-
+        // var_dump($receivedData);
         $this->assertNotEmpty($receivedData->data);
     }
 
@@ -62,7 +62,21 @@ class ApiAdminMethodsTest extends TestCase
 
         $this->assertNotEmpty($responseData);
 
-        var_dump($responseData);
+        //var_dump($responseData);
+
+        $this->removeData();
+    }
+
+    public function test_goods_purchase()
+    {
+        $this->createData();
+
+        $response = $this->call('POST', 'api/admin/goods-price/purchase', [
+            'access_token'      => static::$container['access_token'],
+            'goods_price_id'    => static::$database['goods_price'][0]->id
+        ]);
+        
+        $this->assertEquals(200, $response->getStatusCode());
 
         $this->removeData();
     }
