@@ -14,8 +14,8 @@ const intervalStatusWorker = 15;
 
 let checkingBalance = new CheckingBalance({
     qiwi: {
-        phone : config.get('QIWI1_PHONE'),
-        pass  : config.get('QIWI1_PASS')
+        phone : config.get('QIWI2_PHONE'),
+        pass  : config.get('QIWI2_PASS')
     },
     database: {
         host      : config.get('DB_HOST'),
