@@ -7,7 +7,7 @@ const GhostApi = require('../ghost-api/GhostApi');
 
 class AdminController extends TelegramBaseController {
 
-    /*constructor() {
+    constructor() {
         super();
 
         this.ghostApi = new GhostApi({
@@ -108,10 +108,6 @@ class AdminController extends TelegramBaseController {
             }
 
         }).catch(console.log)
-    }*/
-
-    hd1($) {
-        console.log('YES');
     }
 
     get routes() {
