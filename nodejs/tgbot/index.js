@@ -29,5 +29,5 @@ tg.before(function (updates, cb) {
 tg.router
     .when([
         'транс',
-        'товар :arg1'
+        'товар'
     ], new AdminController());
