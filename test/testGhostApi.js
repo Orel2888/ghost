@@ -14,6 +14,13 @@ describe('Test GhostApi class', function () {
         apiKey: config.get('API_KEY')
     });
 
+    it ('Check authenticate', () => {
+        return ghostApi.checkAuth().then(auth => {
+            assert.equal(auth, 0);
+        });
+    });
+
+
     /**
      * Users methdos
      */
@@ -22,6 +29,10 @@ describe('Test GhostApi class', function () {
         return ghostApi.authenticationUser().then(response => {
             console.log(response);
         });
+    });
+
+    it ('Check authorization after authenticate', () => {
+        return ghostApi.checkAuth().then(assert.isTrue);
     });
 
     it ('Method users.reg', () => {

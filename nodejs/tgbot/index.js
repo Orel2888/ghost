@@ -5,8 +5,8 @@ const Telegram = require('telegram-node-bot');
 const tg = new Telegram.Telegram(config.get('TGBOT_TOKEN'));
 const AdminController = require('./AdminController');
 
-var adminUsernames = config.get('TGBOT_ADMINS').split(',');
-var adminCommands  = ['транс'];
+const adminUsernames = config.get('TGBOT_ADMINS').split(',');
+const adminCommands  = ['транс'];
 
 tg.before(function (updates, cb) {
 

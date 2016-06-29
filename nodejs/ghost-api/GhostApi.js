@@ -25,13 +25,13 @@ class GhostApi {
 
     }
 
-    api(apiMethod, method = 'GET', params = {}) {
+    api(apiMethod, method = 'GET', params = {}, requestOptions = {}) {
 
         if (this.accessTokenUser || this.accessTokenAdmin) {
             params.access_token = apiMethod.match(/^admin/) ? this.accessTokenAdmin : this.accessTokenUser;
         }
 
-        let options = {
+        var options = {
             url: this.config.apiUrl + '/' + apiMethod,
             method,
             json: true
@@ -45,7 +45,26 @@ class GhostApi {
             options.formData = params;
         }
 
+        if (Object.keys(requestOptions).length) {
+            options = Object.assign(options, requestOptions);
+        }
+
         return request(options);
+    }
+
+    checkAuth(admin = false) {
+
+        if (admin && !this.accessTokenAdmin || !admin && !this.accessTokenUser) {
+            return new Promise((resolve, reject) => {
+                resolve(false)
+            })
+        }
+
+        return this.api('users.find', 'GET', {
+            access_token: this.accessTokenUser ? this.accessTokenUser : this.accessTokenAdmin
+        }).catch(err => {
+            return err.statusCode != 403;
+        });
     }
 
     authentication(adminUsername = false) {

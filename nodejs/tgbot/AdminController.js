@@ -10,11 +10,23 @@ class AdminController extends TelegramBaseController {
     constructor() {
         super();
 
-        if (!this.ghostApi) {
-            this.ghostApi = new GhostApi({
-                apiKey: config.get('API_KEY')
-            });
-        }
+        this.ghostApi = new GhostApi({
+            apiKey: config.get('API_KEY')
+        });
+    }
+
+    before(command, scope) {
+
+        scope.checkAuth = this.ghostApi.checkAuth(true).then(auth => {
+
+            if (!auth) {
+                return this.ghostApi.authenticationAdmin(scope._update._message._from._username);
+            }
+
+            return true;
+        });
+
+        return scope;
     }
 
     transHandle($) {
@@ -38,13 +50,12 @@ class AdminController extends TelegramBaseController {
             });
         };
 
-        if (!this.ghostApi.accessTokenAdmin) {
-            this.ghostApi.authenticationAdmin($._message._from._username).then(response => {
-                responseQiwiTransaction();
-            });
-        } else {
+        $.checkAuth.then(auth => {
+
+            if (!auth) return;
+
             responseQiwiTransaction();
-        }
+        });
     }
 
     get routes() {
