@@ -19,6 +19,7 @@ Route::group(['middleware' => 'web'], function () {
 
 Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], function () {
 
+    Route::post('authenticate/check-access-token', 'AuthenticateApiController@postCheckAccessToken');
     Route::post('authenticate/{admin?}', 'AuthenticateApiController@postAuthenticate');
 
     Route::group(['middleware' => 'api'], function () {

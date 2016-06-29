@@ -47,9 +47,9 @@ class ApiGuard
         return $auth;
     }
 
-    public function hasAccessToken($token, $role = null)
+    public function hasAccessToken($token)
     {
-        return $role == 'admin' ? Cache::has('api_admin_token_'. $token) : Cache::has('api_token_'. $token);
+        return Cache::has('api_token_'. $token) ?: Cache::has('api_admin_token_'. $token);
     }
 
     public function getInfoAccessToken($token)

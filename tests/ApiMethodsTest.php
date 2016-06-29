@@ -29,6 +29,17 @@ class ApiMethodsTest extends TestCase
         static::$container['access_token'] = json_decode($response->getContent())->access_token;
     }
 
+    public function test_check_access_token()
+    {
+        $response = $this->call('POST', 'api/authenticate/check-access-token', [
+            'access_token'  => static::$container['access_token']
+        ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $this->assertEquals('ok', json_decode($response->getContent())->status);
+    }
+
     public function test_users_find_not_found()
     {
         $response = $this->call('GET', 'api/users.find', [

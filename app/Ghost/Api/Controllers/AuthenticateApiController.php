@@ -42,4 +42,21 @@ class AuthenticateApiController extends BaseApiController
         
         return response()->json($this->apiResponse->ok($auth));
     }
+
+    public function postCheckAccessToken()
+    {
+        $valid = Validator::make($this->request->all(), [
+            'access_token'  => 'required'
+        ]);
+
+        if ($valid->fails()) {
+            return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
+        }
+
+        if ($this->apiGuard->hasAccessToken($this->request->input('access_token'))) {
+            return response()->json($this->apiResponse->ok());
+        } else {
+            return response()->json($this->apiResponse->fail());
+        }
+    }
 }

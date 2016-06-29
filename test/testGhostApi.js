@@ -20,7 +20,6 @@ describe('Test GhostApi class', function () {
         });
     });
 
-
     /**
      * Users methdos
      */
