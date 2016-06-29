@@ -7,12 +7,13 @@ const GhostApi = require('../ghost-api/GhostApi');
 
 class AdminController extends TelegramBaseController {
 
-    constructor() {
+    /*constructor() {
         super();
 
         this.ghostApi = new GhostApi({
             apiKey: config.get('API_KEY')
         });
+
     }
 
     before(command, scope) {
@@ -55,12 +56,68 @@ class AdminController extends TelegramBaseController {
             if (!auth) return;
 
             responseQiwiTransaction();
-        });
+        }).catch(console.log)
+    }
+
+    goodsPriceHandle($) {
+
+        let responseGoodsPrice = () => {
+            return this.ghostApi.api('admin/goods-price').then(response => {
+
+                if (!Object.keys(response.data).length) {
+                    return $.sendMessage('Товара нету');
+                }
+
+                var goodsSession = new Map();
+                var goodsIndex = 0;
+
+                var message = 'Список товаров по городам\n\n';
+
+                for (let city in response.data) {
+                    message += `🏡 ${city}\n`;
+
+                    for (let goodsName in response.data[city]) {
+                        message += `  🍗 ${goodsName}\n`;
+
+                        for (let goods of response.data[city][goodsName]) {
+                            message += `${++goodsIndex}) ${goods.weight}, ${goods.address}\n`;
+
+                            goodsSession.set(goodsIndex, goods.id);
+                        }
+                    }
+                }
+
+                $.userSession.goodsPrice = goodsSession;
+
+                $.sendMessage(message);
+            })
+        };
+
+        $.checkAuth.then(auth => {
+
+            if (!auth) return;
+
+            switch ($.query.argument) {
+
+                case 'взять':
+                    console.log('YYYESS')
+                break;
+
+                default:
+                    responseGoodsPrice();
+            }
+
+        }).catch(console.log)
+    }*/
+
+    hd1($) {
+        console.log('YES');
     }
 
     get routes() {
         return {
-            'транс': 'transHandle'
+            'транс': 'transHandle',
+            'товар': 'goodsPriceHandle'
         };
     }
 }

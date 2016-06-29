@@ -27,8 +27,12 @@ class GhostApi {
 
     api(apiMethod, method = 'GET', params = {}, requestOptions = {}) {
 
-        if (this.accessTokenUser || this.accessTokenAdmin) {
-            params.access_token = apiMethod.match(/^admin/) ? this.accessTokenAdmin : this.accessTokenUser;
+        if (!params.hasOwnProperty('access_token') && /^admin/.test(apiMethod) && this.accessTokenAdmin) {
+            params.access_token = this.accessTokenAdmin;
+        } else {
+            if (!params.hasOwnProperty('access_token') && this.accessTokenUser) {
+                params.access_token = this.accessTokenUser;
+            }
         }
 
         var options = {
@@ -60,10 +64,10 @@ class GhostApi {
             })
         }
 
-        return this.api('users.find', 'GET', {
+        return this.api('authenticate/check-access-token', 'POST', {
             access_token: this.accessTokenUser ? this.accessTokenUser : this.accessTokenAdmin
-        }).catch(err => {
-            return err.statusCode != 403;
+        }).then(response => {
+            return response.status == 'ok';
         });
     }
 

@@ -6,7 +6,7 @@ const tg = new Telegram.Telegram(config.get('TGBOT_TOKEN'));
 const AdminController = require('./AdminController');
 
 const adminUsernames = config.get('TGBOT_ADMINS').split(',');
-const adminCommands  = ['транс'];
+const adminCommands  = ['транс', 'товар'];
 
 tg.before(function (updates, cb) {
 
@@ -24,4 +24,7 @@ tg.before(function (updates, cb) {
  * Admin functions
  */
 tg.router
-    .when(['транс'], new AdminController());
+    .when([
+        'транс',
+        'товар'
+    ], new AdminController());
