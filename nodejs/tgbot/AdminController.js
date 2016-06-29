@@ -113,7 +113,7 @@ class AdminController extends TelegramBaseController {
     get routes() {
         return {
             'транс': 'transHandle',
-            'товар': 'goodsPriceHandle'
+            'товар :arg1': 'goodsPriceHandle'
         };
     }
 }

@@ -6,13 +6,16 @@ const tg = new Telegram.Telegram(config.get('TGBOT_TOKEN'));
 const AdminController = require('./AdminController');
 
 const adminUsernames = config.get('TGBOT_ADMINS').split(',');
-const adminCommands  = ['транс', 'товар'];
+const adminCommands  = [
+    'транс',
+    'товар'
+];
 
 tg.before(function (updates, cb) {
 
     let command = updates._message.text.split(' ')[0];
 
-    if (adminCommands.includes(command) && adminUsernames.includes(updates._message._from._username)) {
+    if (adminCommands.includes(command) && adminUsernames.includes(updates._message._from._username)) {console.log(command);
         cb(true);
     } else {
         cb(false);
@@ -26,5 +29,5 @@ tg.before(function (updates, cb) {
 tg.router
     .when([
         'транс',
-        'товар'
+        'товар :arg1'
     ], new AdminController());
