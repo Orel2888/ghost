@@ -7,15 +7,15 @@ const AdminController = require('./AdminController');
 
 const adminUsernames = config.get('TGBOT_ADMINS').split(',');
 const adminCommands  = [
-    'транс',
-    'товар'
+    '/транс',
+    '/товар'
 ];
 
 tg.before(function (updates, cb) {
 
     let command = updates._message.text.split(' ')[0];
 
-    if (adminCommands.includes(command) && adminUsernames.includes(updates._message._from._username)) {console.log(command);
+    if (adminCommands.includes(command) && adminUsernames.includes(updates._message._from._username)) {
         cb(true);
     } else {
         cb(false);
@@ -28,6 +28,7 @@ tg.before(function (updates, cb) {
  */
 tg.router
     .when([
-        'транс',
-        'товар'
+        '/транс',
+        '/товар взять :arg1',
+        '/товар'
     ], new AdminController());

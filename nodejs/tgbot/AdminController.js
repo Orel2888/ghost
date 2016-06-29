@@ -97,23 +97,25 @@ class AdminController extends TelegramBaseController {
 
             if (!auth) return;
 
-            switch ($.query.argument) {
-
-                case 'взять':
-                    console.log('YYYESS')
-                break;
-
-                default:
-                    responseGoodsPrice();
-            }
+            responseGoodsPrice();
 
         }).catch(console.log)
     }
 
+    goodsPurchase($) {
+
+        $.checkAuth.then(auth => {
+            if (!auth) return;
+
+            console.log('Selected goods id: %s', $.userSession.goodsPrice.get(parseInt($.query.arg1)));
+        })
+    }
+
     get routes() {
         return {
-            'транс': 'transHandle',
-            'товар': 'goodsPriceHandle'
+            '/транс': 'transHandle',
+            '/товар': 'goodsPriceHandle',
+            '/товар взять :arg1': 'goodsPurchase'
         };
     }
 }
