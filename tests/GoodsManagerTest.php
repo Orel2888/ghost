@@ -107,4 +107,13 @@ class GoodsManagerTest extends TestCase
         $goodsPrice->delete();
         $goodsPriceReserved->delete();
     }
+
+    public function test_parse_addresses()
+    {
+        $text = file_get_contents(storage_path('app/goods'));
+
+        $matches = $this->goodsManager->parseAddreses($text);
+
+        $this->assertNotEmpty($matches);
+    }
 }

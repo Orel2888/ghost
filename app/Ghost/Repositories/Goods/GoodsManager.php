@@ -80,4 +80,16 @@ class GoodsManager extends Goods
 
         return $goodsPrice;
     }
+
+    public function addGoodsPriceFromText()
+    {
+
+    }
+
+    public function parseAddreses($text)
+    {
+        preg_match_all('/\w\)\s?(.*)/', $text, $matches);
+
+        return $matches[1];
+    }
 }
