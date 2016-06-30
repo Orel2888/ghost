@@ -27,7 +27,7 @@ class AdminApiController extends BaseApiController
         $goods = [];
 
         foreach ($goodsPrice as $item) {
-            $goods[$item->goods->city->name][$item->goods->name][round($item->goods->weight, 1)] = array_merge(array_only($item->getAttributes(), ['id', 'goods_id', 'miner_id', 'weight', 'address', 'reserve', 'cost', 'created_at', 'updated_at']), [
+            $goods[$item->goods->city->name][$item->goods->name][round($item->weight, 1)][] = array_merge(array_only($item->getAttributes(), ['id', 'goods_id', 'miner_id', 'weight', 'address', 'reserve', 'cost', 'created_at', 'updated_at']), [
                 'city_name'     => $item->goods->city->name,
                 'goods_name'    => $item->goods->name,
                 'address'       => $item->address
