@@ -78,6 +78,15 @@ class ApiAdminMethodsTest extends TestCase
         
         $this->assertEquals(200, $response->getStatusCode());
 
+        $someGoodsPrice = array_map(function ($item) {
+            return $item->id;
+        }, array_slice(static::$database['goods_price'], 0, 3));
+
+        $response = $this->call('POST', 'api/admin/goods-price/purchase', [
+            'access_token'      => static::$container['access_token'],
+            'goods_price_id'    => implode(',', $someGoodsPrice)
+        ]);
+
         $this->removeData();
     }
 

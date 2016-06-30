@@ -6,6 +6,7 @@ use App\QiwiTransaction;
 use App\GoodsPrice;
 use App\GoodsPurchase;
 use Validator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AdminApiController extends BaseApiController
 {
@@ -26,7 +27,7 @@ class AdminApiController extends BaseApiController
         $goods = [];
 
         foreach ($goodsPrice as $item) {
-            $goods[$item->goods->city->name][$item->goods->name][] = array_merge(array_only($item->getAttributes(), ['id', 'goods_id', 'miner_id', 'weight', 'address', 'reserve', 'cost', 'created_at', 'updated_at']), [
+            $goods[$item->goods->city->name][$item->goods->name][round($item->goods->weight, 1)] = array_merge(array_only($item->getAttributes(), ['id', 'goods_id', 'miner_id', 'weight', 'address', 'reserve', 'cost', 'created_at', 'updated_at']), [
                 'city_name'     => $item->goods->city->name,
                 'goods_name'    => $item->goods->name,
                 'address'       => $item->address
@@ -39,25 +40,32 @@ class AdminApiController extends BaseApiController
     public function getGoodsPricePurchase()
     {
         $valid = Validator::make($this->request->all(), [
-            'goods_price_id'    => 'required|numeric'
+            'goods_price_id'    => 'required'
         ]);
 
         if ($valid->fails()) {
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        $goodsPrice = GoodsPrice::whereId($this->request->input('goods_price_id'))->first();
+        $goodsPriceIds = explode(',', $this->request->input('goods_price_id'));
 
-        if (is_null($goodsPrice)) {
-            return response()->json($this->apiResponse->fail(['message' => 'goods_price_id not found']), 404);
+        try {
+            $goodsPrice = GoodsPrice::findOrFail($goodsPriceIds);
+        } catch (ModelNotFoundException $e) {
+            return response()->json($this->apiResponse->fail(['message' => 'Не удалось выбрать заданные товары']), 400);
         }
 
-        $goodsPrice->delete();
+        $purchases = [];
 
-        $purchase = GoodsPurchase::create(array_only($goodsPrice->getAttributes(), ['goods_id', 'weight', 'miner_id', 'address', 'cost']) + [
-            'city_id'   => $goodsPrice->goods->city->id
-        ]);
+        foreach ($goodsPrice as $item) {
 
-        return response()->json($this->apiResponse->ok(['data' => $purchase->toArray()]));
+            $purchases[] = GoodsPurchase::create(array_only($item->getAttributes(), ['goods_id', 'weight', 'miner_id', 'address', 'cost']) + [
+                    'city_id'   => $item->goods->city->id
+            ])->toArray();
+
+            $item->delete();
+        }
+
+        return response()->json($this->apiResponse->ok(['data' => $purchases]));
     }
 }
