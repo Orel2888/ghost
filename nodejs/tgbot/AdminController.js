@@ -125,7 +125,7 @@ class AdminController extends TelegramBaseController {
                 response.data.forEach((item, index) => {
                     let message = `${++index}) ⚖ ${parseFloat(item.weight).toFixed(1)}, ${item.address}`;
 
-                    $.sendMessage(message);
+                    $.sendMessage(message)
                 })
             });
         };
