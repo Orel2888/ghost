@@ -134,7 +134,7 @@ class AdminController extends TelegramBaseController {
 
             if (!auth) return;
 
-            parchase();
+            parchase()
         })
     }
 
