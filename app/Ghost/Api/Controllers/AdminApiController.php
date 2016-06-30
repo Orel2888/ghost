@@ -59,8 +59,9 @@ class AdminApiController extends BaseApiController
 
         foreach ($goodsPrice as $item) {
 
-            $purchases[] = GoodsPurchase::create(array_only($item->getAttributes(), ['goods_id', 'weight', 'miner_id', 'address', 'cost']) + [
-                    'city_id'   => $item->goods->city->id
+            $purchases[] = GoodsPurchase::create(array_only($item->getAttributes(), ['goods_id', 'weight', 'miner_id', 'cost']) + [
+                    'city_id'   => $item->goods->city->id,
+                    'address'   => $item->address
             ])->toArray();
 
             $item->delete();
