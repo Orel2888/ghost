@@ -79,11 +79,18 @@ class AdminController extends TelegramBaseController {
                     for (let goodsName in response.data[city]) {
                         message += `  🍗 ${goodsName}\n`;
 
-                        for (let goods of response.data[city][goodsName]) {
-                            message += `${++goodsIndex}) ${goods.weight}, ${goods.address}\n`;
+                        let goodsWeights = Object.keys(response.data[city][goodsName]);
 
-                            goodsSession.set(goodsIndex, goods.id);
-                        }
+                        goodsWeights.forEach((goodsWeight, index) => {
+                            let goodsItems = response.data[city][goodsName][goodsWeight];
+
+                            goodsItems.forEach((goods, index) => {
+                                message += `${++goodsIndex}) ${goods.weight}, ${goods.address}\n`;
+
+                                goodsSession.set(goodsIndex, goods.id);
+                            })
+                        })
+
                     }
                 }
 
@@ -104,10 +111,28 @@ class AdminController extends TelegramBaseController {
 
     goodsPurchase($) {
 
+        let parchase = () => {
+
+            let goodsPriceIds = $.query.arg1.split(',').map((item, index) => {
+                return $.userSession.goodsPrice.get(parseInt(item));
+            });
+
+            return this.ghostApi.api('admin/goods-price/purchase', 'POST', {
+                goods_price_id: goodsPriceIds.join(',')
+            }).then(response => {
+                response.data.forEach((item, index) => {
+                    let message = `${++index}) ⚖ ${item.weight}, ${item.address}`;
+
+                    $.sendMessage(message);
+                })
+            });
+        };
+
         $.checkAuth.then(auth => {
+
             if (!auth) return;
 
-            console.log('Selected goods id: %s', $.userSession.goodsPrice.get(parseInt($.query.arg1)));
+            parchase();
         })
     }
 
