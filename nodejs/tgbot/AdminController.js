@@ -82,10 +82,12 @@ class AdminController extends TelegramBaseController {
                         let goodsWeights = Object.keys(response.data[city][goodsName]);
 
                         goodsWeights.forEach((goodsWeight, index) => {
+                            message += `  ⚖ ${goodsWeight}\n`;
+
                             let goodsItems = response.data[city][goodsName][goodsWeight];
 
                             goodsItems.forEach((goods, index) => {
-                                message += `${++goodsIndex}) ${goods.weight}, ${goods.address}\n`;
+                                message += `${++goodsIndex}) ${parseFloat(goods.weight).toFixed(1)}, ${goods.address}\n`;
 
                                 goodsSession.set(goodsIndex, goods.id);
                             })
@@ -121,7 +123,7 @@ class AdminController extends TelegramBaseController {
                 goods_price_id: goodsPriceIds.join(',')
             }).then(response => {
                 response.data.forEach((item, index) => {
-                    let message = `${++index}) ⚖ ${item.weight}, ${item.address}`;
+                    let message = `${++index}) ⚖ ${parseFloat(item.weight).toFixed(1)}, ${item.address}`;
 
                     $.sendMessage(message);
                 })
