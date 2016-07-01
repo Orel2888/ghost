@@ -13,7 +13,7 @@ class GoodsOrdersRenameGoodId extends Migration
     public function up()
     {
         Schema::table('goods_orders', function (Blueprint $table) {
-            $table->dropIndex('goods_orders_good_price_id_foreign');
+            $table->dropForeign('goods_orders_good_price_id_foreign');
             $table->renameColumn('good_price_id', 'goods_price_id');
 
             $table->foreign('goods_price_id')
