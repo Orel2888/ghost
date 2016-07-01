@@ -32,7 +32,7 @@ class AuthenticateApiController extends BaseApiController
         if (!is_null($tgUsername)) {
             // Authenticate admin
             if (!$auth = $this->apiGuard->authenticateAdmin($this->request->input('key'), $tgUsername)) {
-                $this->apiResponse->fail(['message' => 'Unauthorized'])->setStatusCode(401);
+                return response()->json($this->apiResponse->fail(['message' => 'Unauthorized']), 401);
             }
         } else {
             if (!$auth = $this->apiGuard->authenticate($this->request->input('key'))) {

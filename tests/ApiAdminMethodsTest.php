@@ -26,6 +26,10 @@ class ApiAdminMethodsTest extends TestCase
 
     public function test_authenticate()
     {
+        $response = $this->call('POST', 'api/authenticate/some', ['key' => env('API_KEY')]);
+
+        $this->assertEquals(401, $response->getStatusCode());
+
         $admin = Admin::create([
             'login' => 'Vasechka'
         ]);
