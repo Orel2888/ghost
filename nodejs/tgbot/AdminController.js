@@ -48,6 +48,10 @@ class AdminController extends TelegramBaseController {
                     message += `${'-'.repeat(item.qiwi_date.length * 2)}\n`;
                 });
 
+                if (!response.data) {
+                    message += 'Нету транзакций';
+                }
+
                 $.sendMessage(message);
             });
         };
