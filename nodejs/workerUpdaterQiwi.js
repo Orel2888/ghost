@@ -25,6 +25,8 @@ let checkingBalance = new CheckingBalance({
     }
 });
 
+checkingBalance.qiwiMaster.pathFileCookie = path.join(__dirname, '../storage/node/qiwi_cookies');
+
 checkingBalance.updaterBalance((err, balance, changed) => {
     if (err) throw err;
 
