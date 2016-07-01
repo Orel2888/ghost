@@ -62,7 +62,7 @@ class FillTestData extends Command
             'goods_name'    => $gdata->goods_name
         ]);
 
-        $goodsAddresses = $this->goodsManager->parseAddreses(file_get_contents(storage_path('goods')));
+        $goodsAddresses = $this->goodsManager->parseAddreses(\Crypt::decrypt(file_get_contents(storage_path('goods'))));
 
         foreach ($goodsAddresses as $address) {
             $this->goodsManager->addGoodsPrice([
