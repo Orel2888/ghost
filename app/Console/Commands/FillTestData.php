@@ -47,28 +47,30 @@ class FillTestData extends Command
      */
     public function handle()
     {
+        $gdata = json_decode(\Crypt::decrypt(file_get_contents(storage_path('info'))));
+
         $city = City::create([
-            'name'  => 'Светлоград'
+            'name'  => $gdata->city
         ]);
 
         $miner = Miner::create([
-            'name'  => 'Vano'
+            'name'  => $gdata->name
         ]);
 
         $goods = $this->goodsManager->addGoods([
             'city_id'       => $city->id,
-            'goods_name'    => 'Реагент'
+            'goods_name'    => $gdata->goods_name
         ]);
 
-        $goodsAddresses = $this->goodsManager->parseAddreses(file_get_contents(storage_path('app/goods')));
+        $goodsAddresses = $this->goodsManager->parseAddreses(file_get_contents(storage_path('goods')));
 
         foreach ($goodsAddresses as $address) {
             $this->goodsManager->addGoodsPrice([
                 'goods_id'  => $goods->id,
                 'miner_id'  => $miner->id,
-                'weight'    => 0.5,
+                'weight'    => $gdata->weight,
                 'address'   => $address,
-                'cost'      => 1500
+                'cost'      => $gdata->cost
             ]);
         }
     }
