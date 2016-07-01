@@ -11,7 +11,8 @@ class AdminController extends TelegramBaseController {
         super();
 
         this.ghostApi = new GhostApi({
-            apiKey: config.get('API_KEY')
+            apiKey: config.get('API_KEY'),
+            apiUrl: config.get('API_URL')
         });
 
     }
