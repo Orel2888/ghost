@@ -14,7 +14,7 @@ class FillTestData extends Command
      *
      * @var string
      */
-    protected $signature = 'fill_test_data';
+    protected $signature = 'fill_test_data {type}';
 
     /**
      * The console command description.
@@ -47,31 +47,53 @@ class FillTestData extends Command
      */
     public function handle()
     {
-        $gdata = json_decode(\Crypt::decrypt(file_get_contents(storage_path('info'))));
+        if ($this->argument('type') == 'fill') {
 
-        $city = City::create([
-            'name'  => $gdata->city
-        ]);
+            $datas = json_decode(\Crypt::decrypt(file_get_contents(storage_path('goods_test'))), true);
 
-        $miner = Miner::create([
-            'name'  => $gdata->name
-        ]);
+            $cities = $datas['cities'];
+            $goodsTypes = $datas['goods_types'];
+            $miners = $datas['miners'];
+            $goodsStock = $datas['goods_stock'];
 
-        $goods = $this->goodsManager->addGoods([
-            'city_id'       => $city->id,
-            'goods_name'    => $gdata->goods_name
-        ]);
+            foreach ($miners as $minerName) {
+                Miner::create([
+                    'name'  => $minerName
+                ]);
+            }
 
-        $goodsAddresses = $this->goodsManager->parseAddreses(\Crypt::decrypt(file_get_contents(storage_path('goods'))));
+            foreach ($cities as $city) {
 
-        foreach ($goodsAddresses as $address) {
-            $this->goodsManager->addGoodsPrice([
-                'goods_id'  => $goods->id,
-                'miner_id'  => $miner->id,
-                'weight'    => $gdata->weight,
-                'address'   => $address,
-                'cost'      => $gdata->cost
-            ]);
+                $city = City::create([
+                    'name'  => $city
+                ]);
+
+                foreach ($goodsTypes as $goodsType) {
+                    $goods = $this->goodsManager->addGoods([
+                        'city_id'       => $city->id,
+                        'goods_name'    => $goodsType
+                    ]);
+
+                    foreach ($goodsStock[$goodsType] as $goodsItem) {
+                        $this->goodsManager->addGoodsPrice([
+                            'goods_id'  => $goods->id,
+                            'miner_id'  => Miner::where('name', $goodsItem['miner'])->first()->id,
+                            'weight'    => $goodsItem['weight'],
+                            'address'   => $goodsItem['address'],
+                            'cost'      => $goodsItem['cost']
+                        ]);
+                    }
+                }
+            }
+
+            $this->info('OK');
+        }
+
+        if ($this->argument('type') == 'flush') {
+            \DB::statement('DELETE FROM citys');
+            \DB::statement('DELETE FROM miners');
+
+            $this->info('OK');
         }
     }
 }
