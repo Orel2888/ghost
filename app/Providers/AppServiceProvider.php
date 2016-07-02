@@ -28,5 +28,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->extend('Illuminate\Contracts\Routing\ResponseFactory', function ($factory, $app) {
             return new ExtendedResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);
         });
+
+        require app_path('Ghost/Support/helpers.php');
     }
 }
