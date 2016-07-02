@@ -48,7 +48,7 @@ class AdminApiController extends BaseApiController
         if ($valid->fails()) {
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
-        
+
         $goodsPriceIds = explode(',', $this->request->input('goods_price_id'));
 
         try {
@@ -61,9 +61,10 @@ class AdminApiController extends BaseApiController
 
         foreach ($goodsPrice as $item) {
 
-            $purchases[] = GoodsPurchase::create(array_only($item->getAttributes(), ['goods_id', 'weight', 'miner_id', 'cost']) + [
+            $purchases[] = GoodsPurchase::create(array_only($item->getAttributes(), ['goods_id', 'miner_id', 'cost']) + [
                     'city_id'   => $item->goods->city->id,
-                    'address'   => $item->address
+                    'address'   => $item->address,
+                    'weight'    => wcorrect($item->weight)
             ])->toArray();
 
             $item->delete();
