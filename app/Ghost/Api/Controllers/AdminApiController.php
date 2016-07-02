@@ -92,8 +92,9 @@ class AdminApiController extends BaseApiController
 
                     foreach ($goodsTypeWeights as $goodsWeight) {
                         $weight = $goodsWeight->weight;
+                        $weightCount = $goodsType->goodsPrice()->whereWeight($weight)->count();
 
-                        $goodsAvailable[$city->name][$goodsType->name][wcorrect($weight)] = $goodsType->goodsPrice()->whereWeight($weight)->count();
+                        $goodsAvailable[$city->name][$goodsType->name][wcorrect($weight)] = $weightCount;
                     }
                 }
             }
