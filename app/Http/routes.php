@@ -34,6 +34,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
     Route::group(['prefix' => 'admin'], function () {
         Route::get('qiwi-transaction', 'AdminApiController@getQiwiTransaction');
         Route::post('goods-price/purchase', 'AdminApiController@getGoodsPricePurchase');
+        Route::get('goods-price/available', 'AdminApiController@getGoodsPriceAvailable');
         Route::get('goods-price', 'AdminApiController@getGoodsPrice');
     });
 

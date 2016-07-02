@@ -94,6 +94,21 @@ class ApiAdminMethodsTest extends TestCase
         $this->removeData();
     }
 
+    public function test_goods_price_available()
+    {
+        $this->createData();
+
+        $response = $this->call('GET', 'api/admin/goods-price/available', [
+            'access_token'      => static::$container['access_token']
+        ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $this->assertNotEmpty(json_decode($response->getContent())->data);
+
+        $this->removeData();
+    }
+
     public function test_end()
     {
         $this->cacheFlush();

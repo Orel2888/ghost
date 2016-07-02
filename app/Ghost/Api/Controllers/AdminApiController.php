@@ -5,6 +5,7 @@ namespace App\Ghost\Api\Controllers;
 use App\QiwiTransaction;
 use App\GoodsPrice;
 use App\GoodsPurchase;
+use App\City;
 use Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -27,7 +28,7 @@ class AdminApiController extends BaseApiController
         $goods = [];
 
         foreach ($goodsPrice as $item) {
-            $goods[$item->goods->city->name][$item->goods->name][(string)round($item->weight, 1)][] = array_merge(array_only($item->getAttributes(), ['id', 'goods_id', 'miner_id', 'weight', 'address', 'reserve', 'cost', 'created_at', 'updated_at']), [
+            $goods[$item->goods->city->name][$item->goods->name][wcorrect($item->weight)][] = array_merge(array_only($item->getAttributes(), ['id', 'goods_id', 'miner_id', 'weight', 'address', 'reserve', 'cost', 'created_at', 'updated_at']), [
                 'city_name'     => $item->goods->city->name,
                 'goods_name'    => $item->goods->name,
                 'address'       => $item->address
@@ -68,5 +69,34 @@ class AdminApiController extends BaseApiController
         }
 
         return response()->json($this->apiResponse->ok(['data' => $purchases]));
+    }
+
+    public function getGoodsPriceAvailable()
+    {
+        $goodsAvailable = [];
+
+        $cities = City::with('goods.goodsPrice')->get();
+
+        foreach ($cities as $city) {
+            if ($city->goods->count()) {
+                $goodsAvailable[$city->name] = [];
+
+                $cityGoods = $city->goods;
+
+                foreach ($cityGoods as $goodsType) {
+                    $goodsAvailable[$city->name][$goodsType->name] = [];
+
+                    $goodsTypeWeights = $goodsType->goodsPrice()->groupBy('weight')->get();
+
+                    foreach ($goodsTypeWeights as $goodsWeight) {
+                        $weight = $goodsWeight->weight;
+
+                        $goodsAvailable[$city->name][$goodsType->name][wcorrect($weight)] = $goodsType->goodsPrice()->whereWeight($weight)->count();
+                    }
+                }
+            }
+        }
+
+        return response()->json($this->apiResponse->ok(['data' => $goodsAvailable]));
     }
 }
