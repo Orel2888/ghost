@@ -95,5 +95,25 @@ class FillTestData extends Command
 
             $this->info('OK');
         }
+
+        if ($this->argument('type') == 'newgoods') {
+
+            $goods = $this->goodsManager->addGoods([
+                'city_id'       => 3,
+                'goods_name'    => 'Ск'
+            ]);
+
+            $goodsPrice = $this->goodsManager->parseAddreses(file_get_contents(storage_path('newgoods')));
+
+            foreach ($goodsPrice as $address) {
+                $this->goodsManager->addGoodsPrice([
+                    'goods_id'  => $goods->id,
+                    'miner_id'  => 2,
+                    'weight'    => 0.33,
+                    'address'   => $address,
+                    'cost'      => 1000
+                ]);
+            }
+        }
     }
 }
