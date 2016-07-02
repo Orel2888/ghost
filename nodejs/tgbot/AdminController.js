@@ -92,7 +92,7 @@ class AdminController extends TelegramBaseController {
                             let goodsItems = response.data[city][goodsName][goodsWeight];
 
                             goodsItems.forEach((goods, index) => {
-                                message += `${++goodsIndex}) ${parseFloat(goods.weight).toFixed(1)}, ${goods.address}\n`;
+                                message += `${++goodsIndex}) ${goods.weight}, ${goods.address}\n`;
 
                                 goodsSession.set(goodsIndex, goods.id);
                             })
@@ -128,7 +128,7 @@ class AdminController extends TelegramBaseController {
                 goods_price_id: goodsPriceIds.join(',')
             }).then(response => {
                 response.data.forEach((item, index) => {
-                    let message = `${++index}) ⚖ ${parseFloat(item.weight).toFixed(1)}, ${item.address}`;
+                    let message = `${++index}) ⚖ ${item.weight}, ${item.address}`;
 
                     $.sendMessage(message)
                 })
@@ -143,11 +143,55 @@ class AdminController extends TelegramBaseController {
         })
     }
 
+    goodsPriceAvailableHandle($) {
+
+        let responseGoodsAvailable = () => {
+            this.ghostApi.api('admin/goods-price/available').then(response => {
+
+                if (!Object.keys(response.data).length) {
+                    return $.sendMessage('В наличии ничего нет');
+                }
+
+                var message = 'Товар в наличии\n\n';
+
+                let cities = Object.keys(response.data);
+
+                for (let city of cities) {
+                    message += `🏡 ${city}\n`;
+
+                    let goodsTypes = Object.keys(response.data[city]);
+
+                    for (let goodsType of goodsTypes) {
+                        message += `  🍗 ${goodsType}\n`;
+
+                        let weights = Object.keys(response.data[city][goodsType]);
+
+                        for (let weight of weights) {
+                            message += `  ⚖ ${weight} - ${response.data[city][goodsType][weight]}\n`;
+                        }
+                    }
+                }
+
+                $.sendMessage(message);
+
+            }).catch(console.log)
+        }
+
+        $.checkAuth.then(auth => {
+
+            if (!auth) return;
+
+            responseGoodsAvailable();
+
+        }).catch(console.log)
+    }
+
     get routes() {
         return {
             '/транс': 'transHandle',
             '/товар': 'goodsPriceHandle',
-            '/товар взять :arg1': 'goodsPurchase'
+            '/товар взять :arg1': 'goodsPurchase',
+            '/наличие': 'goodsPriceAvailableHandle'
         };
     }
 }
