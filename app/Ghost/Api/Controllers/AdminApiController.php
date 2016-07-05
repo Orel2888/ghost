@@ -86,15 +86,17 @@ class AdminApiController extends BaseApiController
                 $cityGoods = $city->goods;
 
                 foreach ($cityGoods as $goodsType) {
-                    $goodsAvailable[$city->name][$goodsType->name] = [];
-
                     $goodsTypeWeights = $goodsType->goodsPrice()->groupBy('weight')->get();
 
-                    foreach ($goodsTypeWeights as $goodsWeight) {
-                        $weight = $goodsWeight->weight;
-                        $weightCount = $goodsType->goodsPrice()->whereWeight($weight)->count();
+                    if ($goodsTypeWeights->count()) {
+                        $goodsAvailable[$city->name][$goodsType->name] = [];
 
-                        $goodsAvailable[$city->name][$goodsType->name][wcorrect($weight)] = $weightCount;
+                        foreach ($goodsTypeWeights as $goodsWeight) {
+                            $weight = $goodsWeight->weight;
+                            $weightCount = $goodsType->goodsPrice()->whereWeight($weight)->count();
+
+                            $goodsAvailable[$city->name][$goodsType->name][wcorrect($weight)] = $weightCount;
+                        }
                     }
                 }
             }
