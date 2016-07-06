@@ -186,12 +186,35 @@ class AdminController extends TelegramBaseController {
         }).catch(console.log)
     }
 
+    adminHelpHandle($) {
+
+        let responseHelpMessage = () => {
+            let message = 'Помощь по командам\n\n';
+
+            message += '/транс - возвращает список последних 10-ти транзакций по киви кошельку\n';
+            message += '/товар - возвращает список товаров по городам\n';
+            message += '/товар взять {номер} - возвращает товар по номеру (без скобок), удаляя его из списка товар. Для выбора нескольких товаров, перечислить номера через запятую 1,2,3\n';
+            message += '/наличие - возвращает список товара в наличии по городам\n';
+            message += '/админ помощь - описание по командам\n';
+
+            $.sendMessage(message);
+        }
+
+        $.checkAuth.then(auth => {
+
+            if (!auth) return;
+
+            responseHelpMessage();
+        }).catch(console.log)
+    }
+
     get routes() {
         return {
             '/транс': 'transHandle',
             '/товар': 'goodsPriceHandle',
             '/товар взять :arg1': 'goodsPurchase',
-            '/наличие': 'goodsPriceAvailableHandle'
+            '/наличие': 'goodsPriceAvailableHandle',
+            '/админ помощь': 'adminHelpHandle'
         };
     }
 }

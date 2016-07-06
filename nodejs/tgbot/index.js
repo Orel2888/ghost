@@ -9,7 +9,9 @@ const adminUsernames = config.get('TGBOT_ADMINS').split(',');
 const adminCommands  = [
     '/транс',
     '/товар',
-    '/наличие'
+    '/наличие',
+    '/админ',
+    '/кош'
 ];
 
 tg.before(function (updates, cb) {
@@ -32,5 +34,7 @@ tg.router
         '/транс',
         '/товар взять :arg1',
         '/товар',
-        '/наличие'
+        '/наличие',
+        '/админ помощь',
+        '/кош'
     ], new AdminController());
