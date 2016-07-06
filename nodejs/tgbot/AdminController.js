@@ -4,6 +4,7 @@ const Telegram = require('telegram-node-bot');
 const TelegramBaseController = Telegram.TelegramBaseController;
 const config = require('../config');
 const GhostApi = require('../ghost-api/GhostApi');
+const emoji = require('node-emoji');
 
 class AdminController extends TelegramBaseController {
 
@@ -195,6 +196,8 @@ class AdminController extends TelegramBaseController {
             message += '/товар - возвращает список товаров по городам\n';
             message += '/товар взять {номер} - возвращает товар по номеру (без скобок), удаляя его из списка товар. Для выбора нескольких товаров, перечислить номера через запятую 1,2,3\n';
             message += '/наличие - возвращает список товара в наличии по городам\n';
+            message += '/кош - возвращает список кошельков и баланс, помеченный галочкой, текущий\n';
+            message += '/кош выбрать {номер} - установить кошелек как основной для приема средств\n';
             message += '/админ помощь - описание по командам\n';
 
             $.sendMessage(message);
@@ -205,6 +208,66 @@ class AdminController extends TelegramBaseController {
             if (!auth) return;
 
             responseHelpMessage();
+
+        }).catch(console.log)
+    }
+
+    purseHandle($) {
+
+        let responsePurseList = () => {
+            this.ghostApi.api('admin/purse').then(response => {
+
+                if (!response.data.length) {
+                    return $.sendMessage('Нет кошельков');
+                }
+
+                var purseSession = new Map();
+                var message = 'Список кошельков и баланс\n';
+
+                response.data.forEach((item, index) => {
+                    message += `${++index}) ${item.selected == 1 ? emoji.emojify(':white_check_mark:') : ''} ${item.phone} `;
+                    message += `${emoji.emojify(':dollar:')} ${item.balance}\n`;
+
+                    purseSession.set(index, item.id);
+                });
+
+                $.userSession.purse = purseSession;
+
+                $.sendMessage(message);
+            });
+        }
+
+        $.checkAuth.then(auth => {
+
+            if (!auth) return;
+
+            responsePurseList();
+
+        }).catch(console.log)
+    }
+
+    purseSelectHandle($) {
+
+        let changePurse = () => {
+            let id = $.userSession.purse.get(parseInt($.query.arg1));
+
+            if (!id) {
+                return $.sendMessage('Неверный выбор');
+            }
+
+            return this.ghostApi.api('admin/purse/set', 'POST', {
+                id
+            }).then(response => {
+                return $.sendMessage('Кошелек изменен');
+            });
+        }
+
+        $.checkAuth.then(auth => {
+
+            if (!auth) return;
+
+            changePurse()
+
         }).catch(console.log)
     }
 
@@ -214,7 +277,9 @@ class AdminController extends TelegramBaseController {
             '/товар': 'goodsPriceHandle',
             '/товар взять :arg1': 'goodsPurchase',
             '/наличие': 'goodsPriceAvailableHandle',
-            '/админ помощь': 'adminHelpHandle'
+            '/админ помощь': 'adminHelpHandle',
+            '/кош': 'purseHandle',
+            '/кош выбрать :arg1': 'purseSelectHandle'
         };
     }
 }
