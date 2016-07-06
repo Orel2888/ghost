@@ -141,7 +141,7 @@ class ApiAdminMethodsTest extends TestCase
             'access_token'  => static::$container['access_token'],
             'id'    => static::$container['purse_id']
         ]);
-        
+
         $this->assertEquals(200, $response->getStatusCode());
 
         Purse::find(static::$container['purse_id'])->delete();
