@@ -116,7 +116,7 @@ class AdminApiController extends BaseApiController
     public function postPurseSet()
     {
         $valid = Validator::make($this->request->all(), [
-            'id'    => 'required|num'
+            'id'    => 'required|integer'
         ]);
 
         if ($valid->fails()) {
@@ -125,9 +125,11 @@ class AdminApiController extends BaseApiController
 
         Purse::whereSelected(1)->update(['selected' => 0]);
 
-        $purse = Purse::find($this->request->input('id'))->update(['selected' => 1]);
-        
-        file_put_contents(storage_path('node/purse.txt'), $purse->phone);
+        $purse = Purse::find($this->request->input('id'));
+
+        $purse->update(['selected' => 1]);
+
+        file_put_contents(storage_path('node/purse.txt'), $purse->phone .'|'. $purse->pass);
 
         return response()->json($this->apiResponse->ok());
     }

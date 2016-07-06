@@ -14,7 +14,7 @@ class CreatePurses extends Migration
     {
         Schema::create('purses', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('phone');
+            $table->bigInteger('phone');
             $table->string('pass');
             $table->decimal('balance');
             $table->unsignedInteger('selected');
