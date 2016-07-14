@@ -17,6 +17,31 @@ Route::group(['middleware' => 'web'], function () {
     });
 });
 
+Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controllers', 'prefix' => 'apanel'], function () {
+
+    Route::group(['middleware' => ['auth.admin']], function () {
+        Route::get('/', 'ApanelController@getIndex');
+
+        Route::get('goods/addcity', 'ApanelGoodsController@getAddCity');
+        Route::post('goods/addcity', 'ApanelGoodsController@postAddCity');
+
+        Route::get('goods/addgoods-price', 'ApanelGoodsController@getAddGoodsPrice');
+        Route::post('goods/addgoods-price', 'ApanelGoodsController@postAddGoodsPrice');
+
+        Route::get('goods/addgoods', 'ApanelGoodsController@getAddGoods');
+        Route::post('goods/addgoods', 'ApanelGoodsController@postAddGoods');
+
+        Route::get('goods', 'ApanelGoodsController@getIndex');
+        Route::get('goods-price', 'ApanelGoodsController@getGoodsPrice');
+
+        Route::get('notebook', 'ApanelNotebookController@getIndex');
+        Route::post('notebook-save', 'ApanelNotebookController@postSave');
+    });
+
+    Route::get('login', 'ApanelAuthController@getLogin');
+    Route::post('login', 'ApanelAuthController@postLogin');
+});
+
 Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], function () {
 
     Route::post('authenticate/check-access-token', 'AuthenticateApiController@postCheckAccessToken');
