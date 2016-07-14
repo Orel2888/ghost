@@ -8,9 +8,6 @@ use App\Ghost\Repositories\Goods\GoodsReserve as RepoGoodsReserve;
 
 class GoodsManager extends Goods
 {
-    private $cityAddGoodsName;
-    private $cityAddGoodsId;
-
     /**
      * @var GoodsReserve
      */
@@ -36,25 +33,16 @@ class GoodsManager extends Goods
      */
     public function addGoods(array $attributes)
     {
-        if (!isset($attributes['goods_name']) && !isset($attributes['city_id'])
-            || !isset($attributes['goods_name']) && !isset($attributes['city_name'])
-            || isset($attributes['city_name']) && isset($attributes['city_id'])) {
-            throw new InvalidArgumentException('Required goods_name and city_id or goods_name and city_name');
-        }
+        $attributesRequired = [
+            'goods_name',
+            'city_id'
+        ];
 
-        if ($this->cityAddGoodsName && isset($attributes['city_name']) && $this->cityAddGoodsName != $attributes['city_name']) {
-            $this->cityAddGoodsId = $this->getCityId($attributes['city_name']);
-        }
-        if ($this->cityAddGoodsId && isset($attributes['city_id']) && $this->cityAddGoodsId != $attributes['city_id']) {
-            $this->cityAddGoodsId = $this->getCityId($attributes['city_id']);
-        }
-        if (!$this->cityAddGoodsName && !$this->cityAddGoodsId) {
-            $this->cityAddGoodsId = isset($attributes['city_id']) ? $this->getCityId($attributes['city_id']) : $this->getCityId($attributes['city_name']);
-        }
+        $this->checkRequiredAttributesArray($attributes, $attributesRequired);
 
         return $this->goods->create([
             'name'      => $attributes['goods_name'],
-            'city_id'   => $this->cityAddGoodsId
+            'city_id'   => $attributes['city_id']
         ]);
     }
 
@@ -81,12 +69,25 @@ class GoodsManager extends Goods
         return $goodsPrice;
     }
 
-    public function addGoodsPriceFromText()
+    /**
+     * Weights and counts
+     * @param $goodsId
+     * @return array [weight => integer(count)]
+     */
+    public function getGoodsWeightsAndCount($goodsId)
     {
+        $goodsWeights = $this->findGoods($goodsId)->goodsPrice()->groupBy('weight')->orderBy('weight', 'ASC')->get();
 
+        $goodsWeightsCounts = [];
+
+        foreach ($goodsWeights as $item) {
+            $goodsWeightsCounts[wcorrect($item->weight)] = $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($item->weight)->count();
+        }
+
+        return $goodsWeightsCounts;
     }
 
-    public function parseAddreses($text)
+    public function parseAddresses($text)
     {
         preg_match_all('/\w\)\s?(.*)/', $text, $matches);
 
