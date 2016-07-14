@@ -41,18 +41,12 @@ class GoodsManagerTest extends TestCase
     {
         $city = $this->createCity();
 
-        $goods1 = $this->goodsManager->addGoods([
-            'goods_name'    => 'Бананы',
-            'city_name'     => $city->name
-        ]);
-
-        $goods2 = $this->goodsManager->addGoods([
+        $goods = $this->goodsManager->addGoods([
             'goods_name'    => 'Апельсины',
             'city_id'       => $city->id
         ]);
 
-        $goods1->delete();
-        $goods2->delete();
+        $goods->delete();
         $city->delete();
     }
 
@@ -110,10 +104,20 @@ class GoodsManagerTest extends TestCase
 
     public function test_parse_addresses()
     {
-        $text = file_get_contents(storage_path('app/goods'));
+        $list = sprintf('1) The text%s2) The text%s3) The text', PHP_EOL, PHP_EOL);
 
-        $matches = $this->goodsManager->parseAddreses($text);
+        $matches = $this->goodsManager->parseAddresses($list);
 
         $this->assertNotEmpty($matches);
     }
+
+    public function test_goods_weights_and_count()
+    {
+        $city = $this->goodsManager->findCity('Светлоград');
+
+        $goods = $this->goodsManager->goods->where('city_id', $city->id)->first();
+
+        $this->assertEquals(3, count($this->goodsManager->getGoodsWeightsAndCount($goods->id)));
+    }
+
 }

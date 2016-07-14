@@ -19,32 +19,32 @@ abstract class Goods
     /**
      * @var GoodsModel
      */
-    protected $goods;
+    public $goods;
 
     /**
      * @var GoodsPrice
      */
-    protected $goodsPrice;
+    public $goodsPrice;
 
     /**
      * @var City
      */
-    protected $city;
+    public $city;
 
     /**
      * @var GoodsReserve
      */
-    protected $goodsReserve;
+    public $goodsReserve;
 
     /**
      * @var GoodsOrder
      */
-    protected $goodsOrder;
+    public $goodsOrder;
 
     /**
      * @var Client
      */
-    protected $client;
+    public $client;
 
     public function __construct()
     {

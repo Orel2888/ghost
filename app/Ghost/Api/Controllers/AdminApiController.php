@@ -6,6 +6,7 @@ use App\QiwiTransaction;
 use App\GoodsPrice;
 use App\GoodsPurchase;
 use App\City;
+use App\Purse;
 use Validator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -86,20 +87,50 @@ class AdminApiController extends BaseApiController
                 $cityGoods = $city->goods;
 
                 foreach ($cityGoods as $goodsType) {
-                    $goodsAvailable[$city->name][$goodsType->name] = [];
-
                     $goodsTypeWeights = $goodsType->goodsPrice()->groupBy('weight')->get();
 
-                    foreach ($goodsTypeWeights as $goodsWeight) {
-                        $weight = $goodsWeight->weight;
-                        $weightCount = $goodsType->goodsPrice()->whereWeight($weight)->count();
+                    if ($goodsTypeWeights->count()) {
+                        $goodsAvailable[$city->name][$goodsType->name] = [];
 
-                        $goodsAvailable[$city->name][$goodsType->name][wcorrect($weight)] = $weightCount;
+                        foreach ($goodsTypeWeights as $goodsWeight) {
+                            $weight = $goodsWeight->weight;
+                            $weightCount = $goodsType->goodsPrice()->whereWeight($weight)->count();
+
+                            $goodsAvailable[$city->name][$goodsType->name][wcorrect($weight)] = $weightCount;
+                        }
                     }
                 }
             }
         }
 
         return response()->json($this->apiResponse->ok(['data' => $goodsAvailable]));
+    }
+
+    public function getPurse()
+    {
+        $purses = Purse::orderBy('selected', 'DESC')->get();
+
+        return response()->json($this->apiResponse->ok(['data' => $purses]));
+    }
+
+    public function postPurseSet()
+    {
+        $valid = Validator::make($this->request->all(), [
+            'id'    => 'required|integer'
+        ]);
+
+        if ($valid->fails()) {
+            return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
+        }
+
+        Purse::whereSelected(1)->update(['selected' => 0]);
+
+        $purse = Purse::find($this->request->input('id'));
+
+        $purse->update(['selected' => 1]);
+
+        file_put_contents(storage_path('node/purse.txt'), $purse->phone .'|'. $purse->pass);
+
+        return response()->json($this->apiResponse->ok());
     }
 }

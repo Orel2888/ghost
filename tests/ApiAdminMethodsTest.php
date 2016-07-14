@@ -4,6 +4,7 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Container\Container;
+use App\Purse;
 use App\Admin;
 
 class ApiAdminMethodsTest extends TestCase
@@ -107,6 +108,43 @@ class ApiAdminMethodsTest extends TestCase
         $this->assertNotEmpty(json_decode($response->getContent())->data);
 
         $this->removeData();
+    }
+
+    public function test_get_purse()
+    {
+        $purse = Purse::create([
+            'phone' => 79887587475,
+            'pass'  => '2ws2ws',
+            'balance'   => 1
+        ]);
+
+        $response = $this->call('GET', 'api/admin/purse', [
+            'access_token'      => static::$container['access_token']
+        ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $responseData = json_decode($response->getContent())->data;
+
+        $this->assertNotEmpty($responseData);
+
+        $this->assertEquals($purse->phone, $responseData[0]->phone);
+        $this->assertEquals($purse->pass, $responseData[0]->pass);
+        $this->assertEquals($purse->balance, $responseData[0]->balance);
+
+        static::$container['purse_id'] = $purse->id;
+    }
+
+    public function test_purse_set()
+    {
+        $response = $this->call('POST', 'api/admin/purse/set', [
+            'access_token'  => static::$container['access_token'],
+            'id'    => static::$container['purse_id']
+        ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        Purse::find(static::$container['purse_id'])->delete();
     }
 
     public function test_end()

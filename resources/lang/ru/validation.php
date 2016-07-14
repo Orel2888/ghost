@@ -125,7 +125,8 @@ return [
     */
 
     'attributes'           => [
-        //
+        'login' => 'логин',
+        'password'  => 'пароль'
     ],
 
 ];
