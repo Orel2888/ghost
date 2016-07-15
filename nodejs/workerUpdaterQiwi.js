@@ -6,7 +6,14 @@ const CheckingBalance = require('qiwimas/lib/CheckingBalance'),
       path            = require('path');
 
 const fileWorkerStatus = path.join(__dirname, '../storage/node/worker_updater_qiwi.txt');
-const purse = fs.read(path.join(__dirname, '../storage/node/purse.txt')).split('|').map(item => item.trim());
+
+var getPurse = () => {
+    let purse = fs.read(path.join(__dirname, '../storage/node/purse.txt')).split('|').map(item => item.trim());
+
+    return purse;
+};
+
+let purse = getPurse();
 
 fs.write(fileWorkerStatus, 'worked');
 console.log('Worker is start');
@@ -31,6 +38,20 @@ checkingBalance.qiwiMaster.pathFileCookie = path.join(__dirname, '../storage/nod
 checkingBalance.updaterBalance((err, balance, changed) => {
     if (err) throw err;
 
+    // Changes purse
+    let currentPurse = getPurse();
+
+    if (currentPurse[0] != checkingBalance.qiwiMaster.currentPurse()) {
+        checkingBalance.qiwiMaster.changePurse({
+            phone: currentPurse[0],
+            pass: currentPurse[1]
+        });
+
+        // Clear table transaction of old purse
+        checkingBalance.removeAllTransactions();
+    }
+
+    // If changed balance, update transactions
     if (changed) {
         checkingBalance.updaterTransactions().then(countAdded => {
 

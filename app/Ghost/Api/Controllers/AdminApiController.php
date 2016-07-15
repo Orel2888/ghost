@@ -129,7 +129,7 @@ class AdminApiController extends BaseApiController
 
         $purse->update(['selected' => 1]);
 
-        file_put_contents(storage_path('node/purse.txt'), $purse->phone .'|'. $purse->pass);
+        file_put_contents(storage_path('node/purse.txt'), '+'. $purse->phone .'|'. $purse->pass);
 
         return response()->json($this->apiResponse->ok());
     }
