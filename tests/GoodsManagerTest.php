@@ -118,6 +118,42 @@ class GoodsManagerTest extends TestCase
         $goods = $this->goodsManager->goods->where('city_id', $city->id)->first();
 
         $this->assertEquals(3, count($this->goodsManager->getGoodsWeightsAndCount($goods->id)));
+
+        $goodsWeights = $this->goodsManager->getGoodsWeightsAndCount($goods->id, ['cost']);
+
+        $this->assertArrayHasKey('count', $goodsWeights['0.2']);
+        $this->assertArrayHasKey('cost', $goodsWeights['0.2']);
     }
 
+    public function test_goods_price_list()
+    {
+        $priceList = $this->goodsManager->getPriceList();
+
+        $this->assertNotEmpty($priceList);
+
+        $city = 'Буденновск';
+        $goodsType = 'Тв';
+        $weight = '3';
+
+        $this->assertTrue(isset($priceList[$city]));
+        $this->assertTrue(isset($priceList[$city][$goodsType]));
+        $this->assertTrue(isset($priceList[$city][$goodsType][$weight]));
+        $this->assertTrue(isset($priceList[$city][$goodsType][$weight]['goods_id']));
+        $this->assertTrue(isset($priceList[$city][$goodsType][$weight]['cost']));
+        $this->assertTrue(isset($priceList[$city][$goodsType][$weight]['count']));
+    }
+
+    public function test_goods_check_exists()
+    {
+        $goods = $this->goodsManager->goods->first();
+
+        $this->assertTrue($this->goodsManager->goodsCheckExists($goods->id, 0.2, 2));
+    }
+
+    public function test_get_goods_type_by_weight()
+    {
+        $goods = $this->goodsManager->goods->first();
+
+        $this->assertCount(2, $this->goodsManager->getGoodsTypeByWeight($goods->id, 0.2, 2));
+    }
 }

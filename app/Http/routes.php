@@ -17,6 +17,9 @@ Route::group(['middleware' => 'web'], function () {
     });
 });
 
+/**
+ * Apanel
+ */
 Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controllers', 'prefix' => 'apanel'], function () {
 
     Route::group(['middleware' => ['auth.admin']], function () {
@@ -42,14 +45,34 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
     Route::post('login', 'ApanelAuthController@postLogin');
 });
 
+/**
+ * Api telegram bot
+ */
 Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], function () {
 
+    /**
+     * Authenticate
+     */
     Route::post('authenticate/check-access-token', 'AuthenticateApiController@postCheckAccessToken');
     Route::post('authenticate/{admin?}', 'AuthenticateApiController@postAuthenticate');
 
     Route::group(['middleware' => 'api'], function () {
         Route::get('users.find', 'UsersApiController@getFind');
         Route::post('users.reg', 'UsersApiController@postReg');
+    });
+
+    /**
+     * Goods
+     */
+    Route::group(['middleware' => 'api'], function () {
+        Route::get('goods.pricelist', 'GoodsApiController@getPriceList');
+    });
+
+    /**
+     * Orders
+     */
+    Route::group(['middleware' => 'api'], function () {
+        Route::post('order.create', 'OrderApiController@postCreate');
     });
 
     /**
