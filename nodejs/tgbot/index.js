@@ -63,5 +63,10 @@ tg.router
 tg.router
     .when([
         '/start'
-    ], new UsersController())
-    .when(new RegExp('/(/buy)\d*_\d*/i'), new PurchaseController());
+    ], new UsersController());
+
+tg.router
+    .when([
+        /\/buy[0-9]*_[0-9]*_[0-9]*/gi,
+        /\/buy[0-9]*_[0-9]*/gi
+    ], new PurchaseController());
