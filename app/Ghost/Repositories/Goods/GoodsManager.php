@@ -124,14 +124,16 @@ class GoodsManager extends Goods
         return $goodsPrice;
     }
 
-    public function goodsCheckExists($goodsId, $weight, $count)
+    public function goodsPriceCheckExists($goodsId, $weight, $count)
     {
-        return $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->take($count)->count() == $count;
+        return $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->whereReserve(0)->count() >= $count;
     }
 
-    public function getGoodsTypeByWeight($goodsId, $weight, $count)
+    public function getGoodsPriceByWeight($goodsId, $weight, $count)
     {
-        return $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->take($count)->get();
+        $getGoodsPrice = $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->whereReserve(0)->take($count);
+
+        return $count == 1 ? $getGoodsPrice->first() : $getGoodsPrice->get();
     }
 
     public function parseAddresses($text)
