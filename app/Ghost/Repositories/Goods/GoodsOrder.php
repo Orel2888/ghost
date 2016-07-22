@@ -6,10 +6,27 @@ use App\Ghost\Repositories\Traits\BaseRepoTrait;
 use App\Ghost\Repositories\Goods\Exceptions\GoodsEndedException;
 use App\Ghost\Repositories\Goods\Exceptions\NotEnoughMoney;
 use App\GoodsPurchase;
+use App\Ghost\Repositories\Goods\GoodsManager;
 
 class GoodsOrder extends Goods
 {
     use BaseRepoTrait;
+
+    public $goodsManager;
+
+    public $statusOrderMessages = [
+        0 => 'В обработке',
+        1 => 'Оплачен',
+        2 => 'Нет товара',
+        3 => 'Недостаточно средств'
+    ];
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->goodsManager = new GoodsManager();
+    }
 
     public function create(array $attributes)
     {
@@ -17,7 +34,8 @@ class GoodsOrder extends Goods
             'goods_id',
             'client_id',
             'weight',
-            'comment'
+            'comment',
+            'cost'
         ];
 
         $this->checkRequiredAttributesArray($attributes, $attributesRequired);
@@ -41,11 +59,12 @@ class GoodsOrder extends Goods
      * Check is exists a goods to goods price
      * @param $goodsId
      * @param $weight
+     * @param $count
      * @return mixed
      */
-    public function existsGoods($goodsId, $weight)
+    public function existsGoods($goodsId, $weight, $count = 1)
     {
-        return !is_null($this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->whereReserve(0)->first());
+        return $this->goodsManager->goodsPriceCheckExists($goodsId, $weight, $count);
     }
 
     /**
@@ -55,9 +74,13 @@ class GoodsOrder extends Goods
      */
     public function getGoodsPrice($orderId)
     {
-        $order = $this->findOrder($orderId);
+        if ($orderId instanceof $this->goodsOrder) {
+            $order = $orderId;
+        } else {
+            $order = $this->findOrder($orderId);
+        }
 
-        return $this->goodsPrice->whereGoodsId($order->goods_id)->whereWeight($order->weight)->whereReserve(0)->firstOrFail();
+        return $this->goodsManager->getGoodsPriceByWeight($order->goods_id, $order->weight, 1);
     }
 
     /**
@@ -70,28 +93,34 @@ class GoodsOrder extends Goods
      */
     public function checkSolvency($orderId, $clientId)
     {
-        $client = $this->client->findOrFail($clientId);
-        $order  = $this->findOrder($orderId);
+        if ($orderId instanceof $this->goodsOrder) {
+            $client = $orderId->client;
+            $order  = $orderId;
+        } else {
+            $client = $this->client->findOrFail($clientId);
+            $order = $this->findOrder($orderId);
+        }
 
         if ($this->existsGoods($order->goods_id, $order->weight)) {
-
-            $goodsPrice = $this->goodsPrice->whereGoodsId($order->goods_id)->whereWeight($order->weight)->whereReserve(0)->first();
-
-            if ($client->balance < $goodsPrice->cost) {
+            if ($client->balance < $order->cost) {
                 throw new NotEnoughMoney;
             } else {
-                return $goodsPrice;
+                return $this->getGoodsPrice($order);
             }
         } else {
             throw new GoodsEndedException;
         }
     }
 
-    public function buy($orderId, $clientId)
+    public function buy($orderId)
     {
-        $goodsPrice = $this->checkSolvency($orderId, $clientId);
+        if ($orderId instanceof $this->goodsOrder) {
+            $order = $orderId;
+        } else {
+            $order = $this->findOrder($orderId);
+        }
 
-        $order = $this->findOrder($orderId);
+        $goodsPrice = $this->checkSolvency($order->id, $order->client_id);
 
         $goodsPurchase = GoodsPurchase::create([
             'city_id'   => $goodsPrice->goods->city_id,
@@ -105,12 +134,33 @@ class GoodsOrder extends Goods
 
         $goodsPrice->delete();
 
+        $order->update(['purchase_id' => $goodsPurchase->id, 'status' => 1]);
+
         $client = $order->client;
         $client->decrement('balance', $goodsPrice->cost);
         $client->increment('rating', $this->getRating($goodsPrice->cost));
         $client->increment('count_purchases', 1);
 
         return $goodsPurchase;
+    }
+
+    public function buyProcessingOrder($order)
+    {
+        if (!$order instanceof $this->goodsOrder) {
+            $order = $this->goodsOrder->find($order);
+        }
+
+        try {
+            $this->buy($order);
+
+            return true;
+        } catch (GoodsEndedException $e) {
+            $order->update(['status' => 2]);
+        } catch (NotEnoughMoney $e) {
+            $order->update(['status' => 3]);
+        }
+
+        return false;
     }
 
     public function getRating($amount)
