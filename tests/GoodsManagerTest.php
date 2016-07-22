@@ -147,13 +147,13 @@ class GoodsManagerTest extends TestCase
     {
         $goods = $this->goodsManager->goods->first();
 
-        $this->assertTrue($this->goodsManager->goodsCheckExists($goods->id, 0.2, 2));
+        $this->assertTrue($this->goodsManager->goodsPriceCheckExists($goods->id, 0.2, 2));
     }
 
     public function test_get_goods_type_by_weight()
     {
         $goods = $this->goodsManager->goods->first();
 
-        $this->assertCount(2, $this->goodsManager->getGoodsTypeByWeight($goods->id, 0.2, 2));
+        $this->assertCount(2, $this->goodsManager->getGoodsPriceByWeight($goods->id, 0.2, 2));
     }
 }
