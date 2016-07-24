@@ -86,7 +86,7 @@ class UserController extends TelegramBaseController {
             } else {
                 $.sendMessage('Произошла ошибка');
                 console.log(err);
-                
+
                 return err;
             }
         })
