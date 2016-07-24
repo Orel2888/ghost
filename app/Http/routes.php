@@ -62,6 +62,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
     Route::group(['middleware' => 'api:user'], function () {
         Route::get('users.find', 'UsersApiController@getFind');
         Route::post('users.reg', 'UsersApiController@postReg');
+        Route::get('purse', 'UsersApiController@getPurse');
     });
 
     /**

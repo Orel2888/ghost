@@ -5,6 +5,7 @@ namespace App\Ghost\Api\Controllers;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Client;
 use Validator;
+use App\Purse;
 
 class UsersApiController extends BaseApiController
 {
@@ -60,5 +61,12 @@ class UsersApiController extends BaseApiController
         $client = Client::create($this->request->only('name', 'tg_username', 'tg_chatid') + ['comment' => $this->request->input('tg_username')]);
 
         return response()->json($this->apiResponse->ok(['client_id' => $client->id]), 201);
+    }
+
+    public function getPurse()
+    {
+        return response()->json($this->apiResponse->ok([
+            'data' => ['phone' => Purse::whereSelected(1)->first()->phone]
+        ]));
     }
 }
