@@ -82,9 +82,11 @@ class UserController extends TelegramBaseController {
                     $.userSession.udata = udata;
 
                     return priceList();
-                });
+                })
             } else {
-                console.log(err)
+                $.sendMessage('Произошла ошибка');
+                console.log(err);
+                
                 return err;
             }
         })

@@ -14,13 +14,7 @@ class UserScope {
             tg_chatid: clientId
         }).then(response => {
             return scope.userSession.udata = response.data;
-        }).catch(err => {
-            console.log(err)
-
-            scope.sendMessage('Произошла ошибка')
-
-            return err;
-        });
+        }).catch(err => Promise.reject(err));
     }
 }
 
