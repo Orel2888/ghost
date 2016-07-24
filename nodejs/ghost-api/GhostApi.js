@@ -27,7 +27,7 @@ class GhostApi {
 
     api(apiMethod, method = 'GET', params = {}, requestOptions = {}) {
 
-        if (!params.hasOwnProperty('access_token') && /^admin/.test(apiMethod) && this.accessTokenAdmin) {
+        if (!params.hasOwnProperty('access_token') && /^admin|sys/.test(apiMethod) && this.accessTokenAdmin) {
             params.access_token = this.accessTokenAdmin;
         } else {
             if (!params.hasOwnProperty('access_token') && this.accessTokenUser) {
