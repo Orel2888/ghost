@@ -24,6 +24,8 @@ class UserOrder extends TelegramBaseController {
         let messageOrderList = (orders) => {
             var message = `${emojify(':page_facing_up:')} Список заказов\n\n`;
 
+            message += `${emojify(':dollar:')} Баланс: ${$.userSession.udata.balance}\n`;
+
             if (!orders.length) {
                 message += 'Нет заказов\n';
             } else {
@@ -31,6 +33,7 @@ class UserOrder extends TelegramBaseController {
                     message += `${emojify(':house_with_garden:')} *${item.city_name}*\n`;
                     message += `${emojify(':gift:')} Товар: *${item.goods_name}*\n`;
                     message += `${emojify(':package:')} Вес: *${item.weight}*\n`;
+                    message += `${emojify(':dollar:')} Цена: *${item.cost}*\n`;
                     message += `${emojify(':speech_balloon:')} Статус: *${item.status_message}*\n`;
                     message += `${emojify(':date:')} Дата: *${item.date}*\n`;
 
@@ -44,11 +47,12 @@ class UserOrder extends TelegramBaseController {
             }
 
             if (orders.length) {
-                message += `Удалить все заказы ${emojify(':point_right:')} /myorder\\_delall\n`;
+                message += `Удалить все заказы ${emojify(':point_right:')} /myorder\\_delall\n\n`;
             }
 
-            message += `${emojify(':arrows_counterclockwise:')} Обновить ${emojify(':point_right:')} /myorder\n`;
-            message += `${emojify(':house:')} В начало ${emojify(':point_right:')} /start\n`;
+            message += `Обновить ${emojify(':point_right:')} /myorder\n`;
+            message += `Мой профиль ${emojify(':point_right:')} /myprofile\n`;
+            message += `В начало ${emojify(':point_right:')} /start\n`;
 
             return $.sendMessage(message, {parse_mode: 'markdown'})
         }
@@ -135,7 +139,7 @@ class UserOrder extends TelegramBaseController {
             '/\/myorder_del_[0-9]*/g': 'handleOrderDelConfirm',
             '/\/myorder_delcon_[0-9]*/g': 'handleOrderDelete',
             '/\/myorder_delall/g': 'handleOrderDelAll',
-            '/\/myorder_delallcon/g': 'handleOrderDeleteAll',
+            '/\/myorder_delallcon/g': 'handleOrderDeleteAll'
         }
     }
 }
