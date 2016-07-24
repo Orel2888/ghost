@@ -32,11 +32,15 @@ class PurchaseController extends TelegramBaseController {
         let sendMessage = () => {
             var message = `Какое количество вам требуется?\n\n`;
 
+            message += `Будьте внимательны, если на вашем балансе уже есть достаточная сумма для выбранного товара. `;
+            message += `Покупка произойдет сразу же после выбора количества.\n\n`;
+
             for (let i = 1; i<=6; i++) {
                 message += `${emoji.emojify(':package:')} ${i} ${emoji.emojify(':point_right:')} ${$._message._text}_${i}\n`;
                 message += `${'-'.repeat(25)}\n`;
             }
 
+            message += `Мой профиль ${emoji.emojify(':point_right:')} /myprofile\n`;
             message += `В начало ${emoji.emojify(':point_right:')} /start`;
 
             return $.sendMessage(message);
