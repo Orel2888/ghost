@@ -81,6 +81,10 @@ class PurchaseController extends TelegramBaseController {
                     message += `${tab}${emojify(':dollar:')} Цена: *${data.cost}*\n`;
                     message += `\n`;
 
+                    if (data.order_processed > 0) {
+                        message += `${emojify(':white_check_mark:')} Успешно выполнено *${data.order_processed}* заказов\n`;
+                    }
+
                     message += `*Реквизиты для оплаты*\n`;
                     message += `QIWI: *+${data.purse}*\n`;
                     message += `Комментарий: *${$.userSession.udata.comment}*\n`;
