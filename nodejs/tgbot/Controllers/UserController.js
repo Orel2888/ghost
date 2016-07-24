@@ -5,6 +5,8 @@ const TelegramBaseController = Telegram.TelegramBaseController
 const emoji = require('node-emoji')
 const UserScope = require('../UserScope')
 
+let emojify = emoji.emojify;
+
 class UserController extends TelegramBaseController {
 
     constructor(Powers) {
@@ -15,7 +17,7 @@ class UserController extends TelegramBaseController {
         this.userScope = new UserScope(this.powers);
     }
 
-    startHandle($) {
+    handleStart($) {
 
         let registerUser = (scope) => {
             return this.ghostApi.api('users.reg', 'POST', {
@@ -23,7 +25,7 @@ class UserController extends TelegramBaseController {
                 tg_username: scope._message._from._username,
                 tg_chatid: scope._message._chat._id
             }).then(response => {
-                return findUser(scope._message._chat._id);
+                return this.userScope.findUser(scope._message._from._id, scope);
             });
         };
 
@@ -32,6 +34,10 @@ class UserController extends TelegramBaseController {
                 let priceList = response.data;
 
                 var message = `Добро пожаловать в круглосуточный магазин ${emoji.emojify(':eyes:')} Ghost.\n\n`;
+
+                message += `Решение технических вопросов: @Ghost228\n`;
+                message += `Мой профиль ${emoji.emojify(':point_right:')} /myprofile\n`;
+                message += `Мои заказа ${emoji.emojify(':point_right:')} /myorder\n\n`;
 
                 for (let city of Object.keys(priceList)) {
                     message += `${emoji.emojify(':house_with_garden:')} *${city}*\n`;
@@ -51,33 +57,66 @@ class UserController extends TelegramBaseController {
                     }
                 }
 
+                message += `\nОбновить /start`;
+
                 $.sendMessage(message, {parse_mode: 'markdown'});
             });
         };
 
         // Start running
-        if (!$.userSession.userdata) {
-            return this.userScope.findUser($._message._chat._id, $).catch(err => {
-                // If user not registered else register
-                if (err.statusCode == 404) {
-                    return registerUser($);
-                } else {
-                    console.log(err)
-                    return err;
-                }
-            }).then(userdata => {
-                $.userSession.udata = userdata;
+        return this.userScope.findUser($._message._chat._id, $).then(udata => {
+            return priceList();
+        }).catch(err => {
+            // If user not registered else register
+            if (err.statusCode == 404) {
+                return registerUser($).then(udata => {
+                    $.userSession.udata = udata;
 
-                priceList();
-            });
-        } else {
-            priceList();
+                    return priceList();
+                });
+            } else {
+                console.log(err)
+                return err;
+            }
+        })
+    }
+
+    handleProfile($) {
+
+        let profileInfo = (udata, purse) => {
+            let message = `*Мой профиль*\n\n`;
+
+            message += `Здравствуйте, *${udata.name}*\n`;
+            message += `${emojify(':dollar:')} Ваш баланс: ${udata.balance}\n\n`;
+
+            message += `*Реквизиты*\n`;
+            message += `QIWI: +*${purse}*\n`;
+            message += `Комментарий: *${udata.comment}*\n\n`;
+
+            message += `Вы можете заранее пополнять свой баланс, что бы в любой момент совершать покупки. `;
+            message += `Баланс пополняется в течении 30-ти секунд после перевода средств на выше ${emojify(':point_up:')} указанные реквизиты. `;
+            message += `При оплате выбранного товара и не хватке средств, все платежи поступают на ваш счет. `;
+            message += `Если у вас есть не выполненные заказы, они автоматически выполнятся при оказании достаточной суммы на вашем балансе. `;
+            message += `Следите за своим списком заказов.`;
+
+            message += `\n\nОбновить ${emojify(':point_right:')} /myprofile\n`;
+            message += `Мои заказы ${emojify(':point_right:')} /myorder\n`;
+            message += `В начало ${emojify(':point_right:')} /start\n`;
+
+            return $.sendMessage(message, {parse_mode: 'markdown'});
         }
+
+        return this.ghostApi.api('users.find', 'GET', {tg_chatid: $._message._from._id}).then(response => {
+            let udata = response.data;
+
+            return this.ghostApi.api('purse', 'GET').then(response => profileInfo(udata, response.data.phone));
+        }).catch(console.log)
     }
 
     get routes() {
         return {
-            '/start': 'startHandle'
+            '/start': 'handleStart',
+            '/myprofile': 'handleProfile'
         }
     }
 }

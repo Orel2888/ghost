@@ -28,7 +28,8 @@ const userCommands = [
     /\/myorder_delcon_[0-9]*/g,
     /\/myorder_delallcon/g,
     /\/myorder_delall/g,
-    '/myorder'
+    '/myorder',
+    '/myprofile'
 ];
 
 let checkCommand = (command, commandsList) => {
@@ -88,7 +89,8 @@ tg.router
 
 tg.router
     .when([
-        '/start'
+        '/start',
+        '/myprofile'
     ], new UserController(Powers));
 
 tg.router
