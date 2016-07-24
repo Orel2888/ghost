@@ -13,6 +13,10 @@ class UserScope {
         return udata ? Promise.resolve(udata) : this.ghostApi.api('users.find', 'GET', {
             tg_chatid: clientId
         }).then(response => {
+
+            // Set time activity to user
+            scope.userSession.lastTimeActivity = Date.now();
+
             return scope.userSession.udata = response.data;
         }).catch(err => Promise.reject(err));
     }
