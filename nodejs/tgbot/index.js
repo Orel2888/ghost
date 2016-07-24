@@ -45,7 +45,7 @@ tg.before(function (updates, cb) {
 
     // Check is exists username on account
     if (!updates._message._from._username) {
-        tg.api.sendMessage(updates._message._chat.id, 'Извините, вам необходимо зарегистрировать username. Сделать это можно в настройках.');
+        tg.api.sendMessage(updates._message._chat.id, 'Извините, вам необходимо зарегистрировать username. Сделать это можно в настройках. /start');
 
         cb(false);
 
@@ -107,3 +107,29 @@ tg.router
         /\/myorder_delall/g,
         '/myorder'
     ], new UserOrder(Powers))
+
+// Cleaning user session for expires
+const intervalCleanSessions = 10;
+// In minutes
+const timeExpiresUserSession = 60;
+
+let sessionStorage = tg._telegramDataSource._sessionStorage
+let userLastActivity
+
+let checkingActivitySessions = setInterval(() => {
+    if (sessionStorage._storage._storage.hasOwnProperty('userStorage')) {
+
+        for (let userId of Object.keys(sessionStorage._storage._storage.userStorage)) {
+            if (sessionStorage._storage._storage.userStorage[userId] != null) {
+                userLastActivity = sessionStorage._storage._storage.userStorage[userId].lastTimeActivity;
+
+                if (Math.floor((Date.now() - userLastActivity) / 1000) > timeExpiresUserSession * 60) {
+                    sessionStorage.removeUserSession(userId)
+
+                    console.log('Remove session user id', userId)
+                }
+            }
+        }
+    }
+
+}, intervalCleanSessions * 1000)
