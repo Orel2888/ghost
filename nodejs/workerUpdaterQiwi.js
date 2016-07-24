@@ -72,7 +72,7 @@ checkingBalance.updaterBalance((err, balance, changed) => {
                     return auth ? true : ghostApi.authenticationAdmin(systemUser);
                 }).then(() => {
                     ghostApi.api('sys.processing_goods_orders').then(response => {
-                        console.log(response.data)
+                        //console.log(response.data)
                     }).catch(console.log)
                 }).catch(console.log)
             }
