@@ -42,7 +42,15 @@ class UserController extends TelegramBaseController {
                 for (let city of Object.keys(priceList)) {
                     message += `${emoji.emojify(':house_with_garden:')} *${city}*\n`;
 
+                    // If in city not goods price that message about empty
+                    if (!Object.keys(priceList[city]).filter(goodsType => Object.keys(priceList[city][goodsType]).length).length) {
+                        message += `${emojify(':o:')} Пусто\n`;
+                    }
+
                     for (let goodsType of Object.keys(priceList[city])) {
+
+                        // Check is exists goods in price, if not goods, continue
+                        if (!Object.keys(priceList[city][goodsType]).length) continue;
 
                         message += `  ${emoji.emojify(':gift:')} ${goodsType}\n`;
 
@@ -54,12 +62,13 @@ class UserController extends TelegramBaseController {
                             message += `${' '.repeat(4)}купить ${emoji.emojify(':point_right:')} /buy${goodsInfo.goods_id}\\_${weightInt}\n`;
                             message += `${' '.repeat(4)}${'-'.repeat(30)}\n`
                         }
+
                     }
                 }
 
                 message += `\nОбновить /start`;
 
-                $.sendMessage(message, {parse_mode: 'markdown'});
+                return $.sendMessage(message, {parse_mode: 'markdown'});
             });
         };
 
