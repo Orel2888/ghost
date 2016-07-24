@@ -37,10 +37,11 @@ class SystemApiController extends BaseApiController
                     $transactions_ids_abuse[] = $transaction->id;
                 }
 
-                $transaction->update(['status' => 1]);
             } else {
                 $transactions_ids_abuse[] = $transaction->id;
             }
+
+            $transaction->update(['status' => 1]);
         }
 
         // Processing a orders
