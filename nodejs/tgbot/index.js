@@ -41,6 +41,12 @@ let checkCommand = (command, commandsList) => {
 tg.before(function (updates, cb) {
 
     let commandText = updates._message.text;
+
+    // If not message then ignore
+    if (!commandText) {
+        return cb(false);
+    }
+
     let command = updates._message.text.split(' ')[0];
 
     // Check is exists username on account
