@@ -37,7 +37,7 @@ class UserController extends TelegramBaseController {
 
                 message += `Решение технических вопросов: @Ghost228\n`;
                 message += `Мой профиль ${emoji.emojify(':point_right:')} /myprofile\n`;
-                message += `Мои заказа ${emoji.emojify(':point_right:')} /myorder\n\n`;
+                message += `Мои заказы ${emoji.emojify(':point_right:')} /myorder\n\n`;
 
                 for (let city of Object.keys(priceList)) {
                     message += `${emoji.emojify(':house_with_garden:')} *${city}*\n`;
