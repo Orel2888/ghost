@@ -5,11 +5,37 @@ use App\Miner;
 use App\Client;
 use Carbon\Carbon;
 use App\Ghost\Repositories\Goods\GoodsManager;
+use App\Goods;
+use Faker\Factory as Faker;
 
 trait BaseTestsHelper
 {
 
     protected static $database;
+
+    public function createOrder()
+    {
+        $goods = Goods::first();
+
+        $faker = Faker::create();
+
+        $clientName = $faker->name;
+
+        $client = Client::create([
+            'name'      => $clientName,
+            'comment'   => $clientName
+        ]);
+
+        $goodsFirstPrice = $goods->goodsPrice()->first();
+
+        return $this->goodsOrder->create([
+            'goods_id'  => $goods->id,
+            'client_id' => $client->id,
+            'weight'    => $goodsFirstPrice->weight,
+            'comment'   => $client->comment,
+            'cost'      => $goodsFirstPrice->cost
+        ]);
+    }
 
     public function createCity()
     {

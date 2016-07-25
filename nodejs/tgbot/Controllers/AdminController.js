@@ -1,36 +1,18 @@
 'use strict';
 
-const Telegram = require('telegram-node-bot');
-const TelegramBaseController = Telegram.TelegramBaseController;
-const config = require('../config');
-const GhostApi = require('../ghost-api/GhostApi');
-const emoji = require('node-emoji');
+const Telegram = require('telegram-node-bot')
+const TelegramBaseController = Telegram.TelegramBaseController
+const emoji = require('node-emoji')
 
 class AdminController extends TelegramBaseController {
 
-    constructor() {
+    constructor(Powers) {
         super();
 
-        this.ghostApi = new GhostApi({
-            apiKey: config.get('API_KEY'),
-            apiUrl: config.get('API_URL')
-        });
-
+        this.powers   = Powers;
+        this.ghostApi = this.powers.ghostApi;
     }
 
-    before(command, scope) {
-
-        scope.checkAuth = this.ghostApi.checkAuth(true).then(auth => {
-
-            if (!auth) {
-                return this.ghostApi.authenticationAdmin(scope._update._message._from._username);
-            }
-
-            return true;
-        });
-
-        return scope;
-    }
 
     transHandle($) {
 
@@ -57,12 +39,7 @@ class AdminController extends TelegramBaseController {
             });
         };
 
-        $.checkAuth.then(auth => {
-
-            if (!auth) return;
-
-            responseQiwiTransaction();
-        }).catch(console.log)
+        return responseQiwiTransaction();
     }
 
     goodsPriceHandle($) {
@@ -108,13 +85,7 @@ class AdminController extends TelegramBaseController {
             })
         };
 
-        $.checkAuth.then(auth => {
-
-            if (!auth) return;
-
-            responseGoodsPrice();
-
-        }).catch(console.log)
+        return responseGoodsPrice();
     }
 
     goodsPurchase($) {
@@ -136,12 +107,7 @@ class AdminController extends TelegramBaseController {
             });
         };
 
-        $.checkAuth.then(auth => {
-
-            if (!auth) return;
-
-            parchase()
-        })
+        return parchase();
     }
 
     goodsPriceAvailableHandle($) {
@@ -178,13 +144,7 @@ class AdminController extends TelegramBaseController {
             }).catch(console.log)
         }
 
-        $.checkAuth.then(auth => {
-
-            if (!auth) return;
-
-            responseGoodsAvailable();
-
-        }).catch(console.log)
+        return responseGoodsAvailable();
     }
 
     adminHelpHandle($) {
@@ -203,13 +163,7 @@ class AdminController extends TelegramBaseController {
             $.sendMessage(message);
         }
 
-        $.checkAuth.then(auth => {
-
-            if (!auth) return;
-
-            responseHelpMessage();
-
-        }).catch(console.log)
+        return responseHelpMessage();
     }
 
     purseHandle($) {
@@ -237,13 +191,7 @@ class AdminController extends TelegramBaseController {
             });
         }
 
-        $.checkAuth.then(auth => {
-
-            if (!auth) return;
-
-            responsePurseList();
-
-        }).catch(console.log)
+        return responsePurseList();
     }
 
     purseSelectHandle($) {
@@ -262,13 +210,7 @@ class AdminController extends TelegramBaseController {
             });
         }
 
-        $.checkAuth.then(auth => {
-
-            if (!auth) return;
-
-            changePurse()
-
-        }).catch(console.log)
+        return changePurse();
     }
 
     get routes() {

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use App\ExtendsLaravel\ExtendedResponseFactory;
+use Carbon\Carbon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,5 +31,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         require app_path('Ghost/Support/helpers.php');
+
+        // Localization date
+        setlocale(LC_TIME, 'ru');
+
+        Carbon::setLocale('ru');
     }
 }

@@ -17,6 +17,9 @@ Route::group(['middleware' => 'web'], function () {
     });
 });
 
+/**
+ * Apanel
+ */
 Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controllers', 'prefix' => 'apanel'], function () {
 
     Route::group(['middleware' => ['auth.admin']], function () {
@@ -42,21 +45,55 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
     Route::post('login', 'ApanelAuthController@postLogin');
 });
 
+/**
+ * Api telegram bot
+ */
 Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], function () {
 
+    /**
+     * Authenticate
+     */
     Route::post('authenticate/check-access-token', 'AuthenticateApiController@postCheckAccessToken');
     Route::post('authenticate/{admin?}', 'AuthenticateApiController@postAuthenticate');
 
-    Route::group(['middleware' => 'api'], function () {
+    /**
+     * Users
+     */
+    Route::group(['middleware' => 'api:user'], function () {
         Route::get('users.find', 'UsersApiController@getFind');
         Route::post('users.reg', 'UsersApiController@postReg');
+        Route::get('purse', 'UsersApiController@getPurse');
+    });
+
+    /**
+     * Goods
+     */
+    Route::group(['middleware' => 'api:user'], function () {
+        Route::get('goods.pricelist', 'GoodsApiController@getPriceList');
+    });
+
+    /**
+     * Orders
+     */
+    Route::group(['middleware' => 'api:user'], function () {
+        Route::post('order.create', 'OrderApiController@postCreate');
+        Route::get('order.list', 'OrderApiController@getList');
+        Route::post('order.del', 'OrderApiController@postDelOrder');
+        Route::post('order.delall', 'OrderApiController@postDelAllOrder');
+    });
+
+    /**
+     * System
+     */
+    Route::group(['middleware' => 'api:admin'], function () {
+        Route::get('sys.processing_goods_orders', 'SystemApiController@getProcessingGoodsOrders');
     });
 
     /**
      * Admin methods
      */
 
-    Route::group(['prefix' => 'admin'], function () {
+    Route::group(['prefix' => 'admin', 'middleware' => 'api:admin'], function () {
         Route::get('qiwi-transaction', 'AdminApiController@getQiwiTransaction');
 
         Route::post('goods-price/purchase', 'AdminApiController@getGoodsPricePurchase');

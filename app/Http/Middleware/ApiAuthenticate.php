@@ -21,7 +21,6 @@ class ApiAuthenticate
      */
     public function handle($request, Closure $next, $role = 'user')
     {
-
         if (!in_array($request->path(), $this->exceptRouteCheckToken)) {
 
             if (!$request->has('access_token')) {
@@ -30,7 +29,13 @@ class ApiAuthenticate
 
             $apiGuard = new ApiGuard();
 
-            if (!$apiGuard->hasAccessToken($request->input('access_token'), $role)) {
+            if ($role == 'user') {
+                $check = $apiGuard->hasAccessToken($request->input('access_token'));
+            } elseif ($role == 'admin') {
+                $check = $apiGuard->hasAccessTokenAdmin($request->input('access_token'));
+            }
+
+            if (!$check) {
                 return response()->json(['status' => 'fail', 'middleware' => true], 401);
             }
         }

@@ -13,4 +13,14 @@ class GoodsOrder extends Model
     {
         return $this->hasOne('App\Client', 'id', 'client_id');
     }
+
+    public function goods()
+    {
+        return $this->hasOne('App\Goods', 'id', 'goods_id');
+    }
+
+    public function purchase()
+    {
+        return $this->hasOne('App\GoodsPurchase', 'id', 'purchase_id');
+    }
 }

@@ -72,19 +72,68 @@ class GoodsManager extends Goods
     /**
      * Weights and counts
      * @param $goodsId
-     * @return array [weight => integer(count)]
+     * @param $withAttributes
+     * @return array [weight => integer(count)] | [weight => [attributes]]
      */
-    public function getGoodsWeightsAndCount($goodsId)
+    public function getGoodsWeightsAndCount($goodsId, array $withAttributes = [])
     {
         $goodsWeights = $this->findGoods($goodsId)->goodsPrice()->groupBy('weight')->orderBy('weight', 'ASC')->get();
 
         $goodsWeightsCounts = [];
 
         foreach ($goodsWeights as $item) {
-            $goodsWeightsCounts[wcorrect($item->weight)] = $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($item->weight)->count();
+
+            $countWeight = $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($item->weight)->count();
+
+            if (empty($withAttributes)) {
+                $weightAttributes = $countWeight;
+            } else {
+                $weightAttributes = ['count' => $countWeight] + array_only($item->getAttributes(), $withAttributes);
+            }
+
+            $goodsWeightsCounts[wcorrect($item->weight)] = $weightAttributes;
         }
 
         return $goodsWeightsCounts;
+    }
+
+    public function getPriceList()
+    {
+        $goodsPrice = [];
+
+        $cities = $this->city->with('goods')->get();
+
+        foreach ($cities as $city) {
+            $cityName = $city->name;
+
+            $goodsPrice[$cityName] = [];
+
+            foreach ($city->goods as $goods) {
+                $goodsPrice[$cityName][$goods->name] = [];
+
+                foreach ($this->getGoodsWeightsAndCount($goods->id, ['cost']) as $weight => $data) {
+                    $goodsPrice[$cityName][$goods->name][$weight] = [
+                        'goods_id'  => $goods->id,
+                        'count'     => $data['count'],
+                        'cost'      => $data['cost']
+                    ];
+                }
+            }
+        }
+
+        return $goodsPrice;
+    }
+
+    public function goodsPriceCheckExists($goodsId, $weight, $count)
+    {
+        return $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->whereReserve(0)->count() >= $count;
+    }
+
+    public function getGoodsPriceByWeight($goodsId, $weight, $count)
+    {
+        $getGoodsPrice = $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->whereReserve(0)->take($count);
+
+        return $count == 1 ? $getGoodsPrice->first() : $getGoodsPrice->get();
     }
 
     public function parseAddresses($text)

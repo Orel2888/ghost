@@ -3,10 +3,25 @@
 const CheckingBalance = require('qiwimas/lib/CheckingBalance'),
       config          = require('./config'),
       fs              = require('fs-jetpack'),
-      path            = require('path');
+      path            = require('path'),
+      GhostApi        = require('./ghost-api/GhostApi');
+
+const ghostApi = new GhostApi({
+    apiKey: config.get('API_KEY'),
+    apiUrl: config.get('API_URL')
+});
+
+const systemUser = 'system44612';
 
 const fileWorkerStatus = path.join(__dirname, '../storage/node/worker_updater_qiwi.txt');
-const purse = fs.read(path.join(__dirname, '../storage/node/purse.txt')).split('|').map(item => item.trim());
+
+var getPurse = () => {
+    let purse = fs.read(path.join(__dirname, '../storage/node/purse.txt')).split('|').map(item => item.trim());
+
+    return purse;
+};
+
+let purse = getPurse();
 
 fs.write(fileWorkerStatus, 'worked');
 console.log('Worker is start');
@@ -31,9 +46,36 @@ checkingBalance.qiwiMaster.pathFileCookie = path.join(__dirname, '../storage/nod
 checkingBalance.updaterBalance((err, balance, changed) => {
     if (err) throw err;
 
+    // Ghost api authentication
+    let ghostAuth = () => {
+        return ghostApi.checkAuth('system44612').then(auth => {
+            return auth ? true : ghostApi.authenticationAdmin('system44612');
+        }).catch(console.log)
+    }
+
+    // Changes purse
+    let currentPurse = getPurse();
+
+    if (currentPurse[0] != checkingBalance.qiwiMaster.currentPurse()) {
+        checkingBalance.qiwiMaster.changePurse({
+            phone: currentPurse[0],
+            pass: currentPurse[1]
+        });
+    }
+
+    // If changed balance, update transactions
     if (changed) {
         checkingBalance.updaterTransactions().then(countAdded => {
-
+            // If is exists new transaction call request api on processing a orders
+            if (countAdded > 0) {
+                ghostApi.checkAuth(systemUser).then(auth => {
+                    return auth ? true : ghostApi.authenticationAdmin(systemUser);
+                }).then(() => {
+                    ghostApi.api('sys.processing_goods_orders').then(response => {
+                        //console.log(response.data)
+                    }).catch(console.log)
+                }).catch(console.log)
+            }
         }).catch(err => {
             throw err;
         });
