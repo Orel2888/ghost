@@ -6,6 +6,8 @@ const CheckingBalance = require('qiwimas/lib/CheckingBalance'),
       path            = require('path'),
       GhostApi        = require('./ghost-api/GhostApi');
 
+const transUp = (process.argv[2] && process.argv[2] == '--uptrans') ? 1 : false;
+
 const ghostApi = new GhostApi({
     apiKey: config.get('API_KEY'),
     apiUrl: config.get('API_URL')
@@ -65,7 +67,7 @@ checkingBalance.updaterBalance((err, balance, changed) => {
 
     // If changed balance, update transactions
     if (changed) {
-        checkingBalance.updaterTransactions().then(countAdded => {
+        checkingBalance.updaterTransactions(transUp).then(countAdded => {
             // If is exists new transaction call request api on processing a orders
             if (countAdded > 0) {
                 ghostApi.checkAuth(systemUser).then(auth => {
