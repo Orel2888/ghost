@@ -132,7 +132,7 @@ class PurchaseController extends TelegramBaseController {
                 client_id: $.userSession.udata.id
             })
         } else {
-            return this.userScope.findUser($._message._from._id).then(udata => {
+            return this.userScope.findUser($._message._from._id, $).then(udata => {
                 $.userSession.udata = udata;
 
                 return orderCreate({

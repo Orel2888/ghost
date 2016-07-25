@@ -22,12 +22,12 @@ const adminCommands  = [
 
 const userCommands = [
     '/start',
-    /\/buy[0-9]*_[0-9]*_[0-9]*/gi,
-    /\/buy[0-9]*_[0-9]*/gi,
-    /\/myorder_del_[0-9]*/g,
-    /\/myorder_delcon_[0-9]*/g,
-    /\/myorder_delallcon/g,
-    /\/myorder_delall/g,
+    /\/buy[0-9]*_[0-9]*_[0-9]*/i,
+    /\/buy[0-9]*_[0-9]*/i,
+    /\/myorder_del_[0-9]*/,
+    /\/myorder_delcon_[0-9]*/,
+    /\/myorder_delallcon/,
+    /\/myorder_delall/,
     '/myorder',
     '/myprofile'
 ];
@@ -56,7 +56,7 @@ tg.before(function (updates, cb) {
     if (checkCommand(commandText, userCommands)) {
         return Powers.checkSessionAndAuthenticate().then(() => {
             return cb(true)
-        })
+        }).catch(console.log)
     }
 
     // Authentication a admin

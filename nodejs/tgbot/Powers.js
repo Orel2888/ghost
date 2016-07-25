@@ -1,7 +1,8 @@
 'use strict';
 
-const config    = require('../config')
-const ghostApi  = require('../ghost-api/GhostApi')
+const config    = require('../config');
+const ghostApi  = require('../ghost-api/GhostApi');
+const path      = require('path');
 
 class Powers {
 
@@ -28,7 +29,6 @@ class Powers {
             return true;
         }).catch(this.logger)
     }
-
 }
 
 module.exports = Powers;
