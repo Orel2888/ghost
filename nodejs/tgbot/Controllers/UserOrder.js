@@ -4,6 +4,7 @@ const Telegram = require('telegram-node-bot')
 const TelegramBaseController = Telegram.TelegramBaseController
 const emoji = require('node-emoji')
 const UserScope = require('../UserScope')
+const Tools = require('../Tools')
 
 let emojify = emoji.emojify;
 
@@ -15,6 +16,7 @@ class UserOrder extends TelegramBaseController {
         this.powers    = Powers;
         this.ghostApi  = this.powers.ghostApi;
         this.userScope = new UserScope(this.powers);
+        this.tools     = new Tools();
     }
 
     handleOrderList($) {
@@ -22,40 +24,18 @@ class UserOrder extends TelegramBaseController {
         let clientId = $._message._from._id;
 
         let messageOrderList = (orders) => {
-            var message = `${emojify(':page_facing_up:')} Список заказов\n\n`;
 
-            message += `${emojify(':dollar:')} Баланс: ${$.userSession.udata.balance}\n`;
+            let data = {
+                nvg: ['refreshMyOrder', 'myprofile', 'in start'],
+                orders,
+                balance: $.userSession.udata.balance,
+                separator: '-'.repeat(25)
+            };
 
-            if (!orders.length) {
-                message += 'Нет заказов\n';
-            } else {
-                orders.forEach((item, index) => {
-                    message += `${emojify(':house_with_garden:')} *${item.city_name}*\n`;
-                    message += `${emojify(':gift:')} Товар: *${item.goods_name}*\n`;
-                    message += `${emojify(':package:')} Вес: *${item.weight}*\n`;
-                    message += `${emojify(':dollar:')} Цена: *${item.cost}*\n`;
-                    message += `${emojify(':speech_balloon:')} Статус: *${item.status_message}*\n`;
-                    message += `${emojify(':date:')} Дата: *${item.date}*\n`;
-
-                    if (item.status == 1) {
-                        message += `${emojify(':running:')} Адрес: ${item.address}\n`;
-                    }
-
-                    message += `Удалить ${emojify(':point_right:')} /myorder\\_del\\_${item.id}\n`;
-                    message += `${'-'.repeat(25)}\n`;
-                })
-            }
-
-            if (orders.length) {
-                message += `Удалить все заказы ${emojify(':point_right:')} /myorder\\_delall\n\n`;
-            }
-
-            message += `Обновить ${emojify(':point_right:')} /myorder\n`;
-            message += `Мой профиль ${emojify(':point_right:')} /myprofile\n`;
-            message += `В начало ${emojify(':point_right:')} /start\n`;
-
-            return $.sendMessage(message, {parse_mode: 'markdown'})
-        }
+            return this.tools.render('user/order', data).then(content => {
+                return $.sendMessage(content, {parse_mode: 'markdown'});
+            });
+        };
 
         let orderList = (clientId) => {
             return this.ghostApi.api('order.list', 'GET', {
@@ -67,7 +47,7 @@ class UserOrder extends TelegramBaseController {
 
                 $.sendMessage('Произошла ошибка')
             })
-        }
+        };
 
         return this.userScope.findUser(clientId, $).then(udata => orderList(udata.id))
     }
@@ -75,14 +55,21 @@ class UserOrder extends TelegramBaseController {
     handleOrderDelConfirm($) {
         let orderId = $._message._text.match(/(\d+)/)[1];
 
-        let message = 'Подтвердите удаление заказа\n';
+        let message_confirm = 'Подтвердите удаление заказа\n';
 
-        message += `Удалить ${emojify(':point_right:')} /myorder_delcon_${orderId}\n`;
+        message_confirm += `Удалить ${emojify(':point_right:')} /myorder_delcon_${orderId}\n`;
 
-        message += `К заказам ${emojify(':point_right:')} /myorder\n`;
-        message += `В начало ${emojify(':point_right:')} /start\n`;
+        let data = {
+            message_confirm,
+            nvg: ['myorder', 'in start']
+        };
 
-        return $.sendMessage(message);
+        return this.tools.render('confirm', data)
+            .then(content => $.sendMessage(content))
+            .catch(err => {
+                console.log(err);
+                return $.sendMessage('Произошла ошибка');
+            });
     }
 
     handleOrderDelete($) {
@@ -93,12 +80,20 @@ class UserOrder extends TelegramBaseController {
                 order_id: orderId,
                 client_id: udata.id
             }).then(response => {
-                let message = `${emojify(':white_check_mark:')} Заказ успешно удален\n`;
 
-                message += `К заказам ${emojify(':point_right:')} /myorder\n`;
-                message += `В начало ${emojify(':point_right:')} /start\n`;
+                let message_confirm = `${emojify(':white_check_mark:')} Заказ успешно удален\n`;
 
-                return $.sendMessage(message);
+                let data = {
+                    message_confirm,
+                    nvg: ['myorder', 'in start']
+                };
+
+                return this.tools.render('confirm', data)
+                    .then(content => $.sendMessage(content))
+                    .catch(err => {
+                        console.log(err);
+                        return $.sendMessage('Произошла ошибка');
+                    });
             }).catch(err => {
                 return $.sendMessage('Произошла ошибка при удалении заказа');
             })
@@ -106,14 +101,21 @@ class UserOrder extends TelegramBaseController {
     }
 
     handleOrderDelAll($) {
-        let message = 'Подтвердите удаление всех заказов\n';
+        let message_confirm = 'Подтвердите удаление всех заказов\n';
 
-        message += `Удалить ${emojify(':point_right:')} /myorder_delallcon\n`;
+        message_confirm += `Удалить ${emojify(':point_right:')} /myorder_delallcon\n`;
 
-        message += `К заказам ${emojify(':point_right:')} /myorder\n`;
-        message += `В начало ${emojify(':point_right:')} /start\n`;
+        let data = {
+            message_confirm,
+            nvg: ['myorder', 'in start']
+        };
 
-        return $.sendMessage(message);
+        return this.tools.render('confirm', data)
+            .then(content => $.sendMessage(content))
+            .catch(err => {
+                console.log(err);
+                return $.sendMessage('Произошла ошибка');
+            });
     }
 
     handleOrderDeleteAll($) {
@@ -121,12 +123,20 @@ class UserOrder extends TelegramBaseController {
             return this.ghostApi.api('order.delall', 'POST', {
                 client_id: udata.id
             }).then(response => {
-                let message = `${emojify(':white_check_mark:')} Заказы успешно удалены\n`;
 
-                message += `К заказам ${emojify(':point_right:')} /myorder\n`;
-                message += `В начало ${emojify(':point_right:')} /start\n`;
+                let message_confirm = `${emojify(':white_check_mark:')} Заказы успешно удалены\n`;
 
-                return $.sendMessage(message);
+                let data = {
+                    message_confirm,
+                    nvg: ['myorder', 'in start']
+                };
+
+                this.tools.render('confirm', data)
+                    .then(content => $.sendMessage(content))
+                    .catch(err => {
+                        console.log(err);
+                        return $.sendMessage('Произошла ошибка');
+                    })
             }).catch(err => {
                 return $.sendMessage('Произошла ошибка при удалении заказов');
             })

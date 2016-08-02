@@ -4,6 +4,7 @@ const Telegram = require('telegram-node-bot')
 const TelegramBaseController = Telegram.TelegramBaseController
 const emoji = require('node-emoji')
 const UserScope = require('../UserScope')
+const Tools = require('../Tools')
 
 let emojify = emoji.emojify;
 
@@ -15,6 +16,7 @@ class PurchaseController extends TelegramBaseController {
         this.powers   = Powers;
         this.ghostApi = this.powers.ghostApi;
         this.userScope = new UserScope(this.powers);
+        this.tools = new Tools();
     }
 
     handle() {
@@ -30,20 +32,24 @@ class PurchaseController extends TelegramBaseController {
         };
 
         let sendMessage = () => {
-            var message = `Какое количество вам требуется?\n\n`;
-
-            message += `Будьте внимательны, если на вашем балансе уже есть достаточная сумма для выбранного товара. `;
-            message += `Покупка произойдет сразу же после выбора количества.\n\n`;
+            var itemsCount = '';
 
             for (let i = 1; i<=6; i++) {
-                message += `${emoji.emojify(':package:')} ${i} ${emoji.emojify(':point_right:')} ${$._message._text}_${i}\n`;
-                message += `${'-'.repeat(25)}\n`;
+                itemsCount += `${emojify(':package:')} ${i} ${emojify(':point_right:')} ${$._message._text}_${i}\n`;
+                itemsCount += `${'-'.repeat(25)}\n`;
             }
 
-            message += `Мой профиль ${emoji.emojify(':point_right:')} /myprofile\n`;
-            message += `В начало ${emoji.emojify(':point_right:')} /start`;
+            let data = {
+                nvg: ['myprofile', 'in start'],
+                items_count: itemsCount
+            };
 
-            return $.sendMessage(message);
+            return this.tools.render('main/before_buy', data).then(content => {
+                return $.sendMessage(content);
+            }).catch(err => {
+                console.log(err);
+                return $.sendMessage('Произошла ошибка');
+            });
         };
 
         // Start running
@@ -65,55 +71,32 @@ class PurchaseController extends TelegramBaseController {
 
         let orderCreate = (sendData) => {
             return this.ghostApi.api('order.create', 'POST', sendData).then(response => {
+
+                var data = {};
+
                 if (response.status == 'fail') {
-                    let message = response.message + '\n';
-
-                    message += `К выбору количества ${emojify(':point_right:')} ${prevCommand} \n`;
-                    message += `В начало ${emojify(':point_right:')} /start`;
-
-                    return $.sendMessage(message, {parse_mode: 'markdown'});
+                    data.status  = 'fail';
+                    data.message = response.message;
+                    data.nvg     = [
+                        `К выбору количества ${emojify(':point_right:')} ${prevCommand}`,
+                        'in start'
+                    ];
                 } else {
-                    let data = response.data;
-
-                    let tab = ' '.repeat(4);
-
-                    let message = `${emojify(':house_with_garden:')} *${data.city_name}*\n`;
-
-                    message += `${tab}${emojify(':gift:')} Товар: *${data.goods_name}*\n`;
-                    message += `${tab}${emojify(':package:')} Вес: *${data.weight}*\n`;
-                    message += `${tab}${emojify(':bowling:')} Количество: *${data.count}*\n`;
-                    message += `${tab}${emojify(':dollar:')} Цена: *${data.cost}*\n`;
-                    message += `\n`;
-
-                    if (data.order_processed > 0) {
-                        message += `${emojify(':white_check_mark:')} Успешно выполнено *${data.order_processed}* заказов\n`;
-                    }
-
-                    message += `*Реквизиты для оплаты*\n`;
-                    message += `QIWI: *+${data.purse}*\n`;
-                    message += `Комментарий: *${$.userSession.udata.comment}*\n`;
-                    message += `Сумма: *${data.cost}*\n\n`;
-                    message += `*Оплата и покупка*\n`;
-                    message += `Ваш заказ успешно создан и будет автоматически выполнен в течении 30-ти секунд после поступления оплаты. `;
-                    message += `Сумма оплаты может быть любой, можно отправлять средства любыми `;
-                    message += `частями, все платежи зачисляются на ваш баланс, когда на вашем балансе окажеться `;
-                    message += `достаточная сумма для оплаты заказа, последует выполнение.\n`;
-                    message += `Вы можете создать несколько заказов, они будут выполнены в порядки их создания.\n`;
-                    message += `${emojify(':warning:')} Будьте внимательны, следите за вашим списком заказов в разделе ${emojify(':point_right:')} /myorder. `;
-                    message += `Если вы создали первый заказ, а затем передумали и создали второй не удалив первый, при поступлении оплаты `;
-                    message += `последует выполнение заказов в порядке их создания. В описанном случаи, выполнится первый заказ, `;
-                    message += `а затем второй и т.д., пока не закончится баланс или список заказов.\n`;
-                    message += `Если на вашем балансе уже есть достаточная сумма, покупка произойдет сразу же, после выбора количества.\n\n`;
-
-                    message += `После оплаты проверяйте ваш список заказов.\n`;
-                    message += `Мой список заказов ${emojify(':point_right:')} /myorder\n`;
-
-                    message += `\n`;
-                    message += `К выбору количества ${emojify(':point_right:')} ${prevCommand} \n`;
-                    message += `В начало ${emojify(':point_right:')} /start`;
-
-                    return $.sendMessage(message, {parse_mode: 'markdown'});
+                    data.status = 'ok';
+                    data.data_api = response.data;
+                    data.nvg = [
+                        `К выбору количества ${emojify(':point_right:')} ${prevCommand}`,
+                        'in start'
+                    ];
+                    data.comment = $.userSession.udata.comment;
                 }
+
+                return this.tools.render('main/buy', data).then(content => {
+                    return $.sendMessage(content, {parse_mode: 'markdown'});
+                }).catch(err => {
+                    console.log(err);
+                    return $.sendMessage('Произошла ошибка');
+                });
             });
         };
 
