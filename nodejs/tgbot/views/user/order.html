@@ -1,0 +1,27 @@
+{% extends '../layout1.html' %}
+
+{% block content %}
+{{ emojis[11] }} Список заказов
+
+{{ emojis[6] }} Баланс: {{ balance }}
+
+{%- if orders.length %}
+{% for item in orders %}
+{{ emojis[3] }} *{{ item.city_name }}*
+{{ emojis[4] }} Товар: *{{ item.goods_name }}*
+{{ emojis[5] }} Вес: *{{ item.weight }}*
+{{ emojis[6] }} Цена: *{{ item.cost }}*
+{{ emojis[12] }} Статус: *{{ item.status_message }}*
+{{ emojis[13] }} Дата: *{{ item.date }}*
+{%- if item.status == 1 %}
+{{ emojis[14] }} Адрес: {{ item.address }}
+{% endif -%}
+Удалить {{ emojis[2] }} /myorder\_del\_{{ item.id }}
+{{- separator -}}
+{% endfor %}
+
+Удалить все заказы {{ emojis[2] }} /myorder\_delall
+{% else %}
+Нет заказов
+{% endif -%}
+{% endblock %}

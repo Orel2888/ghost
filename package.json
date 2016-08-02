@@ -28,6 +28,7 @@
     "gulp-typescript": "2.12.*",
     "gulp-watch": "^4.3.8",
     "node-emoji": "~1.3.1",
+    "promisify-node": "^0.4.0",
     "qiwimas": "^1.0.13",
     "request-promise": "^3.0.0",
     "swig": "^1.4.2",
