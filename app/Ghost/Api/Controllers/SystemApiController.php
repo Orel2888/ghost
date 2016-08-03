@@ -6,6 +6,8 @@ use App\QiwiTransaction;
 use App\Client;
 use App\Ghost\Repositories\Goods\Exceptions\GoodsEndedException;
 use App\Ghost\Repositories\Goods\Exceptions\NotEnoughMoney;
+use Validator;
+use App\Purse;
 
 class SystemApiController extends BaseApiController
 {
@@ -84,5 +86,23 @@ class SystemApiController extends BaseApiController
         ];
 
         return response()->json($this->apiResponse->ok(['data' => $infoProcessing]));
+    }
+
+    public function postPurseUpdateBalance()
+    {
+        $valid = Validator::make($this->request->all(), [
+            'phone'     => 'required|integer',
+            'balance'   => 'required'
+        ]);
+
+        if ($valid->fails()) {
+            return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
+        }
+
+        $purse = Purse::wherePhone($this->request->input('phone'))->first()->update([
+            'balance'   => $this->request->input('balance')
+        ]);
+
+        return response()->json($this->apiResponse->ok());
     }
 }

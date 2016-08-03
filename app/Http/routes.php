@@ -87,6 +87,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
      */
     Route::group(['middleware' => 'api:admin'], function () {
         Route::get('sys.processing_goods_orders', 'SystemApiController@getProcessingGoodsOrders');
+        Route::post('sys.purse_update_balance', 'SystemApiController@postPurseUpdateBalance');
     });
 
     /**

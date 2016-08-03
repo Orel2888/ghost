@@ -8,10 +8,13 @@ use App\Client;
 use App\Ghost\Repositories\Goods\GoodsOrder;
 use App\Goods;
 use App\GoodsPrice;
+use App\Purse;
 use Faker\Factory as FakerFactory;
 
 class ApiSystemTest extends TestCase
 {
+    use ApiTrait;
+
     public $modelQiwiTransaction;
 
     public $modelClient;
@@ -51,7 +54,8 @@ class ApiSystemTest extends TestCase
             'goods_id'  => $goods->id,
             'client_id' => $client->id,
             'comment'   => $client->comment,
-            'weight'    => $someoneGoodsPrice->weight
+            'weight'    => $someoneGoodsPrice->weight,
+            'cost'      => $someoneGoodsPrice->cost
         ]);
 
         $transaction = $this->modelQiwiTransaction->create([
@@ -83,6 +87,23 @@ class ApiSystemTest extends TestCase
 
         $client->delete();
         $transaction->delete();
+    }
+
+    public function test_purse_update_balance()
+    {
+        $accessToken = $this->authenticateAdmin();
+
+        $purse = Purse::create(['phone' => 79881111111]);
+
+        $response = $this->call('POST', 'api/sys.purse_update_balance', [
+            'access_token'  => $accessToken,
+            'phone'         => $purse->phone,
+            'balance'       => 1
+        ]);
+
+        $this->assertEquals(200, $response->getStatusCode());
+
+        $purse->delete();
     }
 
     public function test_end()
