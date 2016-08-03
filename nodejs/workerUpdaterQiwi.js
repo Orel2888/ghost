@@ -53,7 +53,7 @@ checkingBalance.updaterBalance((err, balance, changed) => {
         return ghostApi.checkAuth('system44612').then(auth => {
             return auth ? true : ghostApi.authenticationAdmin('system44612');
         }).catch(console.log)
-    }
+    };
 
     // Changes purse
     let currentPurse = getPurse();
@@ -70,10 +70,10 @@ checkingBalance.updaterBalance((err, balance, changed) => {
         checkingBalance.updaterTransactions(transUp).then(countAdded => {
             // If is exists new transaction call request api on processing a orders
             if (countAdded > 0) {
-                ghostApi.checkAuth(systemUser).then(auth => {
+                return ghostApi.checkAuth(systemUser).then(auth => {
                     return auth ? true : ghostApi.authenticationAdmin(systemUser);
                 }).then(() => {
-                    ghostApi.api('sys.processing_goods_orders').then(response => {
+                    return ghostApi.api('sys.processing_goods_orders').then(response => {
                         //console.log(response.data)
                     }).catch(console.log)
                 }).catch(console.log)
@@ -81,6 +81,16 @@ checkingBalance.updaterBalance((err, balance, changed) => {
         }).catch(err => {
             throw err;
         });
+
+        // Request api for update balance to purse
+        ghostApi.checkAuth(systemUser).then(auth => {
+            return auth ? true : ghostApi.authenticationAdmin(systemUser);
+        }).then(() => {
+            return ghostApi.api('sys.purse_update_balance', 'POST', {
+                phone: currentPurse[0].substring(1),
+                balance
+            });
+        }).catch(console.log);
     }
 });
 
