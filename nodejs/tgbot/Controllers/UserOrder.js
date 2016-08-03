@@ -131,7 +131,7 @@ class UserOrder extends TelegramBaseController {
                     nvg: ['myorder', 'in start']
                 };
 
-                this.tools.render('confirm', data)
+                return this.tools.render('confirm', data)
                     .then(content => $.sendMessage(content))
                     .catch(err => {
                         console.log(err);
