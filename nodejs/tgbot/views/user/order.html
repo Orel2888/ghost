@@ -13,9 +13,9 @@
 {{ emojis[6] }} Цена: *{{ item.cost }}*
 {{ emojis[12] }} Статус: *{{ item.status_message }}*
 {{ emojis[13] }} Дата: *{{ item.date }}*
-{%- if item.status == 1 %}
+{% if item.status == 1 -%}
 {{ emojis[14] }} Адрес: {{ item.address }}
-{% endif -%}
+{%- endif -%}
 Удалить {{ emojis[2] }} /myorder\_del\_{{ item.id }}
 {{- separator -}}
 {% endfor %}
