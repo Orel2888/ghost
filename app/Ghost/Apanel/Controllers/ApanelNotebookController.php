@@ -9,8 +9,14 @@ class ApanelNotebookController extends ApanelBaseController
 {
     public function getIndex()
     {
+        $notebookFile = storage_path('description.txt');
+
+        if (!file_exists($notebookFile)) {
+            file_put_contents($notebookFile, '');
+        }
+        
         return view('apanel.other.notebook', [
-            'content'   => GibberishAES::dec(file_get_contents(storage_path('description.txt')), env('K5'))
+            'content'   => GibberishAES::dec(file_get_contents($notebookFile), env('K5'))
         ]);
     }
 

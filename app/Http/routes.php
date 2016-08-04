@@ -33,6 +33,12 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
 
         Route::get('goods/addgoods', 'ApanelGoodsController@getAddGoods');
         Route::post('goods/addgoods', 'ApanelGoodsController@postAddGoods');
+        
+        Route::get('goods/delete-goods', 'ApanelGoodsController@getDeleteGoods');
+        Route::post('goods/delete-goods', 'ApanelGoodsController@postDeleteGoods');
+        
+        Route::get('goods/edit-goods', 'ApanelGoodsController@getEditGoods');
+        Route::post('goods/edit-goods', 'ApanelGoodsController@postEditGoods');
 
         Route::get('goods', 'ApanelGoodsController@getIndex');
         Route::get('goods-price', 'ApanelGoodsController@getGoodsPrice');

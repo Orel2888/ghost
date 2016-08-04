@@ -14,7 +14,7 @@ class ApanelGoodsController extends ApanelBaseController
 
         // Get weighs by goods and counts
         $goodsWeights = [];
-
+        
         foreach ($cities as $city) {
             $cityId = $city->id;
 
@@ -170,4 +170,50 @@ class ApanelGoodsController extends ApanelBaseController
             return redirect('apanel/goods/addgoods-price?goods_id='. $goodsId)->with('note', 'Товар успешно добавлен в прайс лист');
         }
     }
+
+    public function getDeleteGoods()
+    {
+        $this->validate($this->request, [
+            'goods_id'  => 'required|integer|exists:goods,id'
+        ]);
+
+        $goods = $this->goodsManager->goods->with('city')->find($this->request->input('goods_id'));
+        
+        return view('apanel.goods.delete_goods', compact('goods'));
+    }
+
+    public function postDeleteGoods()
+    {
+        $this->validate($this->request, [
+            'goods_id'  => 'required|integer|exists:goods,id'
+        ]);
+        
+        $this->goodsManager->goods->find($this->request->input('goods_id'))->delete();
+        
+        return redirect('apanel/goods')->with('note', 'Выбранная категория товара, была успешно удалена');
+    }
+
+    public function getEditGoods()
+    {
+        $this->validate($this->request, [
+            'goods_id'  => 'required|integer|exists:goods,id'
+        ]);
+
+        $goods = $this->goodsManager->goods->with('city')->find($this->request->input('goods_id'));
+        
+        return view('apanel.goods.edit_goods', compact('goods'));
+    }
+
+    public function postEditGoods()
+    {
+        $this->validate($this->request, [
+            'goods_id'  => 'required|integer|exists:goods,id',
+            'name'      => 'required'
+        ]);
+        
+        $this->goodsManager->goods->find($this->request->input('goods_id'))->update(['name' => $this->request->input('name')]);
+        
+        return redirect('apanel/goods/edit-goods?goods_id='. $this->request->input('goods_id'))->with('note', 'Изменения успешно сохранены');
+    }
+    
 }

@@ -8,6 +8,10 @@
                     Города и товары
                 </div>
                 <div class="panel-body">
+
+                    @include('apanel.goods.errors')
+                    @include('apanel.goods.notes')
+
                     <div class="list-group">
                         <a href="{{ url('apanel/goods/addcity') }}" class="btn btn-success btn-sm">Добавить город</a>
                         <hr>
@@ -20,7 +24,9 @@
                                 <p class="list-group-item-text">
                                     @forelse ($city->goods as $goods)
                                         <i class="glyphicon glyphicon-shopping-cart"></i> {{ $goods->name }}
-                                        <a href="{{ url('apanel/goods/addgoods-price?goods_id='. $goods->id) }}" data-toggle="tooltip" title="Добавить товар в прайс"><i class="glyphicon glyphicon-plus-sign"></i></a><br>
+                                        <a href="{{ url('apanel/goods/addgoods-price?goods_id='. $goods->id) }}" data-toggle="tooltip" title="Добавить товар в прайс"><i class="glyphicon glyphicon-plus-sign"></i></a>
+                                        <a href="{{ url('apanel/goods/delete-goods?goods_id='. $goods->id) }}" data-toggle="tooltip" title="Удалить категорию товара"><i class="glyphicon glyphicon-remove"></i></a>
+                                        <a href="{{ url('apanel/goods/edit-goods?goods_id='. $goods->id) }}" data-toggle="tooltip" title="Редактировать категорию товара"><i class="glyphicon glyphicon-pencil"></i></a>
                                         <ul class="list-group">
                                         @forelse ($goods_weights[$city->id][$goods->id] as $weight => $count)
                                             <li class="list-group-item">
