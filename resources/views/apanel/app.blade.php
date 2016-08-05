@@ -29,7 +29,7 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li @if(Request::is('apanel/goods')) class="active" @endif><a href="{{ url('apanel/goods') }}">Города и товар</a></li>
-                    <li @if(Request::is('apanel/goods-price*')) class="active" @endif><a href="{{ url('apanel/goods-price') }}">Каталог товаров</a></li>
+                    <li @if(Request::is('apanel/goods-price*')) class="active" @endif><a href="{{ url('apanel/goods-price') }}">Прайс товаров</a></li>
                     <li @if(Request::is('apanel/notebook*')) class="active" @endif><a href="{{ url('apanel/notebook') }}">Блокнот</a></li>
                 </ul>
             </div>
