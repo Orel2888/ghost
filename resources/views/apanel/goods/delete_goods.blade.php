@@ -18,7 +18,6 @@
             Вместе с категорией товара, будут удалены все товары в прайс листе.
 
             <form method="POST">
-                <input type="hidden" name="goods_id" value="{{ $goods->id }}">
                 {{ csrf_field() }}
                 <button type="submit" class="btn btn-danger">Удалить</button>
             </form>

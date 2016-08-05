@@ -19,11 +19,13 @@
                             <div class="list-group-item">
                                 <h4 class="list-group-item-heading">
                                     <i class="glyphicon glyphicon-home"></i> {{ $city->name }}
+                                    <a href="{{ url('apanel/goods/edit-city?city_id='. $city->id) }}" data-toggle="tooltip" title="Редактирование города"><i class="glyphicon glyphicon-pencil"></i></a>
+                                    <a href="{{ url('apanel/goods/delete-city?city_id='. $city->id) }}" data-toggle="tooltip" title="Удалить город"><i class="glyphicon glyphicon-remove"></i></a>
                                     <a href="{{ url('apanel/goods/addgoods?city_id='. $city->id) }}" class="btn btn-success btn-sm pull-right">Добавить категорию товара</a>
                                 </h4>
                                 <p class="list-group-item-text">
                                     @forelse ($city->goods as $goods)
-                                        <i class="glyphicon glyphicon-shopping-cart"></i> {{ $goods->name }}
+                                        ID: {{ $goods->id }} <i class="glyphicon glyphicon-shopping-cart"></i> {{ $goods->name }}
                                         <a href="{{ url('apanel/goods/addgoods-price?goods_id='. $goods->id) }}" data-toggle="tooltip" title="Добавить товар в прайс"><i class="glyphicon glyphicon-plus-sign"></i></a>
                                         <a href="{{ url('apanel/goods/delete-goods?goods_id='. $goods->id) }}" data-toggle="tooltip" title="Удалить категорию товара"><i class="glyphicon glyphicon-remove"></i></a>
                                         <a href="{{ url('apanel/goods/edit-goods?goods_id='. $goods->id) }}" data-toggle="tooltip" title="Редактировать категорию товара"><i class="glyphicon glyphicon-pencil"></i></a>

@@ -39,7 +39,7 @@ class ApanelGoodsController extends ApanelBaseController
 
 
         $tplData['goods_price'] = $goodsPrice;
-
+        
         return view('apanel.goods.goods_price', $tplData);
     }
 
@@ -57,6 +57,51 @@ class ApanelGoodsController extends ApanelBaseController
         City::create(['name' => $this->request->input('name')]);
 
         return redirect('apanel/goods/addcity')->with('note', 'Город добавлен');
+    }
+
+    public function getEditCity()
+    {
+        $this->validate($this->request, [
+            'city_id'   => 'required|integer|exists:citys,id'
+        ]);
+        
+        $city = City::find($this->request->input('city_id'));
+        
+        return view('apanel.goods.edit_city', compact('city'));
+    }
+
+    public function postEditCity()
+    {
+        $this->validate($this->request, [
+            'city_id'   => 'required|integer|exists:citys,id',
+            'name'      => 'required'
+        ]);
+
+        City::find($this->request->input('city_id'))->update(['name' => $this->request->input('name')]);
+
+        return redirect('apanel/goods/edit-city?city_id='. $this->request->input('city_id'))->with('note', 'Изменения успешно сохранены');
+    }
+
+    public function getDeleteCity()
+    {
+        $this->validate($this->request, [
+            'city_id'   => 'required|integer|exists:citys,id'
+        ]);
+
+        $city = City::find($this->request->input('city_id'));
+
+        return view('apanel.goods.delete_city', compact('city'));
+    }
+
+    public function postDeleteCity()
+    {
+        $this->validate($this->request, [
+            'city_id'   => 'required|integer|exists:citys,id'
+        ]);
+
+        City::find($this->request->input('city_id'))->delete();
+
+        return redirect('apanel/goods')->with('note', 'Город успешно удален');
     }
 
     public function getAddGoods()

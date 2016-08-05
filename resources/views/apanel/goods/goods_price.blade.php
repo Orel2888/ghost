@@ -44,9 +44,12 @@
                 @endforelse
                 </tbody>
             </table>
+
+            @if (($paginate = $goods_price->links()) != '')
             <div class="panel-footer">
-                {{ $goods_price->links() }}
+                {{ $paginate }}
             </div>
+            @endif
         </div>
     </div>
 </div>
