@@ -6,8 +6,6 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use App\GoodsPrice;
 use App\Miner;
-use App\Goods;
-use App\Ghost\Libs\GibberishAES;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -34,21 +32,6 @@ class EventServiceProvider extends ServiceProvider
 
         GoodsPrice::created(function ($goodsPrice) {
             Miner::find($goodsPrice->miner_id)->increment('count_goods', 1);
-        });
-
-        GoodsPrice::creating(function ($goodsPrice) {
-            $goodsPrice->address = GibberishAES::enc($goodsPrice->address, env('K5'));
-        });
-        GoodsPrice::updated(function ($goodsPrice) {
-            $goodsPrice->address = GibberishAES::enc($goodsPrice->address, env('K5'));
-        });
-
-        Goods::creating(function ($goods) {
-            $goods->name = GibberishAES::enc($goods->name, env('K5'));
-        });
-
-        Goods::updating(function ($goods) {
-            $goods->name = GibberishAES::enc($goods->name, env('K5'));
         });
     }
 }
