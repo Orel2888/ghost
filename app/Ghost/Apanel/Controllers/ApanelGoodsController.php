@@ -35,10 +35,52 @@ class ApanelGoodsController extends ApanelBaseController
     {
         $tplData = [];
 
-        $goodsPrice = $this->goodsManager->goodsPrice->paginate(20);
+        $goodsPrice = $this->goodsManager->goodsPrice->query();
 
+        // Reset filter
+        if ($this->request->has('filter_reset')) {
+            return redirect('apanel/goods-price');
+        }
 
-        $tplData['goods_price'] = $goodsPrice;
+        // Query build of filter
+        if ($this->request->has('filter')) {
+            $this->apanelRepo->dbQueryBuilder($goodsPrice, $this->request->except('filter', 'filter_reset', 'page'));
+        }
+        //echo $goodsPrice->toSql();
+        $tplData['goods_price']  = $goodsPrice->paginate(20)->appends($this->request->all());
+
+        // Form filter
+        $tplData['form_filter']  = $this->apanelRepo->formFilter([
+            'inputs'    => [
+                'ID'       => ['name' => 'id'],
+                'Товар ID' => ['name' => 'goods_id'],
+                'Минер ID' => ['name' => 'miner_id'],
+                'Вес'      => ['name' => 'weight'],
+                'Адрес'    => [
+                    'name'      => 'address',
+                    'compare'   => ['=', 'like']
+                ],
+                'Цена'      => ['name' => 'cost']
+            ],
+            'selects'       => [
+                'В резерве' => [
+                    'name'  => 'reserve',
+                    'fields' => [
+                        -1  => '---',
+                        0   => 'Нет',
+                        1   => 'Да'
+                    ],
+                    'selected' => -1
+                ]
+            ],
+            'sorting'   => [
+                'columns'   => [
+                    'ID'        => 'id',
+                    'Вес'       => 'weight',
+                    'Цена'      => 'cost'
+                ]
+            ]
+        ], $this->request->all());
         
         return view('apanel.goods.goods_price', $tplData);
     }

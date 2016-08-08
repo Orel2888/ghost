@@ -10,8 +10,9 @@
                 Каталог адресов
             </div>
             <div class="panel-body">
-
+                {!! $form_filter !!}
             </div>
+
             <table class="table table-bordered">
                 <thead>
                 <tr>
@@ -38,9 +39,9 @@
                         <td>{{ $item->created_at->format('d-m-y H:i') }}</td>
                     </tr>
                 @empty
-                <tr>
-                    <td colspan="8">Пусто</td>
-                </tr>
+                    <tr>
+                        <td colspan="8">Пусто</td>
+                    </tr>
                 @endforelse
                 </tbody>
             </table>
