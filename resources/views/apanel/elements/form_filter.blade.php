@@ -25,6 +25,7 @@
         </div>
     @endforeach
 
+    @if (isset($scheme['selects']))
     @foreach ($scheme['selects'] as $labelText => $rules)
         <div class="form-group">
             <label for="f_{{ $rules['name'] }}">{{ $labelText }}</label>
@@ -35,6 +36,7 @@
             </select>
         </div>
     @endforeach
+    @endif
 
     <br>
     <label>Сортировать</label><br>
