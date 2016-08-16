@@ -23,13 +23,16 @@
     <nav class="navbar navbar-default navbar-static-top">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="{{ url('apanel') }}">Apanel</a>
+                <a class="navbar-brand" href="{{ url('apanel') }}">Dashboard</a>
             </div>
 
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li @if(Request::is('apanel/goods')) class="active" @endif><a href="{{ url('apanel/goods') }}">Города и товар</a></li>
                     <li @if(Request::is('apanel/goods-price*')) class="active" @endif><a href="{{ url('apanel/goods-price') }}">Прайс товаров</a></li>
+                    <li @if(Request::is('apanel/client*')) class="active" @endif><a href="{{ url('apanel/client') }}">Клиенты</a></li>
+                    <li @if(Request::is('apanel/miner*')) class="active" @endif><a href="{{ url('apanel/miner') }}">Курьеры</a></li>
+                    <li @if(Request::is('apanel/purchase*')) class="active" @endif><a href="{{ url('apanel/purchase') }}">Покупки</a></li>
                     <li @if(Request::is('apanel/notebook*')) class="active" @endif><a href="{{ url('apanel/notebook') }}">Блокнот</a></li>
                 </ul>
             </div>
