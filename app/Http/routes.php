@@ -25,6 +25,9 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
     Route::group(['middleware' => ['auth.admin']], function () {
         Route::get('/', 'ApanelController@getIndex');
 
+        /**
+         * Goods
+         */
         Route::get('goods/addcity', 'ApanelGoodsController@getAddCity');
         Route::post('goods/addcity', 'ApanelGoodsController@postAddCity');
 
@@ -49,8 +52,31 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
         Route::get('goods', 'ApanelGoodsController@getIndex');
         Route::get('goods-price', 'ApanelGoodsController@getGoodsPrice');
 
+        /**
+         * Notebook
+         */
         Route::get('notebook', 'ApanelNotebookController@getIndex');
         Route::post('notebook-save', 'ApanelNotebookController@postSave');
+
+        /**
+         * Clients
+         */
+
+        Route::get('client', 'ApanelClientController@getIndex');
+
+        /**
+         * Purchases
+         */
+
+        Route::get('purchase', 'ApanelPurchaseController@getIndex');
+
+        /**
+         * Soldiers
+         */
+        
+        Route::get('miner', 'ApanelMinerController@getIndex');
+        Route::get('miner/info', 'ApanelMinerController@getInfo');
+
     });
 
     Route::get('login', 'ApanelAuthController@getLogin');
