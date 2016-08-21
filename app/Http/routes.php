@@ -75,7 +75,7 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
          */
         
         Route::get('miner', 'ApanelMinerController@getIndex');
-        Route::get('miner/info', 'ApanelMinerController@getInfo');
+        Route::get('miner/info/{id}', 'ApanelMinerController@getInfo')->where('id', '\w+');
 
     });
 

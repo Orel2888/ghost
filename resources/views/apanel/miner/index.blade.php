@@ -4,6 +4,12 @@
 
 @section('content')
     <div class="row wrap">
+
+        <ol class="breadcrumb">
+            <li class="active">Каталог курьеров</li>
+            <li><a href="{{ url('miners/payments') }}">Выплаты</a></li>
+        </ol>
+
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-heading">
@@ -39,7 +45,7 @@
                         <td>{{ $miner->counter_goods_fail }}</td>
                         <td>{{ $miner->counter_total_goods }}</td>
                         <td>{{ $miner->created_at->format('d-m-y H:i') }}</td>
-                        <td><a href="{{ url('apanel/miner/info?id='. $miner->id) }}" class="btn btn-sm btn-success">Инфо</a></td>
+                        <td><a href="{{ url('apanel/miner/info/'. $miner->id) }}" class="btn btn-sm btn-success">Инфо</a></td>
                     </tr>
                         @empty
                     <tr>

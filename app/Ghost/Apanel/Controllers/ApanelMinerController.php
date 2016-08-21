@@ -52,4 +52,13 @@ class ApanelMinerController extends ApanelBaseController
         
         return view('apanel.miner.index', $tplData);
     }
+
+    public function getInfo($minerId)
+    {
+        $miner = Miner::find($minerId);
+        
+        return view('apanel.miner.info', [
+            'miner' => $miner
+        ]);
+    }
 }
