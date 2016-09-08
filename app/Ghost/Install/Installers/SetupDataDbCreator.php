@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Ghost\Install;
+namespace App\Ghost\Install\Installers;
 
+use App\Ghost\Install\BaseInstall;
 use DB;
 
 class SetupDataDbCreator extends BaseInstall

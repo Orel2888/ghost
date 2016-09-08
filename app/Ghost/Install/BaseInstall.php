@@ -10,24 +10,15 @@ abstract class BaseInstall
      */
     public $settings;
 
-    public $config;
-
     public $installers = [];
 
     public $uninstallers = [];
 
-    public function __construct($config)
+    public function __construct($settings)
     {
-        $this->config = $config;
-
-        $this->configure();
+        $this->settings = $settings;
 
         $this->makeMapInstallers();
-    }
-
-    public function configure()
-    {
-        $this->settings = require(app_path('Ghost/Install/settings_'. $this->config['APP_ENV'] .'.php'));
     }
 
     public function makeMapInstallers()
@@ -64,7 +55,7 @@ abstract class BaseInstall
         foreach ($this->installers as $installer) {
             $this->$installer();
 
-            if ($this->getConfig('after_each_unistall')) {
+            if ($this->getConfig('unistall_after_each_setup')) {
                 $this->unistall($installer);
             }
         }
@@ -90,6 +81,6 @@ abstract class BaseInstall
 
     public function getConfig($key)
     {
-        return $this->config[$key] ?? null;
+        return $this->settings[$key] ?? null;
     }
 }
