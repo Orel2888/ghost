@@ -2,12 +2,17 @@
 
 namespace App\Ghost\Api\Controllers;
 
-use App\QiwiTransaction;
-use App\Client;
-use App\Ghost\Repositories\Goods\Exceptions\GoodsEndedException;
-use App\Ghost\Repositories\Goods\Exceptions\NotEnoughMoney;
+use App\{
+    QiwiTransaction,
+    QiwiTransactionAbuse,
+    Client,
+    Purse
+};
+use App\Ghost\Repositories\Goods\Exceptions\{
+    GoodsEndedException,
+    NotEnoughMoney
+};
 use Validator;
-use App\Purse;
 
 class SystemApiController extends BaseApiController
 {
@@ -46,17 +51,20 @@ class SystemApiController extends BaseApiController
             $transaction->update(['status' => 1]);
         }
 
+        // Get all a users with positive a balance
+        $usersWithBalances = Client::where('balance', '>', 0)->get();
+
         // Processing a orders
         $ordersIdsSuccessful       = [];
         $ordersIdsEndedGoods       = [];
         $ordersIdsNotEnoughMoney   = [];
 
-        if (count($clientsIdsUpdatedBalance)) {
-            foreach ($clientsIdsUpdatedBalance as $clientId) {
+        if (count($usersWithBalances)) {
+            foreach ($usersWithBalances as $clientWithBalance) {
 
                 $client = Client::with(['goodsOrders' => function ($query) {
                     $query->where('status', '!=', 1);
-                }])->find($clientId);
+                }])->find($clientWithBalance->id);
 
                 foreach ($client->goodsOrders as $order) {
                     try {
@@ -73,6 +81,13 @@ class SystemApiController extends BaseApiController
                         $ordersIdsNotEnoughMoney[] = $order->id;
                     }
                 }
+            }
+        }
+
+        // Insert abuse transactions
+        if (count($transactions_ids_abuse)) {
+            foreach ($transactions_ids_abuse as $transId) {
+                QiwiTransactionAbuse::create(['transaction_id' => $transId]);
             }
         }
 
