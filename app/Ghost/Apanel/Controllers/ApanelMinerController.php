@@ -2,10 +2,23 @@
 
 namespace App\Ghost\Apanel\Controllers;
 
+use App\Ghost\Domains\Miner\MinerInfoDataProvider;
 use App\Miner;
 
 class ApanelMinerController extends ApanelBaseController
 {
+    /**
+     * @var MinerInfoDataProvider
+     */
+    public $minerInfoDataProvider;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->minerInfoDataProvider = new MinerInfoDataProvider();
+    }
+
     public function getIndex()
     {
         $tplData = [];
@@ -55,10 +68,11 @@ class ApanelMinerController extends ApanelBaseController
 
     public function getInfo($minerId)
     {
-        $miner = Miner::find($minerId);
+
+        $minerData = $this->minerInfoDataProvider->mainStat($minerId);
         
         return view('apanel.miner.info', [
-            'miner' => $miner
+            'miner' => $minerData
         ]);
     }
 }

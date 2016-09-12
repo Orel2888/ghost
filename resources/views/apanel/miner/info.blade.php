@@ -24,7 +24,7 @@
                             Баланс
                         </li>
                         <li class="list-group-item">
-                            <span class="badge">{{ $miner->counter_goods + $miner->counter_goods_ok * $miner->ante }}</span>
+                            <span class="badge">{{ $miner->pending_balance }}</span>
                             Ожидаемый баланс
                         </li>
                         <li class="list-group-item">
@@ -36,7 +36,7 @@
                             Кол-во товара продано
                         </li>
                         <li class="list-group-item">
-                            <span class="badge">{{ $miner->counter_goods_fail }} - {{ $miner->counter_goods_ok * $miner->counter_goods_fail / 100 }}%</span>
+                            <span class="badge">{{ $miner->counter_goods_fail }} / {{ $miner->counter_goods_fail_percent }}%</span>
                             Кол-во товара не найдено
                         </li>
                         <li class="list-group-item">
@@ -44,11 +44,11 @@
                             Кол-во товара всего
                         </li>
                         <li class="list-group-item">
-                            Дата регистрации <span class="pull-right"><b>{{ $miner->created_at->format('d-m-Y H:i') }}</b></span>
+                            Дата регистрации <span class="pull-right"><b>{{ $miner->created_at }}</b></span>
                         </li>
-                        <a href="{{ url('apanel/miner/createpay?id='. $miner->id) }}" class="list-group-item list-group-item-info">
-                            <h4><i class="glyphicon glyphicon-pencil"></i> Корректировка баланса</h4>
-                            <p class="list-group-item-text">Редактировать баланс курьера</p>
+                        <a href="{{ url('apanel/miner/edit?id='. $miner->id) }}" class="list-group-item list-group-item-info">
+                            <h4><i class="glyphicon glyphicon-pencil"></i> Редактировать данные</h4>
+                            <p class="list-group-item-text">Редактировать баланс, счетчики и т.д.</p>
                         </a>
                         <a href="{{ url('apanel/miner/createpay?id='. $miner->id) }}" class="list-group-item list-group-item-success">
                             <h4 class="list-group-item-heading"><i class="glyphicon glyphicon-ruble"></i> Выплатить</h4>
