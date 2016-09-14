@@ -4,14 +4,24 @@ namespace App\Ghost\Domains\Miner;
 
 use App\Ghost\Repositories\Miner\MinerManager;
 use App\Ghost\Domains\Miner\Entities\MinerInfo;
+use App\Miner;
 
 class MinerInfoDataProvider
 {
+    /**
+     * @var MinerManager
+     */
     public $minerManager;
+
+    /**
+     * @var Miner
+     */
+    public $minerModel;
 
     public function __construct()
     {
         $this->minerManager = new MinerManager();
+        $this->minerModel = new Miner();
     }
 
     public function mainStat($minerId)
