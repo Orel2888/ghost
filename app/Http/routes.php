@@ -117,6 +117,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
      */
     Route::group(['middleware' => 'api:user'], function () {
         Route::post('order.create', 'OrderApiController@postCreate');
+        Route::get('order.find', 'OrderApiController@getFind');
         Route::get('order.list', 'OrderApiController@getList');
         Route::post('order.del', 'OrderApiController@postDelOrder');
         Route::post('order.delall', 'OrderApiController@postDelAllOrder');
