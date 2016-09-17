@@ -1,10 +1,10 @@
 'use strict';
 
-const Telegram = require('telegram-node-bot')
-const TelegramBaseController = Telegram.TelegramBaseController
-const emoji = require('node-emoji')
-const UserScope = require('../UserScope')
-const Tools = require('../Tools')
+const Telegram = require('telegram-node-bot');
+const TelegramBaseController = Telegram.TelegramBaseController;
+const emoji = require('node-emoji');
+const UserScope = require('../UserScope');
+const Tools = require('../Tools');
 
 let emojify = emoji.emojify;
 

@@ -1,8 +1,8 @@
 'use strict';
 
-const Telegram = require('telegram-node-bot')
-const TelegramBaseController = Telegram.TelegramBaseController
-const emoji = require('node-emoji')
+const Telegram = require('telegram-node-bot');
+const TelegramBaseController = Telegram.TelegramBaseController;
+const emoji = require('node-emoji');
 
 class AdminController extends TelegramBaseController {
 
@@ -142,7 +142,7 @@ class AdminController extends TelegramBaseController {
                 $.sendMessage(message);
 
             }).catch(console.log)
-        }
+        };
 
         return responseGoodsAvailable();
     }
@@ -161,7 +161,7 @@ class AdminController extends TelegramBaseController {
             message += '/админ помощь - описание по командам\n';
 
             $.sendMessage(message);
-        }
+        };
 
         return responseHelpMessage();
     }
@@ -189,7 +189,7 @@ class AdminController extends TelegramBaseController {
 
                 $.sendMessage(message);
             });
-        }
+        };
 
         return responsePurseList();
     }
@@ -208,7 +208,7 @@ class AdminController extends TelegramBaseController {
             }).then(response => {
                 return $.sendMessage('Кошелек изменен');
             });
-        }
+        };
 
         return changePurse();
     }

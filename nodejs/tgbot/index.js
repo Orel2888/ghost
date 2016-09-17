@@ -1,13 +1,13 @@
 'use strict';
 
-const config = require('../config')
-const Telegram = require('telegram-node-bot')
-const tg = new Telegram.Telegram(config.get('TGBOT_TOKEN'))
-const AdminController = require('./Controllers/AdminController')
-const UserController = require('./Controllers/UserController')
-const UserOrder = require('./Controllers/UserOrder')
-const PurchaseController = require('./Controllers/PurchaseController')
-const powers = require('./Powers')
+const config = require('../config');
+const Telegram = require('telegram-node-bot');
+const tg = new Telegram.Telegram(config.get('TGBOT_TOKEN'));
+const AdminController = require('./Controllers/AdminController');
+const UserController = require('./Controllers/UserController');
+const UserOrder = require('./Controllers/UserOrder');
+const PurchaseController = require('./Controllers/PurchaseController');
+const powers = require('./Powers');
 
 let Powers = new powers();
 
@@ -119,8 +119,8 @@ const intervalCleanSessions = 10;
 // In minutes
 const timeExpiresUserSession = 60;
 
-let sessionStorage = tg._telegramDataSource._sessionStorage
-let userLastActivity
+let sessionStorage = tg._telegramDataSource._sessionStorage;
+let userLastActivity;
 
 let checkingActivitySessions = setInterval(() => {
     if (sessionStorage._storage._storage.hasOwnProperty('userStorage')) {
@@ -130,7 +130,7 @@ let checkingActivitySessions = setInterval(() => {
                 userLastActivity = sessionStorage._storage._storage.userStorage[userId].lastTimeActivity;
 
                 if (Math.floor((Date.now() - userLastActivity) / 1000) > timeExpiresUserSession * 60) {
-                    sessionStorage.removeUserSession(userId)
+                    sessionStorage.removeUserSession(userId);
 
                     console.log('Remove session user id', userId)
                 }
@@ -138,4 +138,4 @@ let checkingActivitySessions = setInterval(() => {
         }
     }
 
-}, intervalCleanSessions * 1000)
+}, intervalCleanSessions * 1000);
