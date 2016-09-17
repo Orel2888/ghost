@@ -10,12 +10,13 @@ let emojify = emoji.emojify;
 
 class PurchaseController extends TelegramBaseController {
 
-    constructor(Powers) {
+    constructor(Container) {
         super();
 
-        this.powers   = Powers;
-        this.ghostApi = this.powers.ghostApi;
-        this.userScope = new UserScope(this.powers);
+        this.container = Container;
+        this.powers    = this.container.make('Powers');
+        this.ghostApi  = this.powers.ghostApi;
+        this.userScope = this.container.make('UserScope');
         this.tools = new Tools();
     }
 

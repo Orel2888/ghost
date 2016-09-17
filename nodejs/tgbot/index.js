@@ -8,8 +8,18 @@ const UserController = require('./Controllers/UserController');
 const UserOrder = require('./Controllers/UserOrder');
 const PurchaseController = require('./Controllers/PurchaseController');
 const powers = require('./Powers');
+const UserScope = require('./UserScope');
+const Container = require('node-service-container');
 
+let con = new Container();
 let Powers = new powers();
+
+con.bind('Powers', Powers);
+con.bind(UserScope.name, new UserScope(con));
+con.bind(AdminController.name, new AdminController(con));
+con.bind(UserController.name, new UserController(con));
+con.bind(UserOrder.name, new UserOrder(con));
+con.bind(PurchaseController.name, new PurchaseController(con));
 
 const adminUsernames = config.get('TGBOT_ADMINS').split(',');
 const adminCommands  = [
@@ -28,6 +38,7 @@ const userCommands = [
     /\/myorder_delcon_[0-9]*/,
     /\/myorder_delallcon/,
     /\/myorder_delall/,
+    /\/myorder_sendme_[0-9]*/,
     '/myorder',
     '/myprofile'
 ];
@@ -87,7 +98,7 @@ tg.router
         '/админ помощь',
         '/кош выбрать :arg1',
         '/кош'
-    ], new AdminController(Powers));
+    ], con.make('AdminController'));
 
 /**
  * Shop
@@ -97,13 +108,13 @@ tg.router
     .when([
         '/start',
         '/myprofile'
-    ], new UserController(Powers));
+    ], con.make('UserController'));
 
 tg.router
     .when([
         /\/buy[0-9]*_[0-9]*_[0-9]*/gi,
         /\/buy[0-9]*_[0-9]*/gi
-    ], new PurchaseController(Powers));
+    ], con.make('PurchaseController'));
 
 tg.router
     .when([
@@ -111,8 +122,9 @@ tg.router
         /\/myorder_delcon_[0-9]*/g,
         /\/myorder_delallcon/g,
         /\/myorder_delall/g,
+        /\/myorder_sendme_[0-9]*/g,
         '/myorder'
-    ], new UserOrder(Powers))
+    ], con.make('UserOrder'));
 
 // Cleaning user session for expires
 const intervalCleanSessions = 10;

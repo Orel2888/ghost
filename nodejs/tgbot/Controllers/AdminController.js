@@ -6,10 +6,11 @@ const emoji = require('node-emoji');
 
 class AdminController extends TelegramBaseController {
 
-    constructor(Powers) {
+    constructor(Container) {
         super();
 
-        this.powers   = Powers;
+        this.container = Container;
+        this.powers   = Container.make('Powers');
         this.ghostApi = this.powers.ghostApi;
     }
 

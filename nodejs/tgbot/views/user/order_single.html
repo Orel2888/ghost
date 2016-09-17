@@ -1,0 +1,13 @@
+{% extends '../layout1.html' %}
+
+{% block content %}
+{{ emojis[11] }} Заказ #{{ order.id }}
+
+{{ emojis[3] }} *{{ order.city_name }}*
+{{ emojis[4] }} Товар: *{{ order.goods_name }}*
+{{ emojis[5] }} Вес: *{{ order.weight }}*
+{{ emojis[6] }} Цена: *{{ order.cost }}*
+{% if order.status == 1 -%}
+{{ emojis[14] }} Адрес: {{ order.address }}
+{%- endif -%}
+{% endblock %}
