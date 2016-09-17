@@ -113,10 +113,16 @@ class OrderApiController extends BaseApiController
         $orderInfo = [
             'city_name'         => $order->goods->city->name,
             'goods_name'        => $order->goods->name,
+            'weight'            => wcorrect($order->weight),
+            'cost'              => $order->cost,
+            'id'                => $order->id,
+            'status'            => $order->status,
+            'status_message'    => $this->goodsOrder->statusOrderMessages[$order->status],
+            'date'              => $order->created_at->isToday() ? $order->created_at->diffForHumans() : $order->created_at->format('d.m.y H:i'),
         ];
 
-        $orderInfo = array_merge($orderInfo, compact('weight', 'cost', 'id'), [
-            'address'   => $order->purchase ? $order->purchase->address : null
+        $orderInfo = array_merge($orderInfo, [
+            'address'   => $order->status == 1 ? $order->purchase->address : null
         ]);
 
         return response()->json($this->apiResponse->ok(['data' => $orderInfo]));
