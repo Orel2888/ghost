@@ -199,6 +199,9 @@ class ApiOrderTest extends TestCase
         $this->assertNotEmpty($data->weight);
         $this->assertNotEmpty($data->cost);
         $this->assertNotEmpty($data->id);
+        $this->assertContains($data->status, [0, 1, 2, 3]);
+        $this->assertNotEmpty($data->status_message);
+        $this->assertNotEmpty($data->date);
 
         $order->client->delete();
     }
