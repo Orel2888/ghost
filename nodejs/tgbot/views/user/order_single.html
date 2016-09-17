@@ -7,6 +7,8 @@
 {{ emojis[4] }} Товар: *{{ order.goods_name }}*
 {{ emojis[5] }} Вес: *{{ order.weight }}*
 {{ emojis[6] }} Цена: *{{ order.cost }}*
+{{ emojis[12] }} Статус: *{{ order.status_message }}*
+{{ emojis[13] }} Дата: *{{ order.date }}*
 {% if order.status == 1 -%}
 {{ emojis[14] }} Адрес: {{ order.address }}
 {%- endif -%}
