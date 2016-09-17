@@ -11,6 +11,8 @@
         </ol>
 
         <div class="col-md-12">
+            @include('apanel.elements.notify_success')
+
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     Курьеры
@@ -45,7 +47,7 @@
                         <td>{{ $miner->counter_goods_fail }}</td>
                         <td>{{ $miner->counter_total_goods }}</td>
                         <td>{{ $miner->created_at->format('d-m-y H:i') }}</td>
-                        <td><a href="{{ url('apanel/miner/info/'. $miner->id) }}" class="btn btn-sm btn-success">Инфо</a></td>
+                        <td><a href="{{ url('apanel/miner/'. $miner->id) }}" class="btn btn-sm btn-success">Инфо</a></td>
                     </tr>
                         @empty
                     <tr>

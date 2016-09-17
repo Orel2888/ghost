@@ -1,10 +1,11 @@
-'use strict'
+'use strict';
 
 class UserScope {
 
-    constructor(Powers) {
-        this.powers     = Powers;
-        this.ghostApi   = Powers.ghostApi;
+    constructor(Container) {
+        this.container  = Container;
+        this.powers     = this.container.make('Powers');
+        this.ghostApi   = this.powers.ghostApi;
     }
 
     findUser(clientId, scope) {

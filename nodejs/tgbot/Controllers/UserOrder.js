@@ -1,21 +1,22 @@
 'use strict';
 
-const Telegram = require('telegram-node-bot')
-const TelegramBaseController = Telegram.TelegramBaseController
-const emoji = require('node-emoji')
-const UserScope = require('../UserScope')
-const Tools = require('../Tools')
+const Telegram = require('telegram-node-bot');
+const TelegramBaseController = Telegram.TelegramBaseController;
+const emoji = require('node-emoji');
+const UserScope = require('../UserScope');
+const Tools = require('../Tools');
 
 let emojify = emoji.emojify;
 
 class UserOrder extends TelegramBaseController {
 
-    constructor(Powers) {
-        super()
+    constructor(Container) {
+        super();
 
-        this.powers    = Powers;
+        this.container = Container;
+        this.powers    = this.container.make('Powers');
         this.ghostApi  = this.powers.ghostApi;
-        this.userScope = new UserScope(this.powers);
+        this.userScope = this.container.make('UserScope');
         this.tools     = new Tools();
     }
 
@@ -143,13 +144,40 @@ class UserOrder extends TelegramBaseController {
         })
     }
 
+    handleSendmeOrder($) {
+        let orderId = $._message._text.match(/(\d+)/)[1];
+
+        return this.userScope.findUser($._message._from._id, $).then(udata => {
+            this.ghostApi.api('order.find', 'GET', {
+                id: orderId,
+                client_id: udata.id
+            }).then(response => {
+
+                let data = {
+                    nvg: ['myorder', 'myprofile', 'in start'],
+                    order: response.data
+                };
+
+                return this.tools.render('user/order_single', data).then(content => $.sendMessage(content, {parse_mode: 'markdown'}))
+                    .catch(err => {
+                        console.log(err);
+                        return $.sendMessage('Произошла ошибка');
+                    });
+            })
+        }).catch(err => {
+            console.log(err);
+            return $.sendMessage('Произошла ошибка');
+        });
+    }
+
     get routes() {
         return {
             '/myorder': 'handleOrderList',
             '/\/myorder_del_[0-9]*/g': 'handleOrderDelConfirm',
             '/\/myorder_delcon_[0-9]*/g': 'handleOrderDelete',
             '/\/myorder_delall/g': 'handleOrderDelAll',
-            '/\/myorder_delallcon/g': 'handleOrderDeleteAll'
+            '/\/myorder_delallcon/g': 'handleOrderDeleteAll',
+            '/\/myorder_sendme_[0-9]*/g': 'handleSendmeOrder'
         }
     }
 }

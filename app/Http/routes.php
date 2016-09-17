@@ -72,11 +72,13 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
 
         /**
          * Soldiers
+         * Resource miner
          */
-        
-        Route::get('miner', 'ApanelMinerController@getIndex');
-        Route::get('miner/info/{id}', 'ApanelMinerController@getInfo')->where('id', '\w+');
-
+        Route::get('miner/{miner_id}/payment_create', ['uses' => 'ApanelMinerController@payment_create', 'as' => 'apanel.miner.payment_create']);
+        Route::get('miner/{miner_id}/payment_store', ['uses' => 'ApanelMinerController@payment_store', 'as' => 'apanel.miner.payment_store']);
+        Route::get('miner/{miner_id}/delete-confirm', ['uses' => 'ApanelMinerController@deleteConfirm', 'as' => 'apanel.miner.delete_confirm']);
+        Route::get('miner/{miner_id}/delete', ['uses' => 'ApanelMinerController@delete', 'as' => 'apanel.miner.delete']);
+        Route::resource('miner', 'ApanelMinerController');
     });
 
     Route::get('login', 'ApanelAuthController@getLogin');
@@ -115,6 +117,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
      */
     Route::group(['middleware' => 'api:user'], function () {
         Route::post('order.create', 'OrderApiController@postCreate');
+        Route::get('order.find', 'OrderApiController@getFind');
         Route::get('order.list', 'OrderApiController@getList');
         Route::post('order.del', 'OrderApiController@postDelOrder');
         Route::post('order.delall', 'OrderApiController@postDelAllOrder');

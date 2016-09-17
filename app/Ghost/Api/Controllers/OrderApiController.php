@@ -3,10 +3,12 @@
 namespace App\Ghost\Api\Controllers;
 
 use Validator;
-use App\Client;
-use App\Goods;
-use App\GoodsOrder;
-use App\Purse;
+use App\{
+    Client,
+    Goods,
+    GoodsOrder,
+    Purse
+};
 
 class OrderApiController extends BaseApiController
 {
@@ -85,6 +87,45 @@ class OrderApiController extends BaseApiController
         return response()->json($this->apiResponse->ok([
             'data' => array_merge($orderInfo, ['order_ids' => $orderIds])
         ]));
+    }
+
+    public function getFind()
+    {
+        $valid = Validator::make($this->request->all(), [
+            'id'        => 'required|integer',
+            'client_id' => 'required|integer'
+        ]);
+
+        if ($valid->fails()) {
+            return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
+        }
+
+        $order = GoodsOrder::with(['goods.city', 'purchase'])
+            ->whereIdAndClientId($this->request->input('id'), $this->request->input('client_id'))
+            ->first();
+
+        if (is_null($order)) {
+            return response()->json($this->apiResponse->fail(['message' => 'Заказ не найден']), 404);
+        }
+
+        list($weight, $cost, $id) = [$order->weight, $order->cost, $order->id];
+
+        $orderInfo = [
+            'city_name'         => $order->goods->city->name,
+            'goods_name'        => $order->goods->name,
+            'weight'            => wcorrect($order->weight),
+            'cost'              => $order->cost,
+            'id'                => $order->id,
+            'status'            => $order->status,
+            'status_message'    => $this->goodsOrder->statusOrderMessages[$order->status],
+            'date'              => $order->created_at->isToday() ? $order->created_at->diffForHumans() : $order->created_at->format('d.m.y H:i'),
+        ];
+
+        $orderInfo = array_merge($orderInfo, [
+            'address'   => $order->status == 1 ? $order->purchase->address : null
+        ]);
+
+        return response()->json($this->apiResponse->ok(['data' => $orderInfo]));
     }
 
     public function getList()

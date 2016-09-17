@@ -44,4 +44,9 @@ class ApanelRepository
 
         return view('apanel.elements.form_filter', $tplData)->render();
     }
+
+    public function confirmAction($message, $urlUp, $urlCancel, $attributes = [])
+    {
+        return view('apanel.elements.confirm', compact('message', 'urlUp', 'urlCancel', 'attributes'));
+    }
 }

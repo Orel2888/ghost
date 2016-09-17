@@ -1,21 +1,22 @@
 'use strict';
 
-const Telegram = require('telegram-node-bot')
-const TelegramBaseController = Telegram.TelegramBaseController
-const emoji = require('node-emoji')
-const UserScope = require('../UserScope')
-const Tools = require('../Tools')
+const Telegram = require('telegram-node-bot');
+const TelegramBaseController = Telegram.TelegramBaseController;
+const emoji = require('node-emoji');
+const UserScope = require('../UserScope');
+const Tools = require('../Tools');
 
 let emojify = emoji.emojify;
 
 class UserController extends TelegramBaseController {
 
-    constructor(Powers) {
+    constructor(Container) {
         super();
 
-        this.powers    = Powers;
+        this.container = Container;
+        this.powers    = this.container.make('Powers');
         this.ghostApi  = this.powers.ghostApi;
-        this.userScope = new UserScope(this.powers);
+        this.userScope = this.container.make('UserScope');
         this.tools = new Tools();
     }
 

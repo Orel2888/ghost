@@ -1,15 +1,25 @@
 'use strict';
 
-const config = require('../config')
-const Telegram = require('telegram-node-bot')
-const tg = new Telegram.Telegram(config.get('TGBOT_TOKEN'))
-const AdminController = require('./Controllers/AdminController')
-const UserController = require('./Controllers/UserController')
-const UserOrder = require('./Controllers/UserOrder')
-const PurchaseController = require('./Controllers/PurchaseController')
-const powers = require('./Powers')
+const config = require('../config');
+const Telegram = require('telegram-node-bot');
+const tg = new Telegram.Telegram(config.get('TGBOT_TOKEN'));
+const AdminController = require('./Controllers/AdminController');
+const UserController = require('./Controllers/UserController');
+const UserOrder = require('./Controllers/UserOrder');
+const PurchaseController = require('./Controllers/PurchaseController');
+const powers = require('./Powers');
+const UserScope = require('./UserScope');
+const Container = require('node-service-container');
 
+let con = new Container();
 let Powers = new powers();
+
+con.bind('Powers', Powers);
+con.bind(UserScope.name, new UserScope(con));
+con.bind(AdminController.name, new AdminController(con));
+con.bind(UserController.name, new UserController(con));
+con.bind(UserOrder.name, new UserOrder(con));
+con.bind(PurchaseController.name, new PurchaseController(con));
 
 const adminUsernames = config.get('TGBOT_ADMINS').split(',');
 const adminCommands  = [
@@ -28,6 +38,7 @@ const userCommands = [
     /\/myorder_delcon_[0-9]*/,
     /\/myorder_delallcon/,
     /\/myorder_delall/,
+    /\/myorder_sendme_[0-9]*/,
     '/myorder',
     '/myprofile'
 ];
@@ -87,7 +98,7 @@ tg.router
         '/админ помощь',
         '/кош выбрать :arg1',
         '/кош'
-    ], new AdminController(Powers));
+    ], con.make('AdminController'));
 
 /**
  * Shop
@@ -97,13 +108,13 @@ tg.router
     .when([
         '/start',
         '/myprofile'
-    ], new UserController(Powers));
+    ], con.make('UserController'));
 
 tg.router
     .when([
         /\/buy[0-9]*_[0-9]*_[0-9]*/gi,
         /\/buy[0-9]*_[0-9]*/gi
-    ], new PurchaseController(Powers));
+    ], con.make('PurchaseController'));
 
 tg.router
     .when([
@@ -111,16 +122,17 @@ tg.router
         /\/myorder_delcon_[0-9]*/g,
         /\/myorder_delallcon/g,
         /\/myorder_delall/g,
+        /\/myorder_sendme_[0-9]*/g,
         '/myorder'
-    ], new UserOrder(Powers))
+    ], con.make('UserOrder'));
 
 // Cleaning user session for expires
 const intervalCleanSessions = 10;
 // In minutes
 const timeExpiresUserSession = 60;
 
-let sessionStorage = tg._telegramDataSource._sessionStorage
-let userLastActivity
+let sessionStorage = tg._telegramDataSource._sessionStorage;
+let userLastActivity;
 
 let checkingActivitySessions = setInterval(() => {
     if (sessionStorage._storage._storage.hasOwnProperty('userStorage')) {
@@ -130,7 +142,7 @@ let checkingActivitySessions = setInterval(() => {
                 userLastActivity = sessionStorage._storage._storage.userStorage[userId].lastTimeActivity;
 
                 if (Math.floor((Date.now() - userLastActivity) / 1000) > timeExpiresUserSession * 60) {
-                    sessionStorage.removeUserSession(userId)
+                    sessionStorage.removeUserSession(userId);
 
                     console.log('Remove session user id', userId)
                 }
@@ -138,4 +150,4 @@ let checkingActivitySessions = setInterval(() => {
         }
     }
 
-}, intervalCleanSessions * 1000)
+}, intervalCleanSessions * 1000);

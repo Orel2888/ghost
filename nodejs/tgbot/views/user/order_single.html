@@ -1,0 +1,8 @@
+{% extends '../layout1.html' %}
+{% import "../includes/order_item.html" as orderInfo %}
+
+{% block content %}
+{{ emojis[11] }} Заказ #{{ order.id }}
+
+{{ orderInfo.item(order) -}}
+{% endblock %}

@@ -21,7 +21,7 @@ abstract class Miner
 
     public function findMiner($miner)
     {
-        if (is_string($miner)) {
+        if (!is_numeric($miner)) {
             return $this->miner->where('name', $miner)->firstOrFail();
         } else {
             return $this->miner->findOrFail($miner);

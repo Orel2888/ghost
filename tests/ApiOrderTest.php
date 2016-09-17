@@ -3,10 +3,12 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use App\Client;
-use App\Goods;
-use App\GoodsOrder;
-use App\GoodsPrice;
+use App\{
+    Client,
+    Goods,
+    GoodsOrder,
+    GoodsPrice
+};
 use App\Ghost\Repositories\Goods\GoodsOrder as GoodsOrderRepo;
 use Faker\Factory as Faker;
 
@@ -176,6 +178,32 @@ class ApiOrderTest extends TestCase
         $this->assertArrayHasKey('date', $orderFirst);
 
         $client->delete();
+    }
+
+    public function test_find_order()
+    {
+        $accessToken = $this->authenticateUser();
+
+        $order = $this->createOrder();
+
+        $response = $this->call('GET', 'api/order.find', [
+            'access_token'  => $accessToken,
+            'id'            => $order->id,
+            'client_id'     => $order->client_id
+        ]);
+
+        $data = json_decode($response->getContent())->data;
+
+        $this->assertNotEmpty($data->city_name);
+        $this->assertNotEmpty($data->goods_name);
+        $this->assertNotEmpty($data->weight);
+        $this->assertNotEmpty($data->cost);
+        $this->assertNotEmpty($data->id);
+        $this->assertContains($data->status, [0, 1, 2, 3]);
+        $this->assertNotEmpty($data->status_message);
+        $this->assertNotEmpty($data->date);
+
+        $order->client->delete();
     }
 
     public function test_order_deletes()
