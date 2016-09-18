@@ -22,8 +22,8 @@ gulp.task('scripts', function () {
     return gulp.src([
         'public/js/jquery.min.js',
         'public/js/bootstrap.min.js',
-        'public/js/common.js',
-        'public/jquery-ui/jquery-ui.min.js'
+        'public/jquery-ui/jquery-ui.min.js',
+        'public/js/common.js'
     ]).pipe(concat('app.js'))
         .pipe(gulp.dest('public/js'));
 });
