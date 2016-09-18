@@ -17,6 +17,16 @@ class ApanelMinerPaymentController extends ApanelBaseController
     {
         $payments = MinerPayment::query();
 
+        // Reset a filter
+        if ($this->request->has('filter_reset')) {
+            return redirect()->current();
+        }
+
+        // Apply a filter for query
+        if ($this->request->has('filter')) {
+            $this->apanelRepo->eloquentFilter($payments, $this->request->except('filter', 'filter_reset', 'page'));
+        }
+
         $tplData = [];
 
         $tplData['payments'] = $payments->paginate(20)->appends($this->request->all());
