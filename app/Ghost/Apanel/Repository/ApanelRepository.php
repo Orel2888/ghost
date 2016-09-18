@@ -35,6 +35,57 @@ class ApanelRepository
         return $builder;
     }
 
+    /**
+     * Eloquent build query for filter
+     *
+     * @param \Eloquent $builder
+     * @param array $input
+     */
+    public function eloquentFilter(\Eloquent $builder, array $input): \Eloquent
+    {
+        $exceptFiledNameForValue = ['', 'f_compare_', 'f_sorting', -1];
+
+        /**
+         * [
+         *      field_name,
+         *      compare <>=,
+         *      value
+         * ]
+         */
+        $fieldValue = [];
+
+        // Generate a fields for query
+        foreach ($input as $filedName => $fieldValue) {
+            if ($fieldValue != '' && $fieldValue != -1 && !preg_match('/'. implode('|', $exceptFiledNameForValue) .'/')) {
+
+                $compareFieldName = 'f_compare_'. str_replace('f_', '', $filedName);
+
+                $fieldValue[] = [
+                    $filedName,
+                    isset($input[$compareFieldName]) ? $input[$compareFieldName] : '=',
+                    $fieldValue
+                ];
+            }
+        }
+
+        // Build query
+        foreach ($fieldValue as $value) {
+
+            switch ($value) {
+                case 'like':
+                    $value[2] = '%'. $value[2]. '%';
+                break;
+            }
+
+            $builder->where(str_replace('f_', '', $value[0]), $value[1], $value[2]);
+        }
+
+        // Sorting
+        if (isset($input['f_sorting_column'])) {
+            $builder->orderBy($input['f_sorting_column'], $input['f_sorting_by']);
+        }
+    }
+
     public function formFilter($scheme, $inputs)
     {
         $tplData = [
