@@ -7,7 +7,7 @@
         <div class="col-md-12">
             <div class="panel panel-primary">
                 <div class="panel-heading">
-                    Курьер <b>{{ $miner->name }}</b>
+                    @include('apanel.elements.button_back') Курьер <b>{{ $miner->name }}</b>
                 </div>
                 <div class="panel-body">
                     @include('apanel.elements.notify_success')
