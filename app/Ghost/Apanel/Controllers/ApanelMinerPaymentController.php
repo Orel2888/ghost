@@ -29,7 +29,10 @@ class ApanelMinerPaymentController extends ApanelBaseController
 
         $tplData = [];
 
-        $tplData['payments'] = $payments->paginate(20)->appends($this->request->all());
+        $tplData['payments']    = $payments->paginate(20)->appends($this->request->all());
+        $tplData['form_filter'] = $this->apanelRepo->formFilter([
+            'period_date'   => true
+        ], $this->request->all());
 
         return view('apanel.miner.payment.index', $tplData);
     }

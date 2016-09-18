@@ -17,7 +17,7 @@
                 </div>
 
                 <div class="panel-body">
-
+                    {!! $form_filter !!}
                 </div>
 
                 <table class="table table-bordered table-hover">
