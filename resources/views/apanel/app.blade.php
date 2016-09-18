@@ -42,5 +42,8 @@
 
 @yield('content')
 
+<script type="text/javascript">
+    (new App()).run();
+</script>
 </body>
 </html>
