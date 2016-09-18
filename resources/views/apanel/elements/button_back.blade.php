@@ -1,7 +1,1 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: orel
- * Date: 18.09.16
- * Time: 14:51
- */
+<i class="glyphicon glyphicon-menu-left"></i> <a href="{{ url()->previous() }}" class="btn btn-default">Назад</a>
