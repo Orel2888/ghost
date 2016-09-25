@@ -7,7 +7,7 @@
 
         <ol class="breadcrumb">
             <li class="active">Каталог курьеров</li>
-            <li><a href="{{ url('miners/payments') }}">Выплаты</a></li>
+            <li><a href="{{ url('apanel/miner/payment') }}">Выплаты</a></li>
         </ol>
 
         <div class="col-md-12">
@@ -20,7 +20,7 @@
                 <div class="panel-body">
                     {!! $form_filter !!}
                 </div>
-                <table class="table table-bordered">
+                <table class="table table-bordered table-hover">
                     <thead>
                     <tr>
                         <th>ID</th>

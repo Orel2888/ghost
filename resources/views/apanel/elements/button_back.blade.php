@@ -1,0 +1,1 @@
+<i class="glyphicon glyphicon-menu-left"></i> <a href="{{ url()->previous() }}" class="btn btn-default">Назад</a>

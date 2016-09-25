@@ -3,9 +3,11 @@
 namespace App\Ghost\Api\Controllers;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Client;
+use App\{
+    Client,
+    Purse
+};
 use Validator;
-use App\Purse;
 
 class UsersApiController extends BaseApiController
 {
@@ -68,5 +70,27 @@ class UsersApiController extends BaseApiController
         return response()->json($this->apiResponse->ok([
             'data' => ['phone' => Purse::whereSelected(1)->first()->phone]
         ]));
+    }
+
+    public function postUpdate()
+    {
+        $valid = Validator::make($this->request->all(), [
+            'name'          => 'required',
+            'tg_username'   => 'required',
+            'tg_chatid'     => 'required|numeric'
+        ]);
+
+        if ($valid->fails()) {
+            return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
+        }
+
+        try {
+            $this->clientManager->findByTgChatId($this->request->input('tg_chatid'))
+                ->update($this->request->only('name', 'tg_username', 'tg_chatid', 'comment'));
+
+            return response()->json($this->apiResponse->ok());
+        } catch (ModelNotFoundException $e) {
+            return response()->json($this->apiResponse->fail(['message' => 'User with id '. $this->request->input('tg_chatid') .' not found']), 400);
+        }
     }
 }

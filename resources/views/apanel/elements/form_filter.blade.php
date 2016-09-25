@@ -1,6 +1,7 @@
 <form class="form-inline">
     <label>Поиск по полям</label><br>
 
+    @if (isset($scheme['inputs']))
     @foreach ($scheme['inputs'] as $labelText => $rules)
         <div class="form-group" style="margin-bottom: 4px;">
             <label for="f_{{ $rules['name'] }}">{{ $labelText }}</label>
@@ -24,6 +25,7 @@
             <input type="text" class="form-control" name="f_{{ $rules['name'] }}" value="{!! $inputs['f_'. $rules['name']] or '' !!}">
         </div>
     @endforeach
+    @endif
 
     @if (isset($scheme['selects']))
     @foreach ($scheme['selects'] as $labelText => $rules)
@@ -36,9 +38,9 @@
             </select>
         </div>
     @endforeach
+        <br>
     @endif
 
-    <br>
     <label>Сортировать</label><br>
     @if (isset($scheme['sorting']))
         <label for="f-sort">По</label>
@@ -53,9 +55,37 @@
         <option value="asc" @if (isset($inputs['f_sorting_by']) && $inputs['f_sorting_by'] == 'asc')selected @endif>По возрастанию</option>
         <option value="desc" @if (isset($inputs['f_sorting_by']) && $inputs['f_sorting_by'] == 'desc')selected @endif>По убыванию</option>
     </select>
+    <br>
+    <br>
 
-    <br>
-    <br>
+    @if (isset($scheme['period_date']))
+        <div class="well">
+            <div class="row">
+                <div class="col-sm-12 col-md-5">
+                    <label>Период времени</label><br>
+                    <div class="form-group">
+                        <label>С</label>
+                        <input type="text" class="form-control" name="f_created_at_to" id="f_created_at_to" value="{{ $date_from }}">
+                    </div>
+                    <div class="form-group">
+                        <label>По</label>
+                        <input type="text" class="form-control" name="f_created_at_from" id="f_created_at_from" value="{{ $date_current }}">
+                    </div>
+                </div>
+                <div class="col-sm-12 col-md-7" style="margin: 23px 0;">
+                    <div class="btn-group" id="btn-group-select">
+                        <button class="btn btn-primary" data-period="1">Сегодня</button>
+                        <button class="btn btn-primary" data-period="2">Вчера</button>
+                        <button class="btn btn-primary" data-period="3">Позавчера</button>
+                        <button class="btn btn-primary" data-period="4">За тек. неделю</button>
+                        <button class="btn btn-primary" data-period="5">За тек. месяц</button>
+                        <button class="btn btn-primary" data-period="6">За прошлый месяц</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <input type="submit" class="btn btn-success" name="filter" value="Запрос">
     <input type="submit" class="btn btn-success" name="filter_reset" value="Сброс">
 </form>

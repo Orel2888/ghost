@@ -117,7 +117,11 @@ class UserController extends TelegramBaseController {
         return this.ghostApi.api('users.find', 'GET', {tg_chatid: $._message._from._id}).then(response => {
             let udata = response.data;
 
-            return this.ghostApi.api('purse', 'GET').then(response => profileInfo(udata, response.data.phone));
+            return this.ghostApi.api('purse', 'GET')
+                .then(response => profileInfo(udata, response.data.phone))
+                .catch(err => {
+                    return $.sendMessage('Извините в данное время нет кошелька для оплаты.');
+                });
         }).catch(console.log)
     }
 

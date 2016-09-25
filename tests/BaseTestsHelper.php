@@ -72,9 +72,9 @@ trait BaseTestsHelper
         }
     }
 
-    public function createClient()
+    public function createClient($attributes = [])
     {
-        return Client::create(['name' => 'Vasya']);
+        return Client::create(array_merge(['name' => 'Vasya'], $attributes));
     }
 
     public function createMiner()

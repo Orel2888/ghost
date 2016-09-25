@@ -74,6 +74,7 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
          * Soldiers
          * Resource miner
          */
+        Route::resource('miner/payment', 'ApanelMinerPaymentController');
         Route::get('miner/{miner_id}/payment_create', ['uses' => 'ApanelMinerController@payment_create', 'as' => 'apanel.miner.payment_create']);
         Route::get('miner/{miner_id}/payment_store', ['uses' => 'ApanelMinerController@payment_store', 'as' => 'apanel.miner.payment_store']);
         Route::get('miner/{miner_id}/delete-confirm', ['uses' => 'ApanelMinerController@deleteConfirm', 'as' => 'apanel.miner.delete_confirm']);
@@ -102,6 +103,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
     Route::group(['middleware' => 'api:user'], function () {
         Route::get('users.find', 'UsersApiController@getFind');
         Route::post('users.reg', 'UsersApiController@postReg');
+        Route::post('users.update', 'UsersApiController@postUpdate');
         Route::get('purse', 'UsersApiController@getPurse');
     });
 
