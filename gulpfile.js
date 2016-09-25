@@ -23,6 +23,7 @@ gulp.task('scripts', function () {
         'public/js/jquery.min.js',
         'public/js/bootstrap.min.js',
         'public/jquery-ui/jquery-ui.min.js',
+        'public/js/moment.min.js',
         'public/js/common.js'
     ]).pipe(concat('app.js'))
         .pipe(gulp.dest('public/js'));

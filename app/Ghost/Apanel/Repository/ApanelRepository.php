@@ -2,6 +2,8 @@
 
 namespace App\Ghost\Apanel\Repository;
 
+use Carbon\Carbon;
+
 class ApanelRepository
 {
     public function dbQueryBuilder($builder, array $input = [])
@@ -92,6 +94,11 @@ class ApanelRepository
             'scheme'    => $scheme,
             'inputs'    => $inputs
         ];
+
+        if (isset($scheme['period_date'])) {
+            $tplData['date_current']  = Carbon::now()->hour(23)->minute(59)->second(59)->format('d-m-Y H:i:s');
+            $tplData['date_from'] = Carbon::now()->subDay(7)->hour(0)->minute(0)->second(0)->format('d-m-Y H:i:s');
+        }
 
         return view('apanel.elements.form_filter', $tplData)->render();
     }

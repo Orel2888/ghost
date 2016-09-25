@@ -1,7 +1,7 @@
 <form class="form-inline">
     <label>Поиск по полям</label><br>
 
-    @if (isset($sheme['inputs']))
+    @if (isset($scheme['inputs']))
     @foreach ($scheme['inputs'] as $labelText => $rules)
         <div class="form-group" style="margin-bottom: 4px;">
             <label for="f_{{ $rules['name'] }}">{{ $labelText }}</label>
@@ -65,11 +65,11 @@
                     <label>Период времени</label><br>
                     <div class="form-group">
                         <label>С</label>
-                        <input type="text" class="form-control" name="f_created_at_to" id="f_created_at_to">
+                        <input type="text" class="form-control" name="f_created_at_to" id="f_created_at_to" value="{{ $date_from }}">
                     </div>
                     <div class="form-group">
                         <label>По</label>
-                        <input type="text" class="form-control" name="f_created_at_from" id="f_created_at_from">
+                        <input type="text" class="form-control" name="f_created_at_from" id="f_created_at_from" value="{{ $date_current }}">
                     </div>
                 </div>
                 <div class="col-sm-12 col-md-7" style="margin: 23px 0;">
