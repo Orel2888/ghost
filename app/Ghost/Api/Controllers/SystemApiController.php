@@ -12,7 +12,10 @@ use App\Ghost\Repositories\Goods\Exceptions\{
     GoodsEndedException,
     NotEnoughMoney
 };
-use Validator;
+use {
+    Validator,
+    Queue
+};
 
 class SystemApiController extends BaseApiController
 {
@@ -90,6 +93,11 @@ class SystemApiController extends BaseApiController
                 QiwiTransactionAbuse::create(['transaction_id' => $transId]);
             }
         }
+
+        //
+        Queue::pushOn('notifications', app('Illuminate\Bus\Dispatcher')->dispatch(
+
+        ));
 
         $infoProcessing = [
             'client_ids_updated_balance'    => $clientsIdsUpdatedBalance,

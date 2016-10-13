@@ -1,7 +1,13 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: orel
- * Date: 02.10.16
- * Time: 16:11
- */
+
+namespace App\Ghost\Notify;
+
+use App\Admin;
+
+abstract class Notify
+{
+    public function getAdmins()
+    {
+        return Admin::all();
+    }
+}

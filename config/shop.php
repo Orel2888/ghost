@@ -13,6 +13,7 @@ return [
      * Bot a token api
      */
     'TGBOT_TOKEN'   => env('TGBOT_TOKEN'),
+    'TGBOT_NAME'    => 'sample',
     /**
      * Usernames a admins in telegram
      * name,name,name,name
