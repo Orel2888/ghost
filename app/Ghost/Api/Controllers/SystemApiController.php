@@ -93,9 +93,9 @@ class SystemApiController extends BaseApiController
         }
 
         //
-        Queue::pushOn('notifications', app('Illuminate\Bus\Dispatcher')->dispatch(
+        /*Queue::pushOn('notifications', app('Illuminate\Bus\Dispatcher')->dispatch(
 
-        ));
+        ));*/
 
         $infoProcessing = [
             'client_ids_updated_balance'    => $clientsIdsUpdatedBalance,
