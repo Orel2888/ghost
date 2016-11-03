@@ -30,7 +30,7 @@
     "node-emoji": "~1.3.1",
     "node-service-container": "^1.0.0",
     "promisify-node": "^0.4.0",
-    "qiwimas": "^1.0.13",
+    "qiwimas": "^1.0.14",
     "request-promise": "^3.0.0",
     "swig": "^1.4.2",
     "telegram-node-bot": "^3.0.12"
