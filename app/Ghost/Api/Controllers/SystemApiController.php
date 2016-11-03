@@ -12,10 +12,8 @@ use App\Ghost\Repositories\Goods\Exceptions\{
     GoodsEndedException,
     NotEnoughMoney
 };
-use {
-    Validator,
-    Queue
-};
+use Validator;
+use Queue;
 
 class SystemApiController extends BaseApiController
 {
