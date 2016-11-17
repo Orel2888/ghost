@@ -15,7 +15,9 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         // Commands\Inspire::class,
         Commands\FillTestData::class,
-        Commands\PathUpdateDb::class
+        Commands\PathUpdateDb::class,
+        Commands\TgNewsletter::class,
+        Commands\TgNewsletterText::class
     ];
 
     /**
