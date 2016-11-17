@@ -2,6 +2,7 @@
 
 namespace App\Ghost\Apanel\Repository;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Carbon\Carbon;
 
 class ApanelRepository
@@ -43,9 +44,9 @@ class ApanelRepository
      * @param \Eloquent $builder
      * @param array $input
      */
-    public function eloquentFilter(\Eloquent $builder, array $input): \Eloquent
+    public function eloquentFilter(EloquentBuilder $builder, array $input): EloquentBuilder
     {
-        $exceptFiledNameForValue = ['', 'f_compare_', 'f_sorting', -1];
+        $exceptFiledNameForValue = ['', 'f_compare_', 'f_sorting', -1, 'f_created_at_to', 'f_created_at_from', 'f_period_date'];
 
         /**
          * [
@@ -54,15 +55,15 @@ class ApanelRepository
          *      value
          * ]
          */
-        $fieldValue = [];
+        $valuesWhere = [];
 
         // Generate a fields for query
         foreach ($input as $filedName => $fieldValue) {
-            if ($fieldValue != '' && $fieldValue != -1 && !preg_match('/'. implode('|', $exceptFiledNameForValue) .'/')) {
+            if ($fieldValue != '' && $fieldValue != -1 && !preg_match('/'. implode('|', $exceptFiledNameForValue) .'/', $filedName)) {
 
                 $compareFieldName = 'f_compare_'. str_replace('f_', '', $filedName);
 
-                $fieldValue[] = [
+                $valuesWhere[] = [
                     $filedName,
                     isset($input[$compareFieldName]) ? $input[$compareFieldName] : '=',
                     $fieldValue
@@ -71,9 +72,9 @@ class ApanelRepository
         }
 
         // Build query
-        foreach ($fieldValue as $value) {
+        foreach ($valuesWhere as $value) {
 
-            switch ($value) {
+            switch ($value[1]) {
                 case 'like':
                     $value[2] = '%'. $value[2]. '%';
                 break;
@@ -82,10 +83,17 @@ class ApanelRepository
             $builder->where(str_replace('f_', '', $value[0]), $value[1], $value[2]);
         }
 
+        // Where between date
+        if (isset($input['f_period_date'])) {
+            $builder->whereBetween('created_at', [$input['f_created_at_to'], $input['f_created_at_from']]);
+        }
+
         // Sorting
         if (isset($input['f_sorting_column'])) {
             $builder->orderBy($input['f_sorting_column'], $input['f_sorting_by']);
         }
+
+        return $builder;
     }
 
     public function formFilter($scheme, $inputs)
@@ -96,8 +104,13 @@ class ApanelRepository
         ];
 
         if (isset($scheme['period_date'])) {
-            $tplData['date_current']  = Carbon::now()->hour(23)->minute(59)->second(59)->format('d-m-Y H:i:s');
-            $tplData['date_from'] = Carbon::now()->subDay(7)->hour(0)->minute(0)->second(0)->format('d-m-Y H:i:s');
+            if (isset($inputs['f_created_at_to']) && isset($inputs['f_created_at_from'])) {
+                $tplData['date_current'] = $inputs['f_created_at_from'];
+                $tplData['date_from']    = $inputs['f_created_at_to'];
+            } else {
+                $tplData['date_current'] = Carbon::now()->hour(23)->minute(59)->second(59)->format('d-m-Y H:i:s');
+                $tplData['date_from'] = Carbon::now()->subDay(7)->hour(0)->minute(0)->second(0)->format('d-m-Y H:i:s');
+            }
         }
 
         return view('apanel.elements.form_filter', $tplData)->render();

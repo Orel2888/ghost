@@ -25,6 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        // Register app providers
+        $this->app->register('App\Services\Tgbot\TgbotServiceProvider');
+
         //
         $this->app->extend('Illuminate\Contracts\Routing\ResponseFactory', function ($factory, $app) {
             return new ExtendedResponseFactory($app['Illuminate\Contracts\View\Factory'], $app['redirect']);

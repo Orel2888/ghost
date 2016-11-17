@@ -15,7 +15,7 @@ class ApanelMinerPaymentController extends ApanelBaseController
      */
     public function index()
     {
-        $payments = MinerPayment::query();
+        $payments = MinerPayment::orderBy('status', 'ASC');
 
         // Reset a filter
         if ($this->request->has('filter_reset')) {
@@ -31,7 +31,34 @@ class ApanelMinerPaymentController extends ApanelBaseController
 
         $tplData['payments']    = $payments->paginate(20)->appends($this->request->all());
         $tplData['form_filter'] = $this->apanelRepo->formFilter([
-            'period_date'   => true
+            'period_date'   => true,
+            'inputs'    => [
+                'ID'    => ['name' => 'id'],
+                'Минер ID'  => ['name' => 'miner_id'],
+                'Сумма'     => ['name' => 'amount'],
+                'Количество найденных кладов'   => ['name' => 'counter_goods_ok'],
+                'Количество ненайденных кладов' => ['name' => 'counter_goods_fail']
+            ],
+            'selects'   => [
+                'Статус'    => [
+                    'name'      => 'status',
+                    'fields'    => [
+                        -1  => '---',
+                        0   => 'В обработке',
+                        1   => 'Выплачено',
+                        2   => 'Отклонено'
+                    ],
+                    'selected'  => -1
+                ]
+            ],
+            'sorting' => [
+                'columns'   => [
+                    'ID'    => 'id',
+                    'Сумма' => 'amount',
+                    'Количество найденных кладов'      => 'counter_goods_ok',
+                    'Количество ненайденных кладов'    => 'counter_goods_fail'
+                ]
+            ]
         ], $this->request->all());
 
         return view('apanel.miner.payment.index', $tplData);

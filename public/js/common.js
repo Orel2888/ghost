@@ -28,8 +28,10 @@ class Tools extends App {
 }
 
 $(function () {
+    // Call tooltip
     $('[data-toggle="tooltip"]').tooltip();
 
+    // Datepicker
     $.datepicker.setDefaults( $.datepicker.regional[ "ru" ] );
 
     $( "#f_created_at_to" ).datepicker({
@@ -48,9 +50,35 @@ $(function () {
         let currentDate = new Date();
 
         let datePeriod = {
+            // Today
             1: [
-                [`${currentDate.getDay()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()} 00:00:00`],
-                [`${currentDate.getDay()}-${currentDate.getMonth() + 1}-${currentDate.getFullYear()} 23:59:59`]
+                `${moment().format('DD-MM-YYYY')} 00:00:00`,
+                `${moment().format('DD-MM-YYYY')} 23:59:59`
+            ],
+            // Yesterday
+            2: [
+                `${moment().subtract(1, 'day').format('DD-MM-YYYY')} 00:00:00`,
+                `${moment().subtract(1, 'day').format('DD-MM-YYYY')} 23:59:59`
+            ],
+            // Day ago
+            3: [
+                `${moment().subtract(2, 'day').format('DD-MM-YYYY')} 00:00:00`,
+                `${moment().subtract(2, 'day').format('DD-MM-YYYY')} 23:59:59`
+            ],
+            // Current a week
+            4: [
+                `${moment().day(1).format('DD-MM-YYYY')} 00:00:00`,
+                `${moment().format('DD-MM-YYYY')} 23:59:59`
+            ],
+            // Current a month
+            5: [
+                `${moment().date(1).format('DD-MM-YYYY')} 00:00:00`,
+                `${moment().format('DD-MM-YYYY')} 23:59:59`
+            ],
+            // Old a month
+            6: [
+                `${moment().month(moment().get('month') - 1).date(1).format('DD-MM-YYYY')} 00:00:00`,
+                `${moment().month(moment().get('month') - 1).date(31).format('DD-MM-YYYY')} 23:59:59`
             ]
         };
 

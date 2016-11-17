@@ -71,6 +71,12 @@
                         <label>По</label>
                         <input type="text" class="form-control" name="f_created_at_from" id="f_created_at_from" value="{{ $date_current }}">
                     </div>
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="f_period_date" value="1" @if (isset($inputs['f_period_date'])) checked @endif>
+                            Выбор по дате
+                        </label>
+                    </div><br>
                 </div>
                 <div class="col-sm-12 col-md-7" style="margin: 23px 0;">
                     <div class="btn-group" id="btn-group-select">
