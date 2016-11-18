@@ -75,7 +75,7 @@ class Tg
 
             $count++;
 
-            if (isset($send['ok']) && $send['ok']) {
+            if (!is_null($send) && $send->isOk()) {
                 $countOk++;
             } else {
                 $countFail++;
