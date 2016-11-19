@@ -42,6 +42,6 @@ class TgNewsletter extends Command
 
         $tg = new Tg();
 
-        $tg->newsletter(\Crypt::decrypt(file_get_contents(storage_path('app/message_newsletter'))));
+        $tg->newsletter(file_get_contents(storage_path('app/message_newsletter')));
     }
 }
