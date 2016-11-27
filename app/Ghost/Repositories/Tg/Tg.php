@@ -5,6 +5,7 @@ namespace App\Ghost\Repositories\Tg;
 use App\Ghost\Repositories\Tg\Channels\TgChannelSync;
 use Longman\TelegramBot\Request as TgRequest;
 use Longman\TelegramBot\Exception\TelegramException;
+use Longman\TelegramBot\Entities\ServerResponse;
 use App\Client;
 
 class Tg
@@ -75,10 +76,12 @@ class Tg
 
             $count++;
 
-            if (!is_null($send) && $send->isOk()) {
-                $countOk++;
-            } else {
-                $countFail++;
+            if ($send instanceof ServerResponse) {
+                if ($send->isOk()) {
+                    $countOk++;
+                } else {
+                    $countFail++;
+                }
             }
 
             $notifyEventData = [
