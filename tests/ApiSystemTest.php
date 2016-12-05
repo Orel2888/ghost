@@ -43,11 +43,12 @@ class ApiSystemTest extends TestCase
         $clientName = $faker->name;
 
         $goods = $this->modelGoods->first();
-        $someoneGoodsPrice = $this->goodsPrice->whereGoodsId($goods->id)->first();
+        $someoneGoodsPrice = $this->goodsPrice->whereGoodsId($goods->id)->firstOrFail();
 
         $client = $this->modelClient->create([
             'name'      => $clientName,
-            'comment'   => $clientName
+            'comment'   => $clientName,
+            'tg_chatid' => '284935778'
         ]);
 
         $order = $this->goodsOrder->create([
