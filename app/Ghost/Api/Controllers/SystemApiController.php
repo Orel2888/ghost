@@ -2,6 +2,7 @@
 
 namespace App\Ghost\Api\Controllers;
 
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use App\{
     QiwiTransaction,
     QiwiTransactionAbuse,
@@ -18,6 +19,8 @@ use Validator,
 
 class SystemApiController extends BaseApiController
 {
+    use DispatchesJobs;
+
     public function getProcessingGoodsOrders()
     {
         // Money transfer to client
@@ -103,9 +106,9 @@ class SystemApiController extends BaseApiController
         ];
 
         // Add a job about purchase
-        Queue::pushOn('made_purchase', app('Illuminate\Bus\Dispatcher')->dispatch(
-            new MadePurchase($infoProcessing)
-        ));
+        $this->dispatch(
+            (new MadePurchase($infoProcessing))->onQueue('made_purchase')
+        );
 
         return response()->json($this->apiResponse->ok(['data' => $infoProcessing]));
     }
