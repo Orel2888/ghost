@@ -68,6 +68,7 @@ class ApiSystemTest extends TestCase
             'key'   => env('API_KEY')
         ]);
 
+        //echo $response->getContent();
         $this->assertEquals(200, $response->getStatusCode());
 
         $accessToken = json_decode($response->getContent())->access_token;

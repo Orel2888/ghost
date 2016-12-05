@@ -62,6 +62,7 @@ class FillTestData extends Command
                 ]);
             }
 
+            $i = 0;
             foreach ($cities as $city) {
 
                 $city = City::create([
@@ -84,6 +85,10 @@ class FillTestData extends Command
                         ]);
                     }
                 }
+
+                if ($i == 0) break;
+
+                $i++;
             }
 
             $this->info('OK');

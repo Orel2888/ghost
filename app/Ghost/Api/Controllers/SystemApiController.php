@@ -12,8 +12,9 @@ use App\Ghost\Repositories\Goods\Exceptions\{
     GoodsEndedException,
     NotEnoughMoney
 };
-use Validator;
-use Queue;
+use App\Jobs\MadePurchase;
+use Validator,
+    Queue;
 
 class SystemApiController extends BaseApiController
 {
@@ -92,11 +93,6 @@ class SystemApiController extends BaseApiController
             }
         }
 
-        //
-        /*Queue::pushOn('notifications', app('Illuminate\Bus\Dispatcher')->dispatch(
-
-        ));*/
-
         $infoProcessing = [
             'client_ids_updated_balance'    => $clientsIdsUpdatedBalance,
             'orders_ids_successful'         => $ordersIdsSuccessful,
@@ -105,6 +101,11 @@ class SystemApiController extends BaseApiController
             'number_successfull_trans'      => $numberSuccessfulTrans,
             'transactions_ids_abuse'        => $transactions_ids_abuse
         ];
+
+        // Add a job about purchase
+        Queue::pushOn('made_purchase', app('Illuminate\Bus\Dispatcher')->dispatch(
+            new MadePurchase($infoProcessing)
+        ));
 
         return response()->json($this->apiResponse->ok(['data' => $infoProcessing]));
     }
