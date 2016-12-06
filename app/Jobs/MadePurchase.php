@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\GoodsOrder;
 use App\Jobs\Job;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -32,7 +33,16 @@ class MadePurchase extends Job implements ShouldQueue
      */
     public function handle()
     {
-        // Fire event about made purchase
-        event(new WasPurchases($this->dataOrders));
+        // Get a purchases and load relations
+        if (isset($this->dataOrders['orders_ids_successful'])) {
+            $orders = GoodsOrder::findMany($this->dataOrders['orders_ids_successful']);
+
+            foreach ($orders as $order) {
+                $order->load('goods.city', 'client', 'purchase');
+            }
+
+            // Fire event about made purchase
+            event(new WasPurchases($orders));
+        }
     }
 }
