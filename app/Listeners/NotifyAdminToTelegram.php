@@ -30,7 +30,6 @@ class NotifyAdminToTelegram
     public function handle(WasPurchases $event)
     {
         //
-
         $admins = Admin::whereTgNotifyPurchase(1)->where('tg_chatid', '>', 0)->get();
 
         if (!empty($event->orders)) {
