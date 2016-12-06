@@ -5,13 +5,12 @@ namespace App\Listeners;
 use App\Events\WasPurchases;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Admin;
 use Longman\TelegramBot\Request as TgRequest;
 use Longman\TelegramBot\Exception\TelegramException;
-use App\GoodsOrder;
 
-class NotifyClientToTelegram
+class NotifyAdminToTelegram
 {
-
     /**
      * Create the event listener.
      *
@@ -30,23 +29,24 @@ class NotifyClientToTelegram
      */
     public function handle(WasPurchases $event)
     {
-        // Successfully processed orders
+        //
+
+        $admins = Admin::whereTgNotifyPurchase(1)->where('tg_chatid', '>', 0)->get();
+
         if (!empty($event->orders)) {
-            foreach ($event->orders as $order) {
 
-                $telegramMessage = view('telegram.successful_purchase', [
-                    'order' => $order
-                ])->render();
+            $sep = str_repeat('❄️', 10);
+            $notifyMessage = view('telegram.admin_about_purchase', ['orders' => $event->orders, 'sep' => $sep])->render();
 
-                // Send message to client in telegram
+            foreach ($admins as $admin) {
+
                 try {
                     TgRequest::sendMessage([
-                        'chat_id' => $order->client->tg_chatid,
-                        'text' => $telegramMessage,
-                        'parse_mode' => 'markdown'
+                        'chat_id'       => $admin->tg_chatid,
+                        'text'          => $notifyMessage,
+                        'parse_mode'    => 'markdown'
                     ]);
                 } catch (TelegramException $e) {
-                    //var_dump($e);
                     echo $e->getMessage();
                 }
             }

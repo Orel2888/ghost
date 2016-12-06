@@ -10,17 +10,17 @@ class WasPurchases extends Event
 {
     use SerializesModels;
 
-    public $dataOrders;
+    public $orders;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct(array $dataOrders)
+    public function __construct($orders)
     {
         //
-        $this->dataOrders = $dataOrders;
+        $this->orders = $orders;
     }
 
     /**
