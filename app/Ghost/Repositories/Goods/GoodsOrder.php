@@ -7,6 +7,8 @@ use App\Ghost\Repositories\Goods\Exceptions\GoodsEndedException;
 use App\Ghost\Repositories\Goods\Exceptions\NotEnoughMoney;
 use App\GoodsPurchase;
 use App\Ghost\Repositories\Goods\GoodsManager;
+use Illuminate\Contracts\Bus\Dispatcher;
+use App\Jobs\MadePurchase;
 
 class GoodsOrder extends Goods
 {
@@ -144,7 +146,7 @@ class GoodsOrder extends Goods
         return $goodsPurchase;
     }
 
-    public function buyProcessingOrder($order)
+    public function buyProcessingOrder($order, $jobNotify = true)
     {
         if (!$order instanceof $this->goodsOrder) {
             $order = $this->goodsOrder->find($order);
@@ -152,6 +154,13 @@ class GoodsOrder extends Goods
 
         try {
             $this->buy($order);
+
+            if ($jobNotify) {
+                // Job for notification about was purchase
+                app(Dispatcher::class)->dispatch(
+                    (new MadePurchase(['orders_ids_successful' => [$order->id]]))->onQueue('made_purchase')
+                );
+            }
 
             return true;
         } catch (GoodsEndedException $e) {
