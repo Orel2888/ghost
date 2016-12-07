@@ -19,6 +19,10 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\Install' => [
             'App\Listeners\InstallStep',
         ],
+        'App\Events\WasPurchases'   => [
+            'App\Listeners\NotifyClientToTelegram',
+            'App\Listeners\NotifyAdminToTelegram'
+        ]
     ];
 
     /**

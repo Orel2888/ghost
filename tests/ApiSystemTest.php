@@ -43,11 +43,12 @@ class ApiSystemTest extends TestCase
         $clientName = $faker->name;
 
         $goods = $this->modelGoods->first();
-        $someoneGoodsPrice = $this->goodsPrice->whereGoodsId($goods->id)->first();
+        $someoneGoodsPrice = $this->goodsPrice->whereGoodsId($goods->id)->firstOrFail();
 
         $client = $this->modelClient->create([
             'name'      => $clientName,
-            'comment'   => $clientName
+            'comment'   => $clientName,
+            'tg_chatid' => '284935778'
         ]);
 
         $order = $this->goodsOrder->create([
@@ -68,6 +69,7 @@ class ApiSystemTest extends TestCase
             'key'   => env('API_KEY')
         ]);
 
+        //echo $response->getContent();
         $this->assertEquals(200, $response->getStatusCode());
 
         $accessToken = json_decode($response->getContent())->access_token;

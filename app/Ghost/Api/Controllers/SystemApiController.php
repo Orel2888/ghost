@@ -2,6 +2,7 @@
 
 namespace App\Ghost\Api\Controllers;
 
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use App\{
     QiwiTransaction,
     QiwiTransactionAbuse,
@@ -12,11 +13,14 @@ use App\Ghost\Repositories\Goods\Exceptions\{
     GoodsEndedException,
     NotEnoughMoney
 };
-use Validator;
-use Queue;
+use App\Jobs\MadePurchase;
+use Validator,
+    Queue;
 
 class SystemApiController extends BaseApiController
 {
+    use DispatchesJobs;
+
     public function getProcessingGoodsOrders()
     {
         // Money transfer to client
@@ -59,6 +63,7 @@ class SystemApiController extends BaseApiController
         $ordersIdsSuccessful       = [];
         $ordersIdsEndedGoods       = [];
         $ordersIdsNotEnoughMoney   = [];
+        $wasPurchasesIds           = [];
 
         if (count($usersWithBalances)) {
             foreach ($usersWithBalances as $clientWithBalance) {
@@ -69,8 +74,9 @@ class SystemApiController extends BaseApiController
 
                 foreach ($client->goodsOrders as $order) {
                     try {
-                        $this->goodsOrder->buy($order);
+                        $purchase = $this->goodsOrder->buy($order);
 
+                        $wasPurchases[] = $purchase->id;
                         $ordersIdsSuccessful[] = $order->id;
                     } catch (GoodsEndedException $e) {
                         $order->update(['status' => 2]);
@@ -92,19 +98,20 @@ class SystemApiController extends BaseApiController
             }
         }
 
-        //
-        /*Queue::pushOn('notifications', app('Illuminate\Bus\Dispatcher')->dispatch(
-
-        ));*/
-
         $infoProcessing = [
             'client_ids_updated_balance'    => $clientsIdsUpdatedBalance,
             'orders_ids_successful'         => $ordersIdsSuccessful,
             'orders_ids_ended_goods'        => $ordersIdsEndedGoods,
             'orders_ids_not_enough_money'   => $ordersIdsNotEnoughMoney,
             'number_successfull_trans'      => $numberSuccessfulTrans,
-            'transactions_ids_abuse'        => $transactions_ids_abuse
+            'transactions_ids_abuse'        => $transactions_ids_abuse,
+            'purchases_ids'                 => $wasPurchasesIds
         ];
+
+        // Add a job about purchase
+        $this->dispatch(
+            (new MadePurchase($infoProcessing))->onQueue('made_purchase')
+        );
 
         return response()->json($this->apiResponse->ok(['data' => $infoProcessing]));
     }
