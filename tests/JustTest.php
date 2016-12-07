@@ -47,4 +47,26 @@ class JustTest extends TestCase
             'parse_mode'    => 'markdown'
         ]);
     }
+
+    public function test_wcorrect()
+    {
+        $weights = [
+            0.2,
+            0.33,
+            0.5,
+            0.50,
+            1.00,
+            8.5,
+            9,
+            10
+        ];
+
+        $cor = function ($weight) {
+            return preg_replace('|0+$|', '', $weight);
+        };
+
+        foreach ($weights as $weight) {
+            echo $weight .'=>'. $cor($weight) . PHP_EOL;
+        }
+    }
 }
