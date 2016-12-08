@@ -32,6 +32,10 @@ class UserController extends TelegramBaseController {
             });
         };
 
+        let weightForHumans = (weight) => {
+            return weight > 0.99 ? `${weight}г` : `${weight}мг`;
+        }
+
         let priceList = () => {
             return this.ghostApi.api('goods.pricelist', 'GET').then(response => {
                 let priceList = response.data;
@@ -57,7 +61,7 @@ class UserController extends TelegramBaseController {
                             let goodsInfo = priceList[city][goodsType][weight];
                             let weightInt = weight.replace('.', '');
 
-                            priceMessage += `${' '.repeat(4)}${emoji.emojify(':package:')} ${weight} - ${goodsInfo.cost}\n`;
+                            priceMessage += `${' '.repeat(4)}${emoji.emojify(':package:')} ${weightForHumans(weight)} - ${goodsInfo.cost}\n`;
                             priceMessage += `${' '.repeat(4)}купить ${emoji.emojify(':point_right:')} /buy${goodsInfo.goods_id}\\_${weightInt}\n`;
                             priceMessage += `${' '.repeat(4)}${'️❄️'.repeat(6)}\n`
                         }
