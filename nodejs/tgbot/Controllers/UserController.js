@@ -61,7 +61,7 @@ class UserController extends TelegramBaseController {
                             let goodsInfo = priceList[city][goodsType][weight];
                             let weightInt = weight.replace('.', '');
 
-                            priceMessage += `${' '.repeat(4)}${emoji.emojify(':package:')} ${weightForHumans(weight)} - ${goodsInfo.cost}\n`;
+                            priceMessage += `${' '.repeat(4)}${emoji.emojify(':package:')} ${weightForHumans(weight)} - 💰 ${goodsInfo.cost}\n`;
                             priceMessage += `${' '.repeat(4)}купить ${emoji.emojify(':point_right:')} /buy${goodsInfo.goods_id}\\_${weightInt}\n`;
                             priceMessage += `${' '.repeat(4)}${'-'.repeat(30)}\n`
                         }
