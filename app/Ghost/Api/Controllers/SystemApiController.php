@@ -109,9 +109,11 @@ class SystemApiController extends BaseApiController
         ];
 
         // Add a job about purchase
-        $this->dispatch(
-            (new MadePurchase($infoProcessing))->onQueue('made_purchase')
-        );
+        if (count($infoProcessing['orders_ids_successful'])) {
+            $this->dispatch(
+                (new MadePurchase($infoProcessing))->onQueue('made_purchase')
+            );
+        }
 
         return response()->json($this->apiResponse->ok(['data' => $infoProcessing]));
     }
