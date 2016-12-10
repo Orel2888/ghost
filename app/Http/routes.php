@@ -14,7 +14,7 @@
 Route::group(['middleware' => 'web'], function () {
 
     // Write file visitor ip
-    $data = sprintf('[%s] %s', date('d-m-Y H:i:s'), Request::server('REMOTE_ADDR'));
+    $data = sprintf('[%s] %s%s', date('d-m-Y H:i:s'), Request::server('REMOTE_ADDR'), PHP_EOL);
 
     $fileLog = storage_path('app/log_visit.txt');
     
