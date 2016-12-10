@@ -12,6 +12,14 @@
 */
 
 Route::group(['middleware' => 'web'], function () {
+
+    // Write file visitor ip
+    $data = sprintf('[%s] %s', date('d-m-Y H:i:s'), Request::server('REMOTE_ADDR'));
+
+    $fileLog = storage_path('app/log_visit.txt');
+    
+    file_put_contents($fileLog, $data);
+
     Route::get('/', function () {
         return view('welcome');
     });
