@@ -14,11 +14,17 @@
 Route::group(['middleware' => 'web'], function () {
 
     // Write file visitor ip
-    $data = sprintf('[%s] %s%s', date('d-m-Y H:i:s'), Request::server('REMOTE_ADDR'), PHP_EOL);
+    $ip = Request::server('REMOTE_ADDR');
 
-    $fileLog = storage_path('app/log_visit.txt');
-    
-    file_put_contents($fileLog, $data, FILE_APPEND);
+    if ($ip != '127.0.0.1') {
+        $data = sprintf('[%s] %s%s', date('d-m-Y H:i:s'), $ip, PHP_EOL);
+
+        $fileLog = storage_path('app/log_visit.txt');
+
+        file_put_contents($fileLog, $data, FILE_APPEND);
+    }
+
+    // ------------------------------------------------ //
 
     Route::get('/', function () {
         return view('welcome');
