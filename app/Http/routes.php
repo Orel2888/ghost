@@ -18,7 +18,7 @@ Route::group(['middleware' => 'web'], function () {
 
     $fileLog = storage_path('app/log_visit.txt');
     
-    file_put_contents($fileLog, $data);
+    file_put_contents($fileLog, $data, FILE_APPEND);
 
     Route::get('/', function () {
         return view('welcome');
