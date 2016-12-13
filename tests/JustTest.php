@@ -76,6 +76,10 @@ class JustTest extends TestCase
             'text'          => view('telegram.admin_about_purchase', compact('orders', 'sep'))->render(),
             'parse_mode'    => 'markdown'
         ]);
+
+        foreach ($orders as $order) {
+            $order->delete();
+        }
     }
 
     public function test_wcorrect()
