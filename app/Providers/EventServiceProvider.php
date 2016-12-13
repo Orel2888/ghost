@@ -22,6 +22,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\WasPurchases'   => [
             'App\Listeners\NotifyClientToTelegram',
             'App\Listeners\NotifyAdminToTelegram'
+        ],
+        'App\Events\QiwiTransaction' => [
+            'App\Listeners\NotifyAdminTelegramAbuseTransaction'
         ]
     ];
 

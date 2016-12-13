@@ -13,7 +13,10 @@ use App\Ghost\Repositories\Goods\Exceptions\{
     GoodsEndedException,
     NotEnoughMoney
 };
-use App\Jobs\MadePurchase;
+use App\Jobs\{
+    MadePurchase,
+    QiwiTransaction as JobQiwiTransaction
+};
 use Validator,
     Queue;
 
@@ -112,6 +115,12 @@ class SystemApiController extends BaseApiController
         if (count($infoProcessing['orders_ids_successful'])) {
             $this->dispatch(
                 (new MadePurchase($infoProcessing))->onQueue('made_purchase')
+            );
+        }
+        // Add a job about abuse transactions
+        if (count($infoProcessing['transactions_ids_abuse'])) {
+            $this->dispatch(
+                (new JobQiwiTransaction($infoProcessing))
             );
         }
 
