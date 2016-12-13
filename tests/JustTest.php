@@ -6,12 +6,42 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Longman\TelegramBot\Request as TgRequest;
 use App\{
     Client,
-    GoodsPrice
+    GoodsPrice,
+    QiwiTransaction
 };
 use App\Ghost\Repositories\Goods\GoodsOrder;
+use App\Listeners\NotifyAdminTelegramAbuseTransaction;
+use App\Events\QiwiTransaction as QiwiTransactionEvent;
 
 class JustTest extends TestCase
 {
+    public function test_tg_notify_qiwi_transaction_abuse()
+    {
+        $trans = [];
+
+        $i = 0;
+        while ($i != 2) {
+
+            $trans[] = QiwiTransaction::create([
+                'provider'  => 'provider',
+                'comment'   => 'dd333',
+                'amount'    => 1000,
+                'qiwi_date' => '2016-12-04 15:37:44',
+                'purse'     => 79881111111
+            ]);
+
+            $i++;
+        }
+
+        (new NotifyAdminTelegramAbuseTransaction())->handle(
+            new QiwiTransactionEvent($trans)
+        );
+
+        foreach ($trans as $tran) {
+            $tran->delete();
+        }
+    }
+
     /**
      * A basic test example.
      *
