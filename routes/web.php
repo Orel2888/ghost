@@ -12,7 +12,9 @@
 */
 
 Route::group(['middleware' => 'web'], function () {
-    Route::get('/', 'App\Http\Controllers\TestController@index');
+    Route::get('/', function () {
+        return view('welcome');
+    });
 });
 
 /**
