@@ -42,7 +42,7 @@ class AdminApiController extends BaseApiController
 
     public function getGoodsPricePurchase()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'goods_price_id'    => 'required'
         ]);
 
@@ -50,7 +50,7 @@ class AdminApiController extends BaseApiController
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        $goodsPriceIds = explode(',', $this->request->input('goods_price_id'));
+        $goodsPriceIds = explode(',', app('request')->input('goods_price_id'));
 
         try {
             $goodsPrice = GoodsPrice::findOrFail($goodsPriceIds);
@@ -115,7 +115,7 @@ class AdminApiController extends BaseApiController
 
     public function postPurseSet()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'id'    => 'required|integer'
         ]);
 
@@ -125,7 +125,7 @@ class AdminApiController extends BaseApiController
 
         Purse::whereSelected(1)->update(['selected' => 0]);
 
-        $purse = Purse::find($this->request->input('id'));
+        $purse = Purse::find(app('request')->input('id'));
 
         $purse->update(['selected' => 1]);
 

@@ -17,7 +17,7 @@ class UsersApiController extends BaseApiController
      */
     public function getFind()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'tg_chatid' => 'required|numeric'
         ]);
 
@@ -26,7 +26,7 @@ class UsersApiController extends BaseApiController
         }
 
         try {
-            $client = $this->clientManager->findByTgChatId($this->request->input('tg_chatid'));
+            $client = $this->clientManager->findByTgChatId(app('request')->input('tg_chatid'));
         } catch (ModelNotFoundException $e) {
             return response()->json($this->apiResponse->fail([
                 'message' => 'Client with this chat id not found. For a registration call request api method users.reg'
@@ -42,7 +42,7 @@ class UsersApiController extends BaseApiController
      */
     public function postReg()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'name'          => 'required',
             'tg_username'   => 'required|alpha_dash',
             'tg_chatid'     => 'required|numeric'
@@ -53,14 +53,14 @@ class UsersApiController extends BaseApiController
         }
 
         try {
-            $this->clientManager->findByTgChatId($this->request->input('tg_chatid'));
+            $this->clientManager->findByTgChatId(app('request')->input('tg_chatid'));
 
             return response()->json($this->apiResponse->fail(['message' => 'Client is already registered']), 400);
         } catch (ModelNotFoundException $e) {
 
         }
 
-        $client = Client::create($this->request->only('name', 'tg_username', 'tg_chatid') + ['comment' => $this->request->input('tg_username')]);
+        $client = Client::create(app('request')->only('name', 'tg_username', 'tg_chatid') + ['comment' => app('request')->input('tg_username')]);
 
         return response()->json($this->apiResponse->ok(['client_id' => $client->id]), 201);
     }
@@ -74,7 +74,7 @@ class UsersApiController extends BaseApiController
 
     public function postUpdate()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'name'          => 'required',
             'tg_username'   => 'required',
             'tg_chatid'     => 'required|numeric'
@@ -85,12 +85,12 @@ class UsersApiController extends BaseApiController
         }
 
         try {
-            $this->clientManager->findByTgChatId($this->request->input('tg_chatid'))
-                ->update($this->request->only('name', 'tg_username', 'tg_chatid', 'comment'));
+            $this->clientManager->findByTgChatId(app('request')->input('tg_chatid'))
+                ->update(app('request')->only('name', 'tg_username', 'tg_chatid', 'comment'));
 
             return response()->json($this->apiResponse->ok());
         } catch (ModelNotFoundException $e) {
-            return response()->json($this->apiResponse->fail(['message' => 'User with id '. $this->request->input('tg_chatid') .' not found']), 400);
+            return response()->json($this->apiResponse->fail(['message' => 'User with id '. app('request')->input('tg_chatid') .' not found']), 400);
         }
     }
 }

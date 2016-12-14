@@ -12,11 +12,6 @@ use App\Ghost\Repositories\Goods\GoodsOrder;
 class BaseApiController extends BaseController
 {
     /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
      * @var ClientManager
      */
     protected $clientManager;
@@ -38,7 +33,6 @@ class BaseApiController extends BaseController
 
     public function __construct()
     {
-        $this->request       = app('request');
         $this->clientManager = new ClientManager();
         $this->apiResponse   = new ApiResponse();
         $this->goodsManager  = new GoodsManager();

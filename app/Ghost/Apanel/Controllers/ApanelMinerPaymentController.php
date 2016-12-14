@@ -18,18 +18,18 @@ class ApanelMinerPaymentController extends ApanelBaseController
         $payments = MinerPayment::orderBy('status', 'ASC');
 
         // Reset a filter
-        if ($this->request->has('filter_reset')) {
+        if (app('request')->has('filter_reset')) {
             return redirect()->current();
         }
 
         // Apply a filter for query
-        if ($this->request->has('filter')) {
-            $this->apanelRepo->eloquentFilter($payments, $this->request->except('filter', 'filter_reset', 'page'));
+        if (app('request')->has('filter')) {
+            $this->apanelRepo->eloquentFilter($payments, app('request')->except('filter', 'filter_reset', 'page'));
         }
 
         $tplData = [];
 
-        $tplData['payments']    = $payments->paginate(20)->appends($this->request->all());
+        $tplData['payments']    = $payments->paginate(20)->appends(app('request')->all());
         $tplData['form_filter'] = $this->apanelRepo->formFilter([
             'period_date'   => true,
             'inputs'    => [
@@ -59,7 +59,7 @@ class ApanelMinerPaymentController extends ApanelBaseController
                     'Количество ненайденных кладов'    => 'counter_goods_fail'
                 ]
             ]
-        ], $this->request->all());
+        ], app('request')->all());
 
         return view('apanel.miner.payment.index', $tplData);
     }

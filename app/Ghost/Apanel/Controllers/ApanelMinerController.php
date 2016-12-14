@@ -36,16 +36,16 @@ class ApanelMinerController extends ApanelBaseController
         $miners = Miner::query();
 
         // Reset filter
-        if ($this->request->has('filter_reset')) {
+        if (app('request')->has('filter_reset')) {
             return redirect('apanel/miner');
         }
 
         // Query build of filter
-        if ($this->request->has('filter')) {
-            $this->apanelRepo->dbQueryBuilder($miners, $this->request->except('filter', 'filter_reset', 'page'));
+        if (app('request')->has('filter')) {
+            $this->apanelRepo->dbQueryBuilder($miners, app('request')->except('filter', 'filter_reset', 'page'));
         }
 
-        $tplData['miners']      = $miners->paginate(20)->appends($this->request->all());
+        $tplData['miners']      = $miners->paginate(20)->appends(app('request')->all());
         $tplData['form_filter'] = $this->apanelRepo->formFilter([
             'inputs'    => [
                 'ID'    => ['name' => 'id'],
@@ -71,7 +71,7 @@ class ApanelMinerController extends ApanelBaseController
                     'Кол-во товара всего'           => 'counter_total_goods'
                 ]
             ]
-        ], $this->request->all());
+        ], app('request')->all());
 
         return view('apanel.miner.index', $tplData);
     }

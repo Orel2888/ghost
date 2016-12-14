@@ -13,16 +13,16 @@ class ApanelClientController extends ApanelBaseController
         $client = Client::query();
 
         // Reset filter
-        if ($this->request->has('filter_reset')) {
+        if (app('request')->has('filter_reset')) {
             return redirect('apanel/client');
         }
 
         // Query build of filter
-        if ($this->request->has('filter')) {
-            $this->apanelRepo->dbQueryBuilder($client, $this->request->except('filter', 'filter_reset', 'page'));
+        if (app('request')->has('filter')) {
+            $this->apanelRepo->dbQueryBuilder($client, app('request')->except('filter', 'filter_reset', 'page'));
         }
 
-        $tplData['clients']     = $client->paginate(20)->appends($this->request->all());
+        $tplData['clients']     = $client->paginate(20)->appends(app('request')->all());
 
         $tplData['form_filter'] = $this->apanelRepo->formFilter([
             'inputs'    => [
@@ -48,7 +48,7 @@ class ApanelClientController extends ApanelBaseController
                     'Кол-во покупок' => 'count_purchases'
                 ]
             ]
-        ], $this->request->all());
+        ], app('request')->all());
 
         return view('apanel.client.index', $tplData);
     }
