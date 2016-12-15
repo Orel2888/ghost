@@ -46,15 +46,18 @@ trait BaseTestsHelper
     {
         return $this->goodsManager->addGoods([
             'goods_name'    => 'Бананы',
-            'city_name'     => $this->createCity()->name
+            'city_id'       => $this->createCity()->id
         ]);
     }
 
     public function createGoodsPrice($reserved = 0)
     {
+        $goods = $this->createGoods();
+
         $goodsData = [
             'miner_id'  => $this->createMiner()->id,
-            'goods_id'  => $this->createGoods()->id,
+            'goods_id'  => $goods->id,
+            'city_id'   => $goods->city_id,
             'weight'    => '0.5',
             'address'   => 'The backup and restore operations for global variables and static',
             'cost'      => 1000
