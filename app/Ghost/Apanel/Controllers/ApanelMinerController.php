@@ -144,7 +144,7 @@ class ApanelMinerController extends ApanelBaseController
 
         $this->minerInfoDataProvider->minerModel->find($minerId)->update($minerUpdatesParams);
 
-        return redirect(\URL::route('apanel.miner.edit', [$minerId]) .'#form-edit')->with('edited-success', 'Данные курьера успешно обновлены');
+        return redirect(\URL::route('miner.edit', [$minerId]) .'#form-edit')->with('edited-success', 'Данные курьера успешно обновлены');
     }
 
     /**
@@ -165,7 +165,7 @@ class ApanelMinerController extends ApanelBaseController
 
         $message = 'Создать заявку на выплату курьеру '. $miner->name .'? Счетчики будут сброшены и создан чек на выплату.';
 
-        return $this->apanelRepo->confirmAction($message, \URL::route('apanel.miner.payment_store', [$minerId]), \URL::previous(), compact('miner'));
+        return $this->apanelRepo->confirmAction($message, \URL::route('miner.payment_store', [$minerId]), \URL::previous(), compact('miner'));
     }
 
     public function payment_store($minerId)
@@ -186,7 +186,7 @@ class ApanelMinerController extends ApanelBaseController
             'counter_goods_fail'    => 0
         ]);
 
-        return redirect()->route('apanel.miner.show', [$minerId])->with('notify', 'Заявка на выплату успешно создана');
+        return redirect()->route('miner.show', [$minerId])->with('notify', 'Заявка на выплату успешно создана');
     }
 
     public function deleteConfirm($minerId)
@@ -195,13 +195,13 @@ class ApanelMinerController extends ApanelBaseController
 
         $message = 'Удалить курьера '. $miner->name .' из базы?';
 
-        return $this->apanelRepo->confirmAction($message, \URL::route('apanel.miner.delete', [$minerId]), \URL::previous());
+        return $this->apanelRepo->confirmAction($message, \URL::route('miner.delete', [$minerId]), \URL::previous());
     }
 
     public function delete($minerId)
     {
         $this->minerInfoDataProvider->minerModel->find($minerId)->delete();
 
-        return redirect()->route('apanel.miner.index')->with('notify', 'Курьер успешно удален');
+        return redirect()->route('miner.index')->with('notify', 'Курьер успешно удален');
     }
 }

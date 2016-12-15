@@ -75,10 +75,10 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
          * Resource miner
          */
         Route::resource('miner/payment', 'ApanelMinerPaymentController');
-        Route::get('miner/{miner_id}/payment_create', ['uses' => 'ApanelMinerController@payment_create', 'as' => 'apanel.miner.payment_create']);
-        Route::get('miner/{miner_id}/payment_store', ['uses' => 'ApanelMinerController@payment_store', 'as' => 'apanel.miner.payment_store']);
-        Route::get('miner/{miner_id}/delete-confirm', ['uses' => 'ApanelMinerController@deleteConfirm', 'as' => 'apanel.miner.delete_confirm']);
-        Route::get('miner/{miner_id}/delete', ['uses' => 'ApanelMinerController@delete', 'as' => 'apanel.miner.delete']);
+        Route::get('miner/{miner_id}/payment_create', ['uses' => 'ApanelMinerController@payment_create', 'as' => 'miner.payment_create']);
+        Route::get('miner/{miner_id}/payment_store', ['uses' => 'ApanelMinerController@payment_store', 'as' => 'miner.payment_store']);
+        Route::get('miner/{miner_id}/delete-confirm', ['uses' => 'ApanelMinerController@deleteConfirm', 'as' => 'miner.delete_confirm']);
+        Route::get('miner/{miner_id}/delete', ['uses' => 'ApanelMinerController@delete', 'as' => 'miner.delete']);
         Route::resource('miner', 'ApanelMinerController');
     });
 

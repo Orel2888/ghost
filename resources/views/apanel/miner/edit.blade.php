@@ -12,7 +12,7 @@
                     <div class="alert alert-success">{{ session('edited-success') }}</div>
                 @endif
 
-                {!! Form::model($miner->minerModel, ['route' => ['apanel.miner.update', $miner->id], 'method' => 'PUT']) !!}
+                {!! Form::model($miner->minerModel, ['route' => ['miner.update', $miner->id], 'method' => 'PUT']) !!}
 
                 {!! Form::control('Ставка', 'ante', $miner->ante) !!}
                 {!! Form::control('Баланс', 'balance', $miner->balance) !!}
@@ -21,7 +21,7 @@
                 {!! Form::control('Кол-во товара не найдено', 'counter_goods_fail', $miner->counter_goods_fail) !!}
                 {!! Form::control('Кол-во товара всего', 'counter_total_goods', $miner->counter_total_goods) !!}
                 {!! Form::buttonType('Сохранить', 'success') !!}
-                <a href="{{ route('apanel.miner.show', [$miner->id]) }}" class="btn btn-default">Отмена</a>
+                <a href="{{ route('miner.show', [$miner->id]) }}" class="btn btn-default">Отмена</a>
                 {!! Form::close() !!}
             </div>
         </div>
