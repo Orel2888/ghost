@@ -62,7 +62,16 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
          * Clients
          */
 
-        Route::get('client', 'ApanelClientController@getIndex');
+        //Route::get('client', 'ApanelClientController@getIndex');
+        Route::resource('client', 'ApanelClientController');
+        Route::get('client/{id}/purchase', [
+            'uses'  => 'ApanelClientController@purchase',
+            'as'    => 'client.purchase'
+        ]);
+        Route::post('client/{id}/purchase', [
+            'uses'  => 'ApanelClientController@purchase',
+            'as'    => 'client.purchase.store'
+        ]);
 
         /**
          * Purchases
