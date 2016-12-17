@@ -3,7 +3,11 @@
 namespace App\Ghost\Apanel\Controllers;
 
 use Illuminate\Http\Request;
-use App\Client;
+use App\{
+    Client,
+    Miner,
+    City
+};
 
 class ApanelClientController extends ApanelBaseController
 {
@@ -140,5 +144,26 @@ class ApanelClientController extends ApanelBaseController
         //
 
         echo 'Destroy';
+    }
+
+    public function purchase($id)
+    {
+        $client = Client::find($id);
+
+        $miners = Miner::all();
+
+        $minerList = [];
+
+        foreach ($miners as $miner) {
+            $minerList[$miner->id] = $miner->name;
+        }
+
+        $cities = City::with('goods')->get();
+
+        return view('apanel.client.purchase_create', [
+            'client'         => $client,
+            'miner_list'     => $minerList,
+            'cities'         => $cities
+        ]);
     }
 }

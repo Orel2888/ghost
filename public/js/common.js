@@ -85,6 +85,36 @@ $(function () {
         $('#f_created_at_to').val(datePeriod[datePeriodId][0]);
         $('#f_created_at_from').val(datePeriod[datePeriodId][1]);
     });
+
+    // Modal select goods
+    $('#go-select-goods').click(function (e) {
+        e.preventDefault();
+
+        $('#modal-select-goods').modal('show');
+    });
+
+    $('.select-goods').click(function (e) {
+        var $this = $(this);
+
+        e.preventDefault();
+
+        if (/client\/\d+\/purchase/.test(location.href)) {
+            var selectedGoods = {
+                'goods_id': $this.attr('data-goods-id'),
+                'goods_name': $this.attr('data-goods-name'),
+                'city_name': $this.attr('data-city-name')
+            };
+
+            var divGoods = $('#selected-goods');
+
+            divGoods.find('#city-name').text(selectedGoods.city_name);
+            divGoods.find('#goods-name').text(selectedGoods.goods_name);
+            divGoods.find('#input-goods-id').val(selectedGoods.goods_id);
+
+            $('#modal-select-goods').modal('hide');
+            $('#selected-goods').slideDown('slow');
+        }
+    })
 });
 
 function notebook(formSelector, secret) {
