@@ -20,6 +20,17 @@ class FormBuilder extends FormBuilderOrig
             '<div class="help-block">'. $helpBlock .'</div>');
     }
 
+    public function checkboxControl($labelText, $name, $value = null, $checked = false, $options = [])
+    {
+        return sprintf('
+        <div class="checkbox">
+            <label>
+                %s %s
+            </label>
+        </div>
+        ', parent::checkbox($name, $value, $checked, $options), $labelText);
+    }
+
     public function buttonType($value, $typeButton = 'default', $options = [])
     {
         return sprintf('
