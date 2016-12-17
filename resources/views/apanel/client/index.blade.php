@@ -25,6 +25,7 @@
                         <th>Баланс</th>
                         <th>Кол-во покупок</th>
                         <th>Дата рег.</th>
+                        <th>&nbsp;</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -38,10 +39,16 @@
                         <td>{{ $client->balance }}</td>
                         <td>{{ $client->count_purchases }}</td>
                         <td>{{ $client->created_at->format('d-m-y H:i') }}</td>
+                        <td>
+                            <a href="{{ route('client.show', $client->id) }}" class="btn btn-xs btn-success">
+                                <i class="glyphicon glyphicon-hdd"></i>
+                                Инфо
+                            </a>
+                        </td>
                     </tr>
                         @empty
                     <tr>
-                        <td colspan="8">Нет клиентов</td>
+                        <td colspan="9">Нет клиентов</td>
                     </tr>
                     @endforelse
                     </tbody>
