@@ -5,6 +5,7 @@ namespace App\Ghost\Repositories\Goods;
 use App\Ghost\Repositories\Traits\BaseRepoTrait;
 use App\Ghost\Repositories\Goods\Exceptions\GoodsEndedException;
 use App\Ghost\Repositories\Goods\Exceptions\NotEnoughMoney;
+use App\Ghost\Repositories\Goods\Exceptions\GoodsNotFound;
 use App\GoodsPurchase;
 use App\Ghost\Repositories\Goods\GoodsManager;
 use Illuminate\Contracts\Bus\Dispatcher;
@@ -41,6 +42,11 @@ class GoodsOrder extends Goods
         ];
 
         $this->checkRequiredAttributesArray($attributes, $attributesRequired);
+
+        // Check to exists the such goods to price
+        if (!$this->goodsManager->checkGoodsPrice($attributes['goods_id'], $attributes['weight'], $attributes['cost'])) {
+            throw new GoodsNotFound('Cannot create order because such goods not found to price');
+        }
 
         return $this->goodsOrder->create(array_only($attributes, $attributesRequired));
     }
