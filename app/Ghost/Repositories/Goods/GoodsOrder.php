@@ -100,7 +100,7 @@ class GoodsOrder extends Goods
             $order  = $orderId;
         } else {
             $client = $this->client->findOrFail($clientId);
-            $order = $this->findOrder($orderId);
+            $order  = $this->findOrder($orderId);
         }
 
         if ($this->existsGoods($order->goods_id, $order->weight)) {
@@ -165,8 +165,12 @@ class GoodsOrder extends Goods
             return true;
         } catch (GoodsEndedException $e) {
             $order->update(['status' => 2]);
+
+            return $e;
         } catch (NotEnoughMoney $e) {
             $order->update(['status' => 3]);
+
+            return $e;
         }
 
         return false;

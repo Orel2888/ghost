@@ -1,7 +1,7 @@
-<?php
-/**
- * Created by PhpStorm.
- * User: orel
- * Date: 18.12.16
- * Time: 12:11
- */
+@if (!$errors->isEmpty())
+    @foreach ($errors->all() as $error)
+        <div class="alert alert-danger">
+            {{ $error }}
+        </div>
+    @endforeach
+@endif

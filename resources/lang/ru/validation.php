@@ -126,7 +126,10 @@ return [
 
     'attributes'           => [
         'login' => 'логин',
-        'password'  => 'пароль'
+        'password'  => 'пароль',
+        'weight'    => 'вес',
+        'cost'      => 'цена',
+        'address'   => 'адрес'
     ],
 
 ];

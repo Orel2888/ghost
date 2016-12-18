@@ -68,8 +68,8 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
             'uses'  => 'ApanelClientController@purchase',
             'as'    => 'client.purchase'
         ]);
-        Route::post('client/{id}/purchase', [
-            'uses'  => 'ApanelClientController@purchase',
+        Route::put('client/{id}/purchase', [
+            'uses'  => 'ApanelClientController@purchaseStore',
             'as'    => 'client.purchase.store'
         ]);
 

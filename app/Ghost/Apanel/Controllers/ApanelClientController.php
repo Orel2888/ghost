@@ -3,14 +3,34 @@
 namespace App\Ghost\Apanel\Controllers;
 
 use Illuminate\Http\Request;
+use App\Ghost\Repositories\Goods\GoodsOrder as GoodsOrderRepo;
+use App\Ghost\Repositories\Goods\GoodsManager as GoodsManager;
+use App\Ghost\Repositories\Goods\Exceptions\NotEnoughMoney;
 use App\{
     Client,
     Miner,
-    City
+    City,
+    Goods
 };
+use Validator;
 
 class ApanelClientController extends ApanelBaseController
 {
+    /**
+     * @var GoodsOrderRepo
+     */
+    public $goodsOrderRepo;
+
+    public $goodsManager;
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->goodsOrderRepo = new GoodsOrderRepo();
+        $this->goodsManager   = new GoodsManager();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -146,6 +166,12 @@ class ApanelClientController extends ApanelBaseController
         echo 'Destroy';
     }
 
+    /**
+     * Create purchase
+     *
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function purchase($id)
     {
         $client = Client::find($id);
@@ -165,5 +191,49 @@ class ApanelClientController extends ApanelBaseController
             'miner_list'     => $minerList,
             'cities'         => $cities
         ]);
+    }
+
+    public function purchaseStore($id)
+    {
+        $valid = Validator::make(app('request')->all(), [
+            'goods_id'  => 'required|exists:goods,id',
+            'miner_id'  => 'required|exists:miners,id',
+            'weight'    => 'required|min:0.01',
+            'cost'      => 'required|min:0',
+            'address'   => 'required'
+        ], [
+            'goods_id.exists'   => 'Такой товар ненайден',
+            'miner_id.exists'   => 'Курьер не найден',
+            'goods_id.required' => 'Не выбран товар',
+            'miner_id.required' => 'Не выбран курьер'
+        ])->validate();
+
+        $request = app('request');
+
+        $cost = $request->input('cost') ?? 0;
+
+        $client = Client::find($id);
+
+        $goods  = Goods::find($request->input('goods_id'));
+
+        // Add goods to price list
+        $this->goodsManager->addGoodsPrice($request->only('goods_id', 'miner_id', 'weight', 'address', 'cost'));
+
+        // Add order
+        $orderGoods = $this->goodsOrderRepo->create([
+            'goods_id'  => $request->input('goods_id'),
+            'client_id' => $client->id,
+            'weight'    => $request->input('weight'),
+            'comment'   => $client->comment,
+            'cost'      => $cost
+        ]);
+
+        $buying = $this->goodsOrderRepo->buyProcessingOrder($orderGoods, $request->input('send_telegram'));
+
+        if ($cost > 0 && $buying instanceof NotEnoughMoney) {
+            return redirect()->back()->withErrors(['error' => 'У клиента недостаточно средств на балансе']);
+        }
+
+        return redirect()->back()->with('notify', 'Покупка для клиента успешно создана');
     }
 }

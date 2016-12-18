@@ -16,6 +16,9 @@
                     Создание покупки {{ $client->name }} {{ '@'. $client->tg_username }}
                 </div>
                 <div class="panel-body">
+                    @include('apanel.elements.notify_success')
+                    @include('apanel.elements.notify_errors')
+
                     Баланс: {{ $client->balance }}<br>
                     <hr>
 
@@ -33,8 +36,7 @@
                     {!! Form::control('Вес', 'weight') !!}
                     {!! Form::control('Цена', 'cost') !!}
                     {!! Form::textareaControl('Товар', 'address') !!}
-                    {!! Form::checkboxControl('Отправить покупку в телеграм', 'notify_telegram', 1, 1) !!}
-                    {!! Form::checkboxControl('Снять средства с баланса', 'decrement_balance', 1, 1) !!}
+                    {!! Form::checkboxControl('Отправить покупку в телеграм', 'send_telegram', 1, 1) !!}
                     {!! Form::buttonType('Создать', 'success') !!}
                     {!! Form::close() !!}
                 </div>
