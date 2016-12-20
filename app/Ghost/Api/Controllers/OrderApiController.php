@@ -14,7 +14,7 @@ class OrderApiController extends BaseApiController
 {
     public function postCreate()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'goods_id'  => 'required|integer',
             'weight'    => 'required',
             'count'     => 'required|integer',
@@ -25,7 +25,7 @@ class OrderApiController extends BaseApiController
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        $input = $this->request->all();
+        $input = app('request')->all();
 
         $client = Client::find($input['client_id']);
 
@@ -91,7 +91,7 @@ class OrderApiController extends BaseApiController
 
     public function getFind()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'id'        => 'required|integer',
             'client_id' => 'required|integer'
         ]);
@@ -101,7 +101,7 @@ class OrderApiController extends BaseApiController
         }
 
         $order = GoodsOrder::with(['goods.city', 'purchase'])
-            ->whereIdAndClientId($this->request->input('id'), $this->request->input('client_id'))
+            ->whereIdAndClientId(app('request')->input('id'), app('request')->input('client_id'))
             ->first();
 
         if (is_null($order)) {
@@ -130,7 +130,7 @@ class OrderApiController extends BaseApiController
 
     public function getList()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'client_id' => 'required|integer'
         ]);
 
@@ -138,7 +138,7 @@ class OrderApiController extends BaseApiController
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        $client = Client::findOrFail($this->request->input('client_id'));
+        $client = Client::findOrFail(app('request')->input('client_id'));
 
         $orders = GoodsOrder::whereClientId($client->id)->orderBy('id', 'DESC')->take(10)->get();
 
@@ -165,7 +165,7 @@ class OrderApiController extends BaseApiController
 
     public function postDelOrder()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'client_id' => 'required|integer',
             'order_id'  => 'required|integer'
         ]);
@@ -174,7 +174,7 @@ class OrderApiController extends BaseApiController
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        $input = $this->request->all();
+        $input = app('request')->all();
 
         $goodsOrder = GoodsOrder::whereId($input['order_id'])->whereClientId($input['client_id'])->first();
 
@@ -189,7 +189,7 @@ class OrderApiController extends BaseApiController
 
     public function postDelAllOrder()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'client_id' => 'required|integer'
         ]);
 
@@ -197,7 +197,7 @@ class OrderApiController extends BaseApiController
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        GoodsOrder::whereClientId($this->request->input('client_id'))->delete();
+        GoodsOrder::whereClientId(app('request')->input('client_id'))->delete();
 
         return response()->json($this->apiResponse->ok(['method' => 'delall']));
     }

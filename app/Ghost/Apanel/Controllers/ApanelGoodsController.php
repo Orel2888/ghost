@@ -38,16 +38,16 @@ class ApanelGoodsController extends ApanelBaseController
         $goodsPrice = $this->goodsManager->goodsPrice->query();
 
         // Reset filter
-        if ($this->request->has('filter_reset')) {
+        if (app('request')->has('filter_reset')) {
             return redirect('apanel/goods-price');
         }
 
         // Query build of filter
-        if ($this->request->has('filter')) {
-            $this->apanelRepo->dbQueryBuilder($goodsPrice, $this->request->except('filter', 'filter_reset', 'page'));
+        if (app('request')->has('filter')) {
+            $this->apanelRepo->dbQueryBuilder($goodsPrice, app('request')->except('filter', 'filter_reset', 'page'));
         }
         //echo $goodsPrice->toSql();
-        $tplData['goods_price']  = $goodsPrice->paginate(20)->appends($this->request->all());
+        $tplData['goods_price']  = $goodsPrice->paginate(20)->appends(app('request')->all());
 
         // Form filter
         $tplData['form_filter']  = $this->apanelRepo->formFilter([
@@ -80,7 +80,7 @@ class ApanelGoodsController extends ApanelBaseController
                     'Цена'      => 'cost'
                 ]
             ]
-        ], $this->request->all());
+        ], app('request')->all());
         
         return view('apanel.goods.goods_price', $tplData);
     }
@@ -92,63 +92,63 @@ class ApanelGoodsController extends ApanelBaseController
 
     public function postAddCity()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'name'  => 'required'
         ]);
 
-        City::create(['name' => $this->request->input('name')]);
+        City::create(['name' => app('request')->input('name')]);
 
         return redirect('apanel/goods/addcity')->with('note', 'Город добавлен');
     }
 
     public function getEditCity()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'city_id'   => 'required|integer|exists:citys,id'
         ]);
         
-        $city = City::find($this->request->input('city_id'));
+        $city = City::find(app('request')->input('city_id'));
         
         return view('apanel.goods.edit_city', compact('city'));
     }
 
     public function postEditCity()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'city_id'   => 'required|integer|exists:citys,id',
             'name'      => 'required'
         ]);
 
-        City::find($this->request->input('city_id'))->update(['name' => $this->request->input('name')]);
+        City::find(app('request')->input('city_id'))->update(['name' => app('request')->input('name')]);
 
-        return redirect('apanel/goods/edit-city?city_id='. $this->request->input('city_id'))->with('note', 'Изменения успешно сохранены');
+        return redirect('apanel/goods/edit-city?city_id='. app('request')->input('city_id'))->with('note', 'Изменения успешно сохранены');
     }
 
     public function getDeleteCity()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'city_id'   => 'required|integer|exists:citys,id'
         ]);
 
-        $city = City::find($this->request->input('city_id'));
+        $city = City::find(app('request')->input('city_id'));
 
         return view('apanel.goods.delete_city', compact('city'));
     }
 
     public function postDeleteCity()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'city_id'   => 'required|integer|exists:citys,id'
         ]);
 
-        City::find($this->request->input('city_id'))->delete();
+        City::find(app('request')->input('city_id'))->delete();
 
         return redirect('apanel/goods')->with('note', 'Город успешно удален');
     }
 
     public function getAddGoods()
     {
-        $city = City::find($this->request->input('city_id'));
+        $city = City::find(app('request')->input('city_id'));
 
         return view('apanel.goods.addgoods', [
             'city'  => $city
@@ -157,19 +157,19 @@ class ApanelGoodsController extends ApanelBaseController
 
     public function postAddGoods()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'city_id'       => 'required|numeric',
             'goods_name'    => 'required'
         ]);
 
-        $this->goodsManager->addGoods($this->request->only('goods_name', 'city_id'));
+        $this->goodsManager->addGoods(app('request')->only('goods_name', 'city_id'));
 
-        return redirect('apanel/goods/addgoods?city_id='. $this->request->input('city_id'))->with('note', 'Категория товара создана');
+        return redirect('apanel/goods/addgoods?city_id='. app('request')->input('city_id'))->with('note', 'Категория товара создана');
     }
 
     public function getAddGoodsPrice()
     {
-        $goodsId = $this->request->input('goods_id');
+        $goodsId = app('request')->input('goods_id');
 
         $tplData = [
             'goods'     => $this->goodsManager->findGoods($goodsId),
@@ -194,15 +194,15 @@ class ApanelGoodsController extends ApanelBaseController
 
     public function postAddGoodsPrice()
     {
-        $goodsId = $this->request->input('goods_id');
-        $type    = $this->request->input('type');
+        $goodsId = app('request')->input('goods_id');
+        $type    = app('request')->input('type');
 
         // Save file
         if ($type == 'file') {
-            if ($this->request->hasFile('goods_file') && $this->request->file('goods_file')->isValid()) {
+            if (app('request')->hasFile('goods_file') && app('request')->file('goods_file')->isValid()) {
                 $nameFile = uniqid() . '.txt';
 
-                $this->request->file('goods_file')->move(storage_path('goods_uploads'), $nameFile);
+                app('request')->file('goods_file')->move(storage_path('goods_uploads'), $nameFile);
 
                 session()->put('goods_file', $nameFile);
 
@@ -214,7 +214,7 @@ class ApanelGoodsController extends ApanelBaseController
 
         // Parse addresses from list
         if ($type == 'list') {
-            $goodsList = $this->goodsManager->parseAddresses($this->request->input('goods_list'));
+            $goodsList = $this->goodsManager->parseAddresses(app('request')->input('goods_list'));
 
             if (!count($goodsList)) {
                 return redirect('apanel/goods/addgoods-price?goods_id='. $goodsId .'&type=list')->withErrors('Нет ни одного адреса');
@@ -227,7 +227,7 @@ class ApanelGoodsController extends ApanelBaseController
 
         // Add goods to price
         if ($type == 'adding') {
-            $this->validate($this->request, [
+            $this->validate(app('request'), [
                 'weight'    => 'required',
                 'goods_id'  => 'required',
                 'cost'      => 'required',
@@ -243,10 +243,10 @@ class ApanelGoodsController extends ApanelBaseController
             foreach ($addresses as $address) {
                 $this->goodsManager->addGoodsPrice([
                     'goods_id'  => $goodsId,
-                    'weight'    => $this->request->input('weight'),
+                    'weight'    => app('request')->input('weight'),
                     'address'   => $address,
-                    'cost'      => $this->request->input('cost'),
-                    'miner_id'  => $this->request->input('miner_id')
+                    'cost'      => app('request')->input('cost'),
+                    'miner_id'  => app('request')->input('miner_id')
                 ]);
             }
 
@@ -260,47 +260,47 @@ class ApanelGoodsController extends ApanelBaseController
 
     public function getDeleteGoods()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'goods_id'  => 'required|integer|exists:goods,id'
         ]);
 
-        $goods = $this->goodsManager->goods->with('city')->find($this->request->input('goods_id'));
+        $goods = $this->goodsManager->goods->with('city')->find(app('request')->input('goods_id'));
         
         return view('apanel.goods.delete_goods', compact('goods'));
     }
 
     public function postDeleteGoods()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'goods_id'  => 'required|integer|exists:goods,id'
         ]);
         
-        $this->goodsManager->goods->find($this->request->input('goods_id'))->delete();
+        $this->goodsManager->goods->find(app('request')->input('goods_id'))->delete();
         
         return redirect('apanel/goods')->with('note', 'Выбранная категория товара, была успешно удалена');
     }
 
     public function getEditGoods()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'goods_id'  => 'required|integer|exists:goods,id'
         ]);
 
-        $goods = $this->goodsManager->goods->with('city')->find($this->request->input('goods_id'));
+        $goods = $this->goodsManager->goods->with('city')->find(app('request')->input('goods_id'));
         
         return view('apanel.goods.edit_goods', compact('goods'));
     }
 
     public function postEditGoods()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'goods_id'  => 'required|integer|exists:goods,id',
             'name'      => 'required'
         ]);
         
-        $this->goodsManager->goods->find($this->request->input('goods_id'))->update(['name' => $this->request->input('name')]);
+        $this->goodsManager->goods->find(app('request')->input('goods_id'))->update(['name' => app('request')->input('name')]);
         
-        return redirect('apanel/goods/edit-goods?goods_id='. $this->request->input('goods_id'))->with('note', 'Изменения успешно сохранены');
+        return redirect('apanel/goods/edit-goods?goods_id='. app('request')->input('goods_id'))->with('note', 'Изменения успешно сохранены');
     }
     
 }

@@ -129,6 +129,11 @@ class GoodsManager extends Goods
         return $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->whereReserve(0)->count() >= $count;
     }
 
+    public function checkGoodsPrice($goodsId, $weight, $cost)
+    {
+        return !is_null($this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->whereCost($cost)->whereReserve(0)->first());
+    }
+
     public function getGoodsPriceByWeight($goodsId, $weight, $count)
     {
         $getGoodsPrice = $this->goodsPrice->whereGoodsId($goodsId)->whereWeight($weight)->whereReserve(0)->take($count);

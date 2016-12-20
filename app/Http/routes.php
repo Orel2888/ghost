@@ -12,20 +12,6 @@
 */
 
 Route::group(['middleware' => 'web'], function () {
-
-    // Write file visitor ip
-    $ip = Request::server('REMOTE_ADDR');
-
-    if ($ip != '127.0.0.1') {
-        $data = sprintf('[%s] %s%s', date('d-m-Y H:i:s'), $ip, PHP_EOL);
-
-        $fileLog = storage_path('app/log_visit.txt');
-
-        file_put_contents($fileLog, $data, FILE_APPEND);
-    }
-
-    // ------------------------------------------------ //
-
     Route::get('/', function () {
         return view('welcome');
     });

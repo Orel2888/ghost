@@ -21,7 +21,7 @@ class AuthenticateApiController extends BaseApiController
 
     public function postAuthenticate($tgUsername = null)
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'key'   => 'required|alpha_num'
         ]);
 
@@ -31,11 +31,11 @@ class AuthenticateApiController extends BaseApiController
 
         if (!is_null($tgUsername)) {
             // Authenticate admin
-            if (!$auth = $this->apiGuard->authenticateAdmin($this->request->input('key'), $tgUsername)) {
+            if (!$auth = $this->apiGuard->authenticateAdmin(app('request')->input('key'), $tgUsername)) {
                 return response()->json($this->apiResponse->fail(['message' => 'Unauthorized']), 401);
             }
         } else {
-            if (!$auth = $this->apiGuard->authenticate($this->request->input('key'))) {
+            if (!$auth = $this->apiGuard->authenticate(app('request')->input('key'))) {
                 return response()->json($this->apiResponse->fail(['messages' => 'Unauthorized']), 401);
             }
         }
@@ -45,7 +45,7 @@ class AuthenticateApiController extends BaseApiController
 
     public function postCheckAccessToken()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'access_token'  => 'required'
         ]);
 
@@ -53,7 +53,7 @@ class AuthenticateApiController extends BaseApiController
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        if ($this->apiGuard->hasAccessToken($this->request->input('access_token'))) {
+        if ($this->apiGuard->hasAccessToken(app('request')->input('access_token'))) {
             return response()->json($this->apiResponse->ok());
         } else {
             return response()->json($this->apiResponse->fail());

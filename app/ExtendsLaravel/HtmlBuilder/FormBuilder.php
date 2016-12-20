@@ -20,6 +20,39 @@ class FormBuilder extends FormBuilderOrig
             '<div class="help-block">'. $helpBlock .'</div>');
     }
 
+    public function checkboxControl($labelText, $name, $value = null, $checked = false, $options = [])
+    {
+        return sprintf('
+        <div class="checkbox">
+            <label>
+                %s %s
+            </label>
+        </div>
+        ', parent::checkbox($name, $value, $checked, $options), $labelText);
+    }
+
+    public function textareaControl($labelText, $name, $value = null, $informer = null, $helpBlock = null, $options = [])
+    {
+        return sprintf('
+        <div class="form-group %s">
+            <label>%s</label>
+            %s
+            %s
+        </div>
+        ',  $informer ? 'has-'. $informer : '',
+            $labelText,
+            parent::textarea($name, $value, $options + ['class' => 'form-control']),
+            '<div class="help-block">'. $helpBlock .'</div>');
+    }
+
+    public function selectControl($labelText, $name, $list = [], $selected = null, $options = [])
+    {
+        return sprintf('
+        <label>%s</label>
+        %s
+        ', $labelText, parent::select($name, $list, $selected, ['class' => 'form-control']));
+    }
+
     public function buttonType($value, $typeButton = 'default', $options = [])
     {
         return sprintf('

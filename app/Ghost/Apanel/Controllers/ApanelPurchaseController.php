@@ -13,16 +13,16 @@ class ApanelPurchaseController extends ApanelBaseController
         $purchases = GoodsPurchase::query();
 
         // Reset filter
-        if ($this->request->has('filter_reset')) {
+        if (app('request')->has('filter_reset')) {
             return redirect('apanel/purchase');
         }
 
         // Query build of filter
-        if ($this->request->has('filter')) {
-            $this->apanelRepo->dbQueryBuilder($purchases, $this->request->except('filter', 'filter_reset', 'page'));
+        if (app('request')->has('filter')) {
+            $this->apanelRepo->dbQueryBuilder($purchases, app('request')->except('filter', 'filter_reset', 'page'));
         }
 
-        $tplData['purchases']   = $purchases->paginate(20)->appends($this->request->all());
+        $tplData['purchases']   = $purchases->paginate(20)->appends(app('request')->all());
         $tplData['form_filter'] = $this->apanelRepo->formFilter([
             'inputs'    => [
                 'ID'        => ['name' => 'id'],
@@ -60,7 +60,7 @@ class ApanelPurchaseController extends ApanelBaseController
                     'Статус'    => 'status'
                 ]
             ]
-        ], $this->request->all());
+        ], app('request')->all());
         
         return view('apanel.purchase.index', $tplData);
     }

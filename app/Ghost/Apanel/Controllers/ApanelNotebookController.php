@@ -22,20 +22,20 @@ class ApanelNotebookController extends ApanelBaseController
 
     public function postSave()
     {
-        if (!$this->request->ajax()) {
+        if (!app('request')->ajax()) {
             return response()->json([
                 'status'    => 'fail'
             ], 400);
         }
 
         // Verify a content
-        if (!GibberishAES::dec($this->request->input('content'), env('K5'))) {
+        if (!GibberishAES::dec(app('request')->input('content'), env('K5'))) {
             return response()->json([
                 'status'    => 'fail'
             ], 400);
         }
 
-        file_put_contents(storage_path('description.txt'), $this->request->input('content'));
+        file_put_contents(storage_path('description.txt'), app('request')->input('content'));
 
         return response()->json([
             'status'    => 'ok'
