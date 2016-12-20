@@ -5,6 +5,8 @@
 @section('content')
     <div class="row wrap">
         <div class="col-md-12">
+            @include('apanel.elements.notify_success')
+            
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     Клиенты
