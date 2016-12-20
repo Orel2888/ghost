@@ -72,6 +72,10 @@ Route::group(['middleware' => ['web'], 'namespace' => 'App\Ghost\Apanel\Controll
             'uses'  => 'ApanelClientController@purchaseStore',
             'as'    => 'client.purchase.store'
         ]);
+        Route::get('client/{id}/destroy', [
+            'uses'  => 'ApanelClientController@getDestroy',
+            'as'    => 'client.delete'
+        ]);
 
         /**
          * Purchases

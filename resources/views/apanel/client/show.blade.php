@@ -50,10 +50,9 @@
                         <a href="{{ route('client.purchase', $client->id) }}" class="list-group-item list-group-item-info">
                             <h4><i class="glyphicon glyphicon-shopping-cart"></i> Оформить покупку</h4>
                         </a>
-                        {!! Form::open(['route' => ['client.destroy', $client->id]]) !!}
-                        {!! method_field('delete') !!}
-                        {!! Form::buttonType('<h4 class="pull-left"><i class="glyphicon glyphicon-remove"></i> Удалить</h4>', 'danger', ['class' => 'btn btn-danger btn-block list-group-item']) !!}
-                        {!! Form::close() !!}
+                        <a href="{{ route('client.delete', $client->id) }}" class="list-group-item list-group-item-danger">
+                            <h4><i class="glyphicon glyphicon-remove"></i> Удалить</h4>
+                        </a>
                         <a href="{{ url('apanel/purchase?filter=1&f_client_id='. $client->id) }}" target="_blank" class="list-group-item"><i class="glyphicon glyphicon-search"></i> Найти покупки</a>
                     </ul>
                 </div>

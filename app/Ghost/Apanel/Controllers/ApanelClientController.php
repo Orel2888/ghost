@@ -153,6 +153,17 @@ class ApanelClientController extends ApanelBaseController
         return redirect()->back()->with('notify', 'Клиент отредактирован успешно');
     }
 
+    public function getDestroy($id)
+    {
+        $client = Client::find($id);
+
+        $message = "Удалить клиента {$client->name} @{$client->tg_username} из базы навсегда?";
+
+        return $this->apanelRepo->confirmAction($message, route('client.destroy', $client->id), url()->previous(), [
+            'form'  => 'delete'
+        ]);
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -162,8 +173,9 @@ class ApanelClientController extends ApanelBaseController
     public function destroy($id)
     {
         //
+        Client::find($id)->delete();
 
-        echo 'Destroy';
+        return redirect()->route('client.index')->with('notify', 'Клиент успешно удален');
     }
 
     /**
