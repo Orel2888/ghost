@@ -129,7 +129,7 @@ class SystemApiController extends BaseApiController
 
     public function postPurseUpdateBalance()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'phone'     => 'required|integer',
             'balance'   => 'required'
         ]);
