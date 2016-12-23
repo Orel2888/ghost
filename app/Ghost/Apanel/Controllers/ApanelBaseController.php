@@ -12,11 +12,6 @@ class ApanelBaseController extends BaseController
     use ValidatesRequests;
 
     /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
      * @var GoodsManager
      */
     protected $goodsManager;
@@ -28,7 +23,6 @@ class ApanelBaseController extends BaseController
 
     public function __construct()
     {
-        $this->request      = app('request');
         $this->goodsManager = new GoodsManager();
         $this->apanelRepo   = new ApanelRepository();
     }

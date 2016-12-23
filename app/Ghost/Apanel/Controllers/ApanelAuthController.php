@@ -14,12 +14,12 @@ class ApanelAuthController extends ApanelBaseController
 
     public function postLogin()
     {
-        $this->validate($this->request, [
+        $this->validate(app('request'), [
             'login'     => 'required|alpha_dash',
             'password'  => 'required|alpha_dash'
         ]);
 
-        if (!Auth::guard('admin')->attempt(['login' => $this->request->input('login'), 'password' => $this->request->input('password')], $this->request->input('remember'))) {
+        if (!Auth::guard('admin')->attempt(['login' => app('request')->input('login'), 'password' => app('request')->input('password')], app('request')->input('remember'))) {
             return redirect()->back()->withErrors(['Ошибка аутентификации']);
         }
 

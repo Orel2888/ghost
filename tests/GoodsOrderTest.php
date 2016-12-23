@@ -60,6 +60,35 @@ class GoodsOrderTest extends TestCase
         $order->client->delete();
     }
 
+    /**
+     * @expectedException App\Ghost\Repositories\Goods\Exceptions\GoodsNotFound
+     */
+    public function test_create_order_goods_not_found()
+    {
+        $goods = Goods::first();
+
+        $faker = Faker::create();
+
+        $clientName = $faker->name;
+
+        $client = Client::create([
+            'name'      => $clientName,
+            'comment'   => $clientName
+        ]);
+
+        $goodsFirstPrice = $goods->goodsPrice()->first();
+
+        $this->goodsOrder->create([
+            'goods_id'  => $goods->id,
+            'client_id' => $client->id,
+            'weight'    => $goodsFirstPrice->weight,
+            'comment'   => $client->comment,
+            'cost'      => 25
+        ]);
+
+        $client->delete();
+    }
+
     public function test_exists_order()
     {
         $order = $this->createOrder();

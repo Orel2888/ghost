@@ -129,7 +129,7 @@ class SystemApiController extends BaseApiController
 
     public function postPurseUpdateBalance()
     {
-        $valid = Validator::make($this->request->all(), [
+        $valid = Validator::make(app('request')->all(), [
             'phone'     => 'required|integer',
             'balance'   => 'required'
         ]);
@@ -138,8 +138,8 @@ class SystemApiController extends BaseApiController
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        $purse = Purse::wherePhone($this->request->input('phone'))->first()->update([
-            'balance'   => $this->request->input('balance')
+        $purse = Purse::wherePhone(app('request')->input('phone'))->first()->update([
+            'balance'   => app('request')->input('balance')
         ]);
 
         return response()->json($this->apiResponse->ok());

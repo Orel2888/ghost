@@ -3,7 +3,6 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Container\Container;
 use App\Purse;
 use App\Admin;
 
@@ -21,7 +20,7 @@ class ApiAdminMethodsTest extends TestCase
         parent::setUp();
 
         if (is_null(static::$container)) {
-            static::$container = new Container();
+            static::$container = [];
         }
     }
 
@@ -115,7 +114,8 @@ class ApiAdminMethodsTest extends TestCase
         $purse = Purse::create([
             'phone' => 79887587475,
             'pass'  => '2ws2ws',
-            'balance'   => 1
+            'balance'   => 1,
+            'selected'  => 1
         ]);
 
         $response = $this->call('GET', 'api/admin/purse', [

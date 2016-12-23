@@ -31,9 +31,13 @@ class GoodsReserveTest extends TestCase
 
     public function test_check_expired()
     {
+        $city  = $this->createMiner();
+        $goods = $this->createGoods();
+
         $goodsPrice = $this->goodsManager->addGoodsPrice([
-            'goods_id'  => $this->createGoods()->id,
-            'miner_id'  => $this->createMiner()->id,
+            'goods_id'  => $goods->id,
+            'city_id'   => $goods->city_id,
+            'miner_id'  => $city->id,
             'weight'    => 0.5,
             'address'   => 'Prospect costa 277',
             'cost'      => 1000
