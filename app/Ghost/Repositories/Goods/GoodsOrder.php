@@ -159,7 +159,7 @@ class GoodsOrder extends Goods
         }
 
         try {
-            $this->buy($order);
+            $purchase = $this->buy($order);
 
             if ($jobNotify) {
                 // Job for notification about was purchase
@@ -168,7 +168,7 @@ class GoodsOrder extends Goods
                 );
             }
 
-            return true;
+            return $purchase;
         } catch (GoodsEndedException $e) {
             $order->update(['status' => 2]);
 
