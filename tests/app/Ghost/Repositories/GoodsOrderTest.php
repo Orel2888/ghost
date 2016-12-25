@@ -5,18 +5,19 @@ use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Ghost\Repositories\Goods\GoodsOrder;
 use App\Ghost\Repositories\Goods\GoodsManager;
-use App\City;
-use App\Client;
-use App\Miner;
-use App\GoodsPrice;
-use App\Goods;
-use App\Ghost\Libs\GibberishAES;
-use Faker\Factory as Faker;
+use App\Jobs\MadePurchase;
+use App\Events\WasPurchases;
+use App\{
+    City,
+    Client,
+    Miner,
+    GoodsPrice,
+    Goods,
+    GoodsPurchase
+};
 
 class GoodsOrderTest extends TestCase
 {
-    use BaseTestsHelper;
-
     /**
      * @var GoodsOrder
      */
@@ -33,14 +34,7 @@ class GoodsOrderTest extends TestCase
     {
         $goods = Goods::first();
 
-        $faker = Faker::create();
-
-        $clientName = $faker->name;
-
-        $client = Client::create([
-            'name'      => $clientName,
-            'comment'   => $clientName
-        ]);
+        $client = Client::first();
 
         $goodsFirstPrice = $goods->goodsPrice()->first();
 
@@ -57,7 +51,7 @@ class GoodsOrderTest extends TestCase
     {
         $order = $this->createOrder();
 
-        $order->client->delete();
+        $order->delete();
     }
 
     /**
@@ -67,14 +61,7 @@ class GoodsOrderTest extends TestCase
     {
         $goods = Goods::first();
 
-        $faker = Faker::create();
-
-        $clientName = $faker->name;
-
-        $client = Client::create([
-            'name'      => $clientName,
-            'comment'   => $clientName
-        ]);
+        $client = Client::first();
 
         $goodsFirstPrice = $goods->goodsPrice()->first();
 
@@ -85,8 +72,6 @@ class GoodsOrderTest extends TestCase
             'comment'   => $client->comment,
             'cost'      => 25
         ]);
-
-        $client->delete();
     }
 
     public function test_exists_order()
@@ -95,8 +80,7 @@ class GoodsOrderTest extends TestCase
 
         $this->assertTrue($this->goodsOrder->existsOrder($order->client_id, $order->goods_id, $order->weight));
 
-        $order->client->delete();
-
+        $order->delete();
     }
 
     public function test_exists_goods()
@@ -105,7 +89,7 @@ class GoodsOrderTest extends TestCase
 
         $this->assertTrue($this->goodsOrder->existsGoods($order->goods_id, $order->weight));
 
-        $order->client->delete();
+        $order->delete();
     }
 
     public function test_check_solvency()
@@ -118,7 +102,7 @@ class GoodsOrderTest extends TestCase
 
         $this->assertInstanceOf(GoodsPrice::class, $this->goodsOrder->checkSolvency($order->id, $order->client->id));
 
-        $order->client->delete();
+        $order->delete();
     }
 
     public function test_buy()
@@ -133,6 +117,25 @@ class GoodsOrderTest extends TestCase
 
         $goodsPurchase->delete();
 
-        $order->client->delete();
+        $order->delete();
+    }
+
+    public function test_buy_processing_order()
+    {
+        $order = $this->createOrder();
+
+        $goodsPrice = $this->goodsOrder->getGoodsPrice($order);
+
+        $order->client->update(['balance' => $goodsPrice->cost]);
+
+        //$this->expectsJobs(MadePurchase::class);
+        $this->expectsEvents(WasPurchases::class);
+
+        $purchase = $this->goodsOrder->buyProcessingOrder($order);
+
+        $this->assertInstanceOf(GoodsPurchase::class, $purchase);
+
+        $order->delete();
+        $purchase->delete();
     }
 }
