@@ -11,7 +11,7 @@ use App\{
     Miner
 };
 
-class GoodsManagerNewTest extends TestCase
+class GoodsManagerTest extends TestCase
 {
 
     use BaseTestsHelper;
