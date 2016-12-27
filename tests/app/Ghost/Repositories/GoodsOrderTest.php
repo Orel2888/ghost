@@ -4,13 +4,10 @@ use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Ghost\Repositories\Goods\GoodsOrder;
-use App\Ghost\Repositories\Goods\GoodsManager;
 use App\Jobs\MadePurchase;
 use App\Events\WasPurchases;
 use App\{
-    City,
     Client,
-    Miner,
     GoodsPrice,
     Goods,
     GoodsPurchase
@@ -57,85 +54,84 @@ class GoodsOrderTest extends TestCase
     /**
      * @expectedException App\Ghost\Repositories\Goods\Exceptions\GoodsNotFound
      */
-    public function test_create_order_goods_not_found()
+    public function test_create_order_goods_price_not_found()
     {
-        $goods = Goods::first();
-
-        $client = Client::first();
-
-        $goodsFirstPrice = $goods->goodsPrice()->first();
+        $models = $this->testTools->clientWithOrder();
 
         $this->goodsOrder->create([
-            'goods_id'  => $goods->id,
-            'client_id' => $client->id,
-            'weight'    => $goodsFirstPrice->weight,
-            'comment'   => $client->comment,
+            'goods_id'  => $models->goods->id,
+            'client_id' => $models->client->id,
+            'weight'    => $models->goods_price->weight,
+            'comment'   => $models->client->comment,
             'cost'      => 25
         ]);
     }
 
     public function test_exists_order()
     {
-        $order = $this->createOrder();
+        $models = $this->testTools->clientWithOrder();
 
-        $this->assertTrue($this->goodsOrder->existsOrder($order->client_id, $order->goods_id, $order->weight));
-
-        $order->delete();
+        $this->assertTrue(
+            $this->goodsOrder->existsOrder($models->order->client_id, $models->order->goods_id, $models->order->weight)
+        );
     }
 
     public function test_exists_goods()
     {
-        $order = $this->createOrder();
+        $models = $this->testTools->clientWithOrder();
 
-        $this->assertTrue($this->goodsOrder->existsGoods($order->goods_id, $order->weight));
-
-        $order->delete();
+        $this->assertTrue($this->goodsOrder->existsGoods($models->order->goods_id, $models->order->weight));
     }
 
     public function test_check_solvency()
     {
-        $order = $this->createOrder();
+        $models = $this->testTools->clientWithOrder();
 
-        $goodsPrice = $this->goodsOrder->getGoodsPrice($order);
+        $goodsPrice = $this->goodsOrder->getGoodsPrice($models->order);
 
-        $order->client->update(['balance' => $goodsPrice->cost]);
+        $models->order->client->update(['balance' => $models->goods_price->cost]);
 
-        $this->assertInstanceOf(GoodsPrice::class, $this->goodsOrder->checkSolvency($order->id, $order->client->id));
-
-        $order->delete();
+        $this->assertInstanceOf(
+            GoodsPrice::class,
+            $this->goodsOrder->checkSolvency($models->order->id, $models->order->client->id)
+        );
     }
 
     public function test_buy()
     {
-        $order = $this->createOrder();
+        $models = $this->testTools->clientWithOrder();
 
-        $goodsPrice = $this->goodsOrder->getGoodsPrice($order);
+        $goodsPrice = $this->goodsOrder->getGoodsPrice($models->order);
 
-        $order->client->update(['balance' => $goodsPrice->cost]);
+        $models->order->client->update(['balance' => $models->goods_price->cost]);
 
-        $goodsPurchase = $this->goodsOrder->buy($order);
+        $goodsPurchase = $this->goodsOrder->buy($models->order);
 
         $goodsPurchase->delete();
-
-        $order->delete();
     }
 
     public function test_buy_processing_order()
     {
-        $order = $this->createOrder();
+        $models = $this->testTools->clientWithOrder();
 
-        $goodsPrice = $this->goodsOrder->getGoodsPrice($order);
+        $goodsPrice = $this->goodsOrder->getGoodsPrice($models->order);
 
-        $order->client->update(['balance' => $goodsPrice->cost]);
+        $models->order->client->update(['balance' => $models->goods_price->cost]);
 
         //$this->expectsJobs(MadePurchase::class);
         $this->expectsEvents(WasPurchases::class);
 
-        $purchase = $this->goodsOrder->buyProcessingOrder($order);
+        $purchase = $this->goodsOrder->buyProcessingOrder($models->order);
 
         $this->assertInstanceOf(GoodsPurchase::class, $purchase);
 
-        $order->delete();
         $purchase->delete();
+    }
+
+    public function test_terminate()
+    {
+        $this->testTools->cleaningTemporaryRows();
+
+        echo 'Terminate';
     }
 }
