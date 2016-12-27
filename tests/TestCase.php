@@ -14,6 +14,11 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     protected $databaseSeed = false;
 
     /**
+     * @var TestTools
+     */
+    protected $testTools;
+
+    /**
      * Creates the application.
      *
      * @return \Illuminate\Foundation\Application
@@ -43,5 +48,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
                 Artisan::call('db:seed');
             }
         }
+
+        $this->testTools = new TestTools();
     }
 }
