@@ -33,7 +33,7 @@
             "tests/BaseTestsHelper.php",
             "tests/ApiTrait.php",
             "tests/TestTools.php",
-            "tests/TestSessionStorage.php"
+            "tests/DataStore.php"
         ]
     },
     "scripts": {
