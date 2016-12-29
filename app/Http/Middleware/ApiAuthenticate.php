@@ -17,10 +17,17 @@ class ApiAuthenticate
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
+     * @param $role
+     * @throws \Exception
      * @return mixed
      */
     public function handle($request, Closure $next, $role = 'user')
     {
+        // For testing
+        if ($request->has('test_exception')) {
+            throw new \Exception('Throws test exception from api');
+        }
+
         if (!in_array($request->path(), $this->exceptRouteCheckToken)) {
 
             if (!$request->has('access_token')) {
