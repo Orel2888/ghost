@@ -5,8 +5,8 @@ class MainApi extends BaseApi
     public function makeBadRequest(\Closure $closure)
     {
         try {
-            $response = $this->http->request('GET', 'authenticate', [
-                'test_exception' => 1
+            $response = $this->http->request('GET', 'users.find', [
+                'query' => ['test_exception' => 1]
             ]);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $response = $e->getResponse();
