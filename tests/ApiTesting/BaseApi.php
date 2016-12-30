@@ -19,6 +19,11 @@ abstract class BaseApi
 
     protected $fileStoreToken = 'tokenapi_for_tests';
 
+    protected $apiMethodMaps = [];
+
+    const DEBUG = true;
+    const DEBUG_DISPLAY_DUMP_FULL_EXCEPTION = false;
+
     public function __construct()
     {
         $this->http    = new Client(['base_uri'  => env('API_URL') .'/']);
@@ -92,5 +97,66 @@ abstract class BaseApi
         $filesystem = app('filesystem');
 
         return $filesystem->has($this->fileStoreToken) ? $filesystem->get($this->fileStoreToken) : null;
+    }
+
+    public function removeTokenStore()
+    {
+        return app('filesystem')->delete($this->fileStoreToken);
+    }
+
+    public function handleResponseApi(\GuzzleHttp\Psr7\Response $response)
+    {
+        if ($response->getReasonPhrase() != 'OK') {
+            $exception = new UsersApiException('Bad request, api return status code '. $response->getStatusCode());
+
+            $exception->setResponseContent($response->getBody());
+            $exception->setStatusCode($response->getStatusCode());
+
+            throw $exception;
+        }
+
+        if (array_has($response->getHeader('Content-Type'), 'application/json')) {
+            throw new UsersApiException('Wrong response content');
+        }
+
+        return json_decode($response->getBody());
+    }
+
+    public function run($apiMethod, $params, Closure $closure)
+    {
+        if (!in_array($apiMethod, $this->apiMethodMaps)) throw new BaseApiException("Method {$apiMethod} not found");
+
+        $insideMethod = camel_case(str_replace('.', '-', $apiMethod));
+
+        if (method_exists($this, $insideMethod)) {
+            try {
+                return $closure($this->$insideMethod($insideMethod, $params));
+            } catch (UsersApiException $e) {
+                return $closure($e->hasApiResponse() ? $e->getResponseJson() : null, $e);
+            }
+        } else {
+            throw new BaseApiException("Method {$insideMethod} not found");
+        }
+
+        return false;
+    }
+
+    public static function throwException($exception)
+    {
+        if (!is_null($exception)) {
+
+            if (BaseApi::DEBUG) {
+
+                if (BaseApi::DEBUG_DISPLAY_DUMP_FULL_EXCEPTION) {
+                    dump($exception);
+                }
+
+                if ($exception instanceof BaseApiException) {
+                    dump('Body response api:', $exception->getResponseJson());
+                }
+            }
+
+            throw $exception;
+        }
     }
 }
