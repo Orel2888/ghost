@@ -75,10 +75,17 @@ class MainApiTest extends TestCase
         $this->assertNotNull($this->apiClient->getToken(true));
     }
 
+    public function test_remove_token_store()
+    {
+        $this->assertTrue($this->apiClient->removeTokenStore());
+    }
+
     public function test_bad_request()
     {
         $this->apiClient->makeBadRequest(function (\GuzzleHttp\Psr7\Response $response, $jsonData) {
-            dump($response->getStatusCode(), $jsonData);
+            //dump($response->getStatusCode(), $jsonData);
+
+            $this->assertArrayHasKey('exception', (array) $jsonData);
         });
     }
 }
