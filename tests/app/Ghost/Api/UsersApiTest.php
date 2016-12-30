@@ -25,8 +25,38 @@ class UsersApiTest extends TestCase
 
     public function test_find()
     {
-        $userChatId = Client::first()->tg_chatid;
+        $client = Client::first();
 
+        $responseData = $this->usersApi->find($client->tg_chatid);
 
+        $this->assertEquals($client->getAttributes(), (array) $responseData->data);
+    }
+
+    public function test_find_not_exists_user()
+    {
+        try {
+            $this->usersApi->find(222111211111);
+        } catch (UsersApiException $e) {
+            $this->assertEquals(404, $e->getStatusCode());
+        }
+    }
+
+    public function test_registration()
+    {
+        /*try {
+            $responseData = $this->usersApi->reg();
+        } catch (UsersApiException $e) {
+
+        }*/
+
+        $this->usersApi->run('users.find', [
+            'name'          => 'newusertest',
+            'tg_username'   => 'username',
+            'tg_chatid'     => '44678'
+        ], function ($responseData, $exception) {
+            BaseApi::throwException($exception);
+
+            $this->assertNotEmpty($responseData->client_id);
+        });
     }
 }
