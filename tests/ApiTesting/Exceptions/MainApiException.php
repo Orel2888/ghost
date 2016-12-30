@@ -1,3 +1,3 @@
 <?php
 
-class MainApiException extends Exception {}
+class MainApiException extends BaseApiException {}

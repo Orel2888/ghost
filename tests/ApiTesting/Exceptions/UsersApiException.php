@@ -1,3 +1,3 @@
 <?php
 
-class UsersApiException extends Exception {}
+class UsersApiException extends BaseApiException {}
