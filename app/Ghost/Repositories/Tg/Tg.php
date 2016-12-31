@@ -17,6 +17,8 @@ class Tg
     ];
     public $notifyChannel;
 
+    public $forceTest = false;
+
     public function __construct($notifyChannel = 'sync')
     {
         $this->setNotifyChannel($notifyChannel);
@@ -41,10 +43,32 @@ class Tg
         $this->notifyChannel->pushOn('error', $e);
     }
 
+    public function getClientsTesting()
+    {
+        $clientsUsername = explode(',', env('TG_CLIENTS_TESTING'));
+
+        if (empty($clientsUsername)) {
+            throw new Exception("Telegram clients for testing not found");
+        }
+
+        $clients = array_map(function ($username) {
+            return Client::where('tg_username', $username)->first();
+        }, $clientsUsername);
+
+        $clients = array_filter($clients, function ($item) {
+            return !is_null($item);
+        });
+
+        return collect($clients);
+    }
 
     public function getClientChatIds()
     {
-        $clients = Client::select('id', 'tg_chatid', 'name')->whereNotify(1)->get();
+        if (env('APP_ENV') == 'testing' || $this->forceTest) {
+            $clients = $this->getClientsTesting();
+        } else {
+            $clients = Client::select('id', 'tg_chatid', 'name')->whereNotify(1)->get();
+        }
 
         return $clients;
     }
@@ -126,5 +150,10 @@ class Tg
     public function subscribe($name, $callback)
     {
         $this->notifyChannels[$name] = 0;
+    }
+
+    public function forceTest()
+    {
+        return $this->forceTest = true;
     }
 }
