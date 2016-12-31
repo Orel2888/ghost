@@ -40,7 +40,11 @@ class TgNewsletter extends Command
     {
         //
 
-        $tg = new Tg('sync', $this->option('testing'));
+        $tg = new Tg('sync');
+
+        if ($this->option('testing')) {
+            $tg->forceTest();
+        }
 
         $tg->newsletter(file_get_contents(storage_path('app/message_newsletter')));
     }
