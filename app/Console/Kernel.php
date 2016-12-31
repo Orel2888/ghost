@@ -30,5 +30,11 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
+
+        $schedule->command('tg_newsletter:go')->at('00:00');
+
+        if (env('TEST_CRON')) {
+            $schedule->command('tg_newsletter:go --testing')->everyMinute();
+        }
     }
 }
