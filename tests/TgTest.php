@@ -7,19 +7,34 @@ use App\Ghost\Repositories\Tg\Tg;
 
 class TgTest extends TestCase
 {
+    /**
+     * @var Tg
+     */
+    public $tg;
+    
+    public function setUp()
+    {
+        parent::setUp();
+        
+        $this->tg = new Tg();
+    }
+
+    public function test_get_clients_testing()
+    {
+        $clientsTesting = $this->tg->getClientsTesting();
+        //dump($clientsTesting);
+        $this->assertNotEmpty($clientsTesting);
+    }
+    
     public function test_send_message_to_telegram()
     {
-        $tg = new Tg();
-
-        $response = $tg->sendMessageToUser(206441217, '*Hi world*');
+        $response = $this->tg->sendMessageToUser($this->tg->getClientsTesting()[0], '*Hi world*');
 
         var_dump($response->ok);
     }
 
     public function test_send_newsletter()
     {
-        $tg = new Tg();
-
-        $tg->newsletter('Hi client');
+        $this->tg->newsletter('Hi client');
     }
 }

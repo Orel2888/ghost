@@ -12,7 +12,7 @@ class TgNewsletter extends Command
      *
      * @var string
      */
-    protected $signature = 'tg_newsletter:go {--file_text=}';
+    protected $signature = 'tg_newsletter:go {--file_text=} {--message=} {--testing}';
 
     /**
      * The console command description.
@@ -40,8 +40,12 @@ class TgNewsletter extends Command
     {
         //
 
-        $tg = new Tg();
+        $tg = new Tg('sync');
 
-        $tg->newsletter(file_get_contents(storage_path('app/message_newsletter')));
+        if ($this->option('testing')) {
+            $tg->forceTest();
+        }
+
+        $tg->newsletter($this->option('message') ?? file_get_contents(storage_path('app/message_newsletter')));
     }
 }
