@@ -106,8 +106,8 @@ abstract class BaseApi
 
     public function handleResponseApi(\GuzzleHttp\Psr7\Response $response)
     {
-        if ($response->getReasonPhrase() != 'OK') {
-            $exception = new UsersApiException('Bad request, api return status code '. $response->getStatusCode());
+        if ($response->getReasonPhrase() != 'OK' && $response->getReasonPhrase() != 'Created') {
+            $exception = new BaseApiException('Bad request, api return status code '. $response->getStatusCode());
 
             $exception->setResponseContent($response->getBody());
             $exception->setStatusCode($response->getStatusCode());
@@ -115,8 +115,8 @@ abstract class BaseApi
             throw $exception;
         }
 
-        if (array_has($response->getHeader('Content-Type'), 'application/json')) {
-            throw new UsersApiException('Wrong response content');
+        if (!in_array('application/json', $response->getHeader('Content-Type'))) {
+            throw new BaseApiException('Wrong response content');
         }
 
         return json_decode($response->getBody());
@@ -130,7 +130,7 @@ abstract class BaseApi
 
         if (method_exists($this, $insideMethod)) {
             try {
-                return $closure($this->$insideMethod($insideMethod, $params));
+                return $closure($this->$insideMethod($params), null);
             } catch (UsersApiException $e) {
                 return $closure($e->hasApiResponse() ? $e->getResponseJson() : null, $e);
             }
