@@ -63,6 +63,34 @@ class TestTools
         return (object)(compact('miner', 'client', 'goods', 'order') + ['goods_price' => $goodsFromPrice]);
     }
 
+    public function createGoodsToPrice($count = 1)
+    {
+        $goods = Goods::first();
+        $miner = Miner::first();
+        $faker = Faker::create();
+
+        $i = 0;
+        $goodsPrice = [];
+        while ($i < $count) {
+
+            $goodsToPrice = $this->goodsManager->addGoodsPrice([
+                'goods_id'  => $goods->id,
+                'miner_id'  => $miner->id,
+                'address'   => $faker->streetAddress,
+                'weight'    => 1,
+                'cost'      => 2500
+            ]);
+
+            $goodsPrice[] = $goodsToPrice;
+
+            $this->storage->add('goods_price', $goodsToPrice->id);
+
+            $i++;
+        }
+
+        return collect($goodsPrice);
+    }
+
     public function cleaningTemporaryRows()
     {
         $tablesAndPkId = $this->storage->getAllData();

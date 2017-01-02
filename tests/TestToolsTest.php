@@ -10,27 +10,21 @@ class TestToolsTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-
-        dump($this->getName());
     }
-    /**
-     * A basic test example.
-     *
-     * @return void
-     */
-    public function testExample()
+
+    public function test_create_goods_to_price()
     {
-        $testTools = new TestTools();
+        $goodsList = $this->testTools->createGoodsToPrice(1);
 
-        //dump($testTools->clientWithOrder()->miner);
+        $this->assertEquals(1, $goodsList->count());
 
-        //$testTools->cleaningTemporaryRows();
-        echo 'Test 1';
+        $goodsList = $this->testTools->createGoodsToPrice(2);
+
+        $this->assertEquals(2, $goodsList->count());
     }
 
-    public function testExample2()
+    public function test_clear()
     {
-        echo 'Test 2';
+        $this->testTools->cleaningTemporaryRows();
     }
-
 }
