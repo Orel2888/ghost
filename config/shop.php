@@ -23,5 +23,8 @@ return [
      * Api to url for bot
      */
     'API_URL'   => env('API_URL'),
-    'API_KEY'   => env('API_KEY')
+    'API_KEY'   => env('API_KEY'),
+
+    'test_telegram_clients'     => env('TG_CLIENTS_TESTING'),
+    'test_execute_async_jobs'   => env('TEST_EXECUTE_ASYNC_JOBS', false)
 ];
