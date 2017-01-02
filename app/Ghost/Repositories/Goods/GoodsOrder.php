@@ -161,7 +161,7 @@ class GoodsOrder extends Goods
         try {
             $purchase = $this->buy($order);
 
-            if ($jobNotify) {
+            if (config('shop.test_execute_async_jobs') && $jobNotify) {
                 // Job for notification about was purchase
                 app(Dispatcher::class)->dispatch(
                     (new MadePurchase(['orders_ids_successful' => [$order->id]]))->onQueue('made_purchase')
