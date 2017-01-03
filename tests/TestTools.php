@@ -37,7 +37,7 @@ class TestTools
     public function clientWithOrder()
     {
         $miner  = Miner::first();
-        $client = Client::first();
+        $client = Client::whereNotNull('comment')->first();
 
         $goods  = Goods::first();
 
