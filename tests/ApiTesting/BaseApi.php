@@ -65,9 +65,9 @@ abstract class BaseApi
         ]);
     }
 
-    public function getToken($fromStorage = false)
+    public function getToken()
     {
-        return $this->accessToken ?: $fromStorage ? $this->restoreToken() : null;
+        return $this->accessToken ?: $this->restoreToken();
     }
 
     public function setToken($token)
@@ -122,23 +122,61 @@ abstract class BaseApi
         return json_decode($response->getBody());
     }
 
-    public function run($apiMethod, $params, Closure $closure)
+    public function run($apiMethod, $method, $params, Closure $closure)
     {
         if (!in_array($apiMethod, $this->apiMethodMaps)) throw new BaseApiException("Method {$apiMethod} not found");
 
         $insideMethod = camel_case(str_replace('.', '-', $apiMethod));
 
         if (method_exists($this, $insideMethod)) {
+
             try {
-                return $closure($this->$insideMethod($params), null);
-            } catch (UsersApiException $e) {
-                return $closure($e->hasApiResponse() ? $e->getResponseJson() : null, $e);
+                $response = $this->requestApi(...func_get_args());
+
+                return $closure($response, null);
+            } catch (BaseApiException $e) {
+                return $closure($e->getResponseJson(), $e);
             }
+
         } else {
             throw new BaseApiException("Method {$insideMethod} not found");
         }
 
         return false;
+    }
+
+    public function requestApi($apiMethod, $method, $params, Closure $closure)
+    {
+        $params  = $params ?? [];
+        $options = [];
+
+        if ($method == 'POST') {
+            $options['form_params'] = $params + ['access_token' => $this->getToken()];
+        }
+
+        if ($method == 'GET') {
+            $options['query'] = $params + ['access_token' => $this->getToken()];
+        }
+
+        try {
+            $response = $this->http->request($method, $apiMethod, $options);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $response = $e->getResponse();
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            return $closure(null, $e);
+        } catch (\GuzzleHttp\Exception\RequestException $e) {
+            return $closure(null, $e);
+        } catch (\GuzzleHttp\Exception\SeekException $e) {
+            return $closure(null, $e);
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            return $closure(null, $e);
+        } catch (\GuzzleHttp\Exception\TooManyRedirectsException $e) {
+            return $closure(null, $e);
+        } catch (\GuzzleHttp\Exception\TransferException $e) {
+            return $closure(null, $e);
+        }
+
+        return $this->handleResponseApi($response);
     }
 
     public static function throwException($exception)
