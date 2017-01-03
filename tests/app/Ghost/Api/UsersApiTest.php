@@ -7,7 +7,7 @@ class UsersApiTest extends TestCase
     /**
      * @var UsersApi
      */
-    public $usersApi;
+    public $api;
 
     /**
      * @var DataStore
@@ -18,21 +18,21 @@ class UsersApiTest extends TestCase
     {
         parent::setUp();
 
-        $this->usersApi = new UsersApi();
+        $this->api = new UsersApi();
 
-        $this->usersApi->saveToken();
+        $this->api->saveToken();
     }
 
     public function test_authentication()
     {
-        $this->usersApi->authentication();
+        $this->api->authentication();
     }
 
     public function test_find()
     {
         $client = Client::first();
 
-        $this->usersApi->run('users.find', $client->tg_chatid, function ($responseData, $exception) use($client) {
+        $this->api->usersFind($client->tg_chatid, function ($responseData, $exception) use($client) {
             BaseApi::throwException($exception);
 
             $this->assertEquals($client->getAttributes(), (array) $responseData->data);
@@ -41,14 +41,14 @@ class UsersApiTest extends TestCase
 
     public function test_find_not_exists_user()
     {
-        $this->usersApi->run('users.find', 222111211111, function ($responseData, $exception) {
+        $this->api->usersFind(222111211111, function ($responseData, $exception) {
             $this->assertEquals(404, $exception->getStatusCode());
         });
     }
 
     public function test_registration()
     {
-        $this->usersApi->run('users.reg', [
+        $this->api->usersReg([
             'name'          => 'newusertest',
             'tg_username'   => 'username',
             'tg_chatid'     => 44678
@@ -65,7 +65,7 @@ class UsersApiTest extends TestCase
     {
         $client = Client::first();
 
-        $this->usersApi->run('users.update', [
+        $this->api->usersUpdate([
             'name'          => 'new_name',
             'tg_username'   => 'new_username',
             'tg_chatid'     => $client->tg_chatid
@@ -77,7 +77,7 @@ class UsersApiTest extends TestCase
 
     public function test_get_purse()
     {
-        $this->usersApi->run('users.purse', null, function ($responseData, $e) {
+        $this->api->usersPurse(function ($responseData, $e) {
             BaseApi::throwException($e);
 
             $this->assertNotEmpty($responseData->data->phone);

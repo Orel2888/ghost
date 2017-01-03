@@ -23,7 +23,7 @@ class GoodsApiTest extends TestCase
 
     public function test_goods_pricelist()
     {
-        $this->api->run('goods.pricelist', null, function ($responseData, $e) {
+        $this->api->goodsPricelist(function ($responseData, $e) {
             BaseApi::throwException($e);
 
             //dump($responseData);
