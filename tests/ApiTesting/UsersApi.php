@@ -10,67 +10,43 @@ class UsersApi extends BaseApi
     ];
 
     /**
-     * @throws UsersApiException
-     * @param $tgchatId
+     * @throws BaseApiException
+     * @param $tg_chatid
+     * @param $closure
      * @return mixed
      */
-    public function usersFind($tgchatId)
+    public function usersFind($tg_chatid, Closure $closure)
     {
-        try {
-            $response = $this->http->request('GET', 'users.find', [
-                'query' => [
-                    'tg_chatid'     => $tgchatId,
-                    'access_token'  => $this->getToken(true)
-                ]
-            ]);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-        }
-
-        return $this->handleResponseApi($response);
+        return $this->run('users.find', 'GET', compact('tg_chatid'), $closure);
     }
 
     /**
-     * @throws UsersApiException
+     * @throws BaseApiException
      * @param $params
+     * @param $closure
      * @return mixed
      */
-    public function usersReg($params)
+    public function usersReg($params, Closure $closure)
     {
-        try {
-            $response = $this->http->request('POST', 'users.reg', [
-                'form_params'   => array_merge($params, ['access_token'  => $this->getToken(true)])
-            ]);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-        }
-
-        return $this->handleResponseApi($response);
+        return $this->run('users.reg', 'POST', $params, $closure);
     }
 
-    public function usersUpdate($params)
+    /**
+     * @param $params
+     * @param Closure $closure
+     * @return bool|mixed
+     */
+    public function usersUpdate($params, Closure $closure)
     {
-        try {
-            $response = $this->http->request('POST', 'users.update', [
-                'form_params'   => array_merge($params, ['access_token'  => $this->getToken(true)])
-            ]);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-        }
-
-        return $this->handleResponseApi($response);
+        return $this->run('users.update', 'POST', $params, $closure);
     }
 
-    public function usersPurse()
+    /**
+     * @param Closure $closure
+     * @return bool|mixed
+     */
+    public function usersPurse(Closure $closure)
     {
-        try {
-            $response = $this->http->request('GET', 'users.purse', [
-                'query'   => ['access_token'  => $this->getToken(true)]
-            ]);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-        }
-
-        return $this->handleResponseApi($response);
+        return $this->run('users.purse', ' GET', null, $closure);
     }
 }

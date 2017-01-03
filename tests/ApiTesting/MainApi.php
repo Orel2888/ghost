@@ -18,4 +18,5 @@ class MainApi extends BaseApi
 
         return $closure($response, $responseToJson);
     }
+
 }

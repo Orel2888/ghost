@@ -6,16 +6,12 @@ class GoodsApi extends BaseApi
         'goods.pricelist'
     ];
 
-    public function goodsPricelist()
+    /**
+     * @param Closure $closure
+     * @return bool|mixed
+     */
+    public function goodsPricelist(Closure $closure)
     {
-        try {
-            $response = $this->http->request('GET', 'goods.pricelist', [
-                'query' => ['access_token' => $this->getToken(true)]
-            ]);
-        } catch (\GuzzleHttp\Exception\ClientException $e) {
-            $response = $e->getResponse();
-        }
-
-        return $this->handleResponseApi($response);
+        return $this->run('goods.pricelist', 'GET', null, $closure);
     }
 }
