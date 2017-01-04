@@ -51,3 +51,13 @@ $factory->define(App\Miner::class, function (Faker\Generator $faker) {
         'ante'  => 150
     ];
 });
+
+$factory->define(App\QiwiTransaction::class, function (Faker\Generator $faker) {
+    return [
+        'qiwi_id'   => $faker->randomNumber(),
+        'purse'     => '79111111111',
+        'provider'  => $faker->company,
+        'qiwi_date' => $faker->date('d-m-Y H:i:s'),
+        'type'      => 1
+    ];
+});
