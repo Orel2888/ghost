@@ -4,7 +4,8 @@ use Faker\Factory as Faker;
 use App\{
     Client,
     Goods,
-    Miner
+    Miner,
+    QiwiTransaction
 };
 use App\Ghost\Repositories\Goods\GoodsManager;
 use App\Ghost\Repositories\Goods\GoodsOrder;
@@ -89,6 +90,11 @@ class TestTools
         }
 
         return collect($goodsPrice);
+    }
+
+    public function createTransaction($amount = 0, $comment = '', $count = 1)
+    {
+        return factory(QiwiTransaction::class, $count)->create(compact('amount', 'comment'));
     }
 
     public function cleaningTemporaryRows()
