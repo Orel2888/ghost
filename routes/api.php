@@ -57,7 +57,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
         Route::get('product.available', 'AdminApiController@getProductAvailable');
         Route::get('product.list', 'AdminApiController@getProductList');
 
-        Route::post('purse/set', 'AdminApiController@postPurseSet');
+        Route::post('purse.set', 'AdminApiController@postPurseSet');
         Route::get('purse', 'AdminApiController@getPurse');
     });
 
