@@ -51,11 +51,11 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
      * Admin methods
      */
     Route::group(['prefix' => 'admin', 'middleware' => 'api:admin'], function () {
-        Route::get('qiwi-transaction', 'AdminApiController@getQiwiTransaction');
+        Route::get('qiwi.transaction', 'AdminApiController@getQiwiTransaction');
 
-        Route::post('goods-price/purchase', 'AdminApiController@getGoodsPricePurchase');
-        Route::get('goods-price/available', 'AdminApiController@getGoodsPriceAvailable');
-        Route::get('goods-price', 'AdminApiController@getGoodsPrice');
+        Route::post('product.purchase', 'AdminApiController@getGoodsPricePurchase');
+        Route::get('product.available', 'AdminApiController@getGoodsPriceAvailable');
+        Route::get('product.list', 'AdminApiController@getGoodsPrice');
 
         Route::post('purse/set', 'AdminApiController@postPurseSet');
         Route::get('purse', 'AdminApiController@getPurse');
