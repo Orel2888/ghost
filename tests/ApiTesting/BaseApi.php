@@ -8,6 +8,8 @@ abstract class BaseApi
      * @var Client
      */
     protected $http;
+
+    protected $baseApiUrl;
     
     protected $apiKey;
 
@@ -26,7 +28,11 @@ abstract class BaseApi
 
     public function __construct()
     {
-        $this->http    = new Client(['base_uri'  => env('API_URL') .'/']);
+        if (!$this->baseApiUrl) {
+            $this->baseApiUrl = env('API_URL') .'/';
+        }
+
+        $this->http    = new Client(['base_uri'  => $this->baseApiUrl]);
         $this->apiKey  = env('API_KEY');
     }
 
@@ -35,7 +41,7 @@ abstract class BaseApi
         // Not form params for testing fail
         $formParams = !$withoutFormParams ? ['key' => $this->apiKey] : [];
 
-        $request = $this->http->request('POST', 'authenticate'. ($loginAdmin ? '/'. $loginAdmin : ''), [
+        $request = $this->http->request('POST', env('API_URL') .'/authenticate'. ($loginAdmin ? '/'. $loginAdmin : ''), [
             'form_params'   => $formParams
         ]);
 
@@ -57,7 +63,7 @@ abstract class BaseApi
     {
         $token = $token ?? $this->accessToken;
 
-        return $this->http->request('POST', 'authenticate/check-access-token', [
+        return $this->http->request('POST', env('API_URL') .'/authenticate/check-access-token', [
             'form_params'   => [
                 'key'           => $this->apiKey,
                 'access_token'  => $token
