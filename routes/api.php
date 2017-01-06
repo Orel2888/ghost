@@ -53,9 +53,9 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
     Route::group(['prefix' => 'admin', 'middleware' => 'api:admin'], function () {
         Route::get('qiwi.transaction', 'AdminApiController@getQiwiTransaction');
 
-        Route::post('product.purchase', 'AdminApiController@getGoodsPricePurchase');
-        Route::get('product.available', 'AdminApiController@getGoodsPriceAvailable');
-        Route::get('product.list', 'AdminApiController@getGoodsPrice');
+        Route::post('product.purchase', 'AdminApiController@postProductPurchase');
+        Route::get('product.available', 'AdminApiController@getProductAvailable');
+        Route::get('product.list', 'AdminApiController@getProductList');
 
         Route::post('purse/set', 'AdminApiController@postPurseSet');
         Route::get('purse', 'AdminApiController@getPurse');
