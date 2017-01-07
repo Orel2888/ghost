@@ -25,6 +25,6 @@ return [
     'API_URL'   => env('API_URL'),
     'API_KEY'   => env('API_KEY'),
 
-    'test_telegram_clients'     => env('TG_CLIENTS_TESTING'),
+    'test_telegram_clients'     => env('TEST_TELEGRAM_CLIENTS'),
     'test_execute_async_jobs'   => env('TEST_EXECUTE_ASYNC_JOBS', false)
 ];
