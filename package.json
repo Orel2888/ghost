@@ -15,6 +15,7 @@
     "babel-preset-stage-0": "6.5.*",
     "chai": "^3.5.0",
     "config": "^1.21.0",
+    "dotenv": "^2.0.0",
     "fs-jetpack": "^0.9.1",
     "gulp": "^3.9.1",
     "gulp-babel": "6.1.*",
@@ -33,6 +34,6 @@
     "qiwimas": "^1.0.14",
     "request-promise": "^3.0.0",
     "swig": "^1.4.2",
-    "telegram-node-bot": "^3.0.12"
+    "telegram-node-bot": "^4"
   }
 }
