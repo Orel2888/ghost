@@ -14,8 +14,6 @@ use App\{
 class GoodsManagerTest extends TestCase
 {
 
-    use BaseTestsHelper;
-
     protected $databaseSeed = true;
 
     /**
@@ -65,8 +63,8 @@ class GoodsManagerTest extends TestCase
     public function test_add_goods_price()
     {
         $city   = City::first();
-        $client = $this->createClient();
-        $miner  = $this->createMiner();
+        $client = Client::first();
+        $miner  = Miner::first();
 
         $goods = $this->goodsManager->addGoods([
             'goods_name'    => 'Апельсины',
