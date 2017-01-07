@@ -9,8 +9,6 @@ use Carbon\Carbon;
 
 class GoodsReserveTest extends TestCase
 {
-    use BaseTestsHelper;
-
     /**
      * @var GoodsReserve
      */
