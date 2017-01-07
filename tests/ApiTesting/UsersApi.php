@@ -47,6 +47,6 @@ class UsersApi extends BaseApi
      */
     public function usersPurse(Closure $closure)
     {
-        return $this->run('users.purse', ' GET', null, $closure);
+        return $this->run('users.purse', 'GET', null, $closure);
     }
 }
