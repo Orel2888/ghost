@@ -30,8 +30,6 @@
     "autoload-dev": {
         "classmap": [
             "tests/TestCase.php",
-            "tests/BaseTestsHelper.php",
-            "tests/ApiTrait.php",
             "tests/TestTools.php",
             "tests/DataStore.php",
             "tests/ApiTesting/"
