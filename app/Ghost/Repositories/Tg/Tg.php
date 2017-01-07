@@ -45,7 +45,7 @@ class Tg
 
     public function getClientsTesting()
     {
-        $clientsUsername = explode(',', env('shop.test_execute_async_jobs'));
+        $clientsUsername = explode(',', config('shop.test_telegram_clients'));
 
         if (empty($clientsUsername)) {
             throw new Exception("Telegram clients for testing not found");
