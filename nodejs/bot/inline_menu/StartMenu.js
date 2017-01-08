@@ -1,13 +1,46 @@
+'use strict'
+
 /**
- * Main controller
- **/
+ * Start menu
+ */
 
-const Telegram = require('telegram-node-bot');
-const TelegramBaseController = Telegram.TelegramBaseController;
+const BaseMenu = require('./BaseMenu')
 
-class MainController extends TelegramBaseController {
+class StartMenu extends BaseMenu {
 
-    startHandler($) {
+    run() {
+
+        let cities = {
+            1: 'City1',
+            2: 'City2',
+            3: 'City3'
+        }
+
+        let goods = {
+            'City1': [{
+                id: 1,
+                name: 'Ananas',
+                count: 2
+            }],
+            'City2': [{
+                id: 2,
+                name: 'Banan',
+                count: 1
+            }]
+        }
+
+        let productWeights = {
+            1: [{
+                weight: 0.5,
+                cost: 1500,
+                count: 2
+            },
+            {
+                weight: 1,
+                cost: 2500,
+                count: 4
+            }]
+        }
 
         let homeMessage = '❄️ Добро пожаловать в круглосуточный магазин 👀 GHOST.';
 
@@ -71,16 +104,10 @@ class MainController extends TelegramBaseController {
                     }
                 }
             ]
-        };
+        }
 
-        $.runInlineMenu();
-    }
-
-    get routes() {
-        return {
-            'startCommand': 'startHandler'
-        };
+        return this.botScope.runInlineMenu(menu)
     }
 }
 
-module.exports = MainController;
+module.exports = StartMenu
