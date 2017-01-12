@@ -12,7 +12,7 @@ class GhostApi {
         this.accessTokenAdmin = null;
 
         this.config = {
-            apiUrl: 'http://ghost.projects.dev/api'
+            apiUrl: 'http://gst.dev/api'
         };
 
         if (Object.keys(conf).length) {
