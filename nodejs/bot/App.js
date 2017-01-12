@@ -5,13 +5,17 @@
  */
 
 const path = require('path')
+const swig  = require('swig')
+const promisify = require("promisify-node")
+const GhostApi  = require('../ghost-api/GhostApi')
 
 class App {
 
     constructor(config) {
         this.pathControllers = './controllers'
         this.mapControllers  = []
-        this._controllers   = {}
+        this._controllers    = {}
+        this.templatter      = null
 
         if (Object.keys(config).length) {
             for (let k in config) {
@@ -19,10 +23,14 @@ class App {
             }
         }
 
-        this.bootstrapControllers()
+        this.api = null
+
+        this._bootstrapControllers()
+        this._bootstrapTemplatter()
+        this._bootstrapApi()
     }
 
-    bootstrapControllers() {
+    _bootstrapControllers() {
 
         if (!this.mapControllers.length) {
             throw new Error('Not controllers for bootstrap')
@@ -40,6 +48,19 @@ class App {
         })
     }
 
+    _bootstrapTemplatter() {
+        swig.setDefaults({autoescape: false})
+
+        this.templatter = promisify(swig.compileFile)
+    }
+
+    _bootstrapApi() {
+        return this.api = new GhostApi({
+            apiKey: this.config.API_KEY,
+            apiUrl: this.config.API_URL
+        })
+    }
+
     getController(name) {
 
         if (!this._controllers.hasOwnProperty(name)) {
@@ -47,6 +68,19 @@ class App {
         }
 
         return this._controllers[name]
+    }
+
+    render(templateFile, data = {}) {
+
+        if (templateFile.indexOf('.') != -1) {
+            templateFile = templateFile.replace('.', '/');
+        }
+
+        return this.templatter(`${__dirname}/views/${templateFile}.html`, null).then(tpl => tpl(data))
+    }
+
+    getAdminUsernames() {
+        return this.config.TGBOT_ADMINS.split(',')
     }
 }
 

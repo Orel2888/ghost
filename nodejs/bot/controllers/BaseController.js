@@ -18,7 +18,7 @@ class BaseController extends TelegramBaseController {
 
     runMenu(menuName, $, params) {
         const className    = menuName.split('').map((s, index) => index == 0 ? s.toUpperCase() : s).join('') + 'Menu';
-        const pathLoadMenu = '../' + this.app.config.bot_mode +'/'+ className;
+        const pathLoadMenu = `../${this.app.config.bot_mode}/${className}`;
 
         try {
             var Menu = require(pathLoadMenu)
