@@ -57,13 +57,13 @@ describe('Test GhostApi class', function () {
      */
 
     it ('Authentication admin', () => {
-        return ghostApi.authenticationAdmin('vasechka').then(response => {
+        return ghostApi.authenticationAdmin('stick01').then(response => {
             console.log(response);
         });
     });
 
-    it ('Method admin/qiwi-transaction', () => {
-        return ghostApi.api('admin/qiwi-transaction').then(response => {
+    it ('Method admin/qiwi.transaction', () => {
+        return ghostApi.api('admin/qiwi.transaction').then(response => {
 
         });
     });

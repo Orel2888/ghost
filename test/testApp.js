@@ -76,11 +76,12 @@ describe('Test class App', function() {
 
             if (hasProduct(cityName, priceData)) {
                 getGoods(cityName, priceData).forEach(goods => {
-                    console.log('-', goods.name)
 
                     let product = getProduct(goods.id, priceData)
 
                     if (product !== null) {
+                        console.log('-', goods.name)
+
                         product.forEach(product => {
                             console.log('->', product.weight, '$' + product.cost, `(${product.count})`)
                         })
