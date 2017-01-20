@@ -34,6 +34,6 @@
     "qiwimas": "^1.0.14",
     "request-promise": "^3.0.0",
     "swig": "^1.4.2",
-    "telegram-node-bot": "^4"
+    "telegram-node-bot": "git://github.com/orel2888/telegram-node-bot.git#before-middleware"
   }
 }

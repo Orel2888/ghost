@@ -8,14 +8,22 @@ const path = require('path')
 const swig  = require('swig')
 const promisify = require("promisify-node")
 const GhostApi  = require('../ghost-api/GhostApi')
+const Logger = require('./Logger')
+const User = require('./Models/User')
 
 class App {
 
     constructor(config) {
         this.pathControllers = './controllers'
         this.mapControllers  = []
+        /**
+         * Instances a controllers
+         * @type {{}}
+         * @private
+         */
         this._controllers    = {}
         this.templatter      = null
+        this.logger          = new Logger()
 
         if (Object.keys(config).length) {
             for (let k in config) {
@@ -42,7 +50,7 @@ class App {
 
                 this._controllers[Controller.name] = new Controller(this)
             } catch (e) {
-                console.log(e)
+                this.logger.error(e)
                 throw new Error(`Error load controller ${controller}`)
             }
         })
@@ -81,6 +89,26 @@ class App {
 
     getAdminUsernames() {
         return this.config.TGBOT_ADMINS.split(',')
+    }
+
+    includeMenu(menuName, botScope, params) {
+        const className    = menuName.split('').map((s, index) => index == 0 ? s.toUpperCase() : s).join('') + 'Menu'
+        const pathLoadMenu = `./${this.config.bot_mode}/${className}`
+
+        try {
+            var Menu = require(pathLoadMenu)
+        } catch (e) {
+            this.logger.error(e);
+            throw new Error(`Error load menu ${menuName}`)
+
+            return
+        }
+
+        return new Menu(this, menuName, botScope, params)
+    }
+
+    user(botScope) {
+        return new User(botScope)
     }
 }
 

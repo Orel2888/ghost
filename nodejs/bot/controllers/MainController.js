@@ -8,13 +8,15 @@ const BaseController = require('./BaseController')
 class MainController extends BaseController {
 
     startHandler($) {
-        return this.runMenu('start', $).run();
+
+        console.log('username', $.user.telegramUsername)
+        return this.app.includeMenu('start', $).run()
     }
 
     get routes() {
         return {
             'startCommand': 'startHandler'
-        };
+        }
     }
 }
 

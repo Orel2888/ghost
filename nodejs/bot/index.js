@@ -10,9 +10,10 @@ const TelegramBaseController = Telegram.TelegramBaseController
 const TextCommand = Telegram.TextCommand
 const path = require('path')
 const config = require('dotenv').config({path: require('path').join(__dirname, '../../.env')})
+const app = require('./App')
 
 // Initialization App
-const App = new (require('./App'))({
+const App = new app({
     config: Object.assign(require('./config'), config),
     // Bot controllers
     mapControllers: [
@@ -33,11 +34,13 @@ let messageUsernameNotRegistered = userId => {
 // Before
 tg.before((update, cb) => {
 
-    let telegramUsername = update.message.from
+    // Get username from update
+    let telegramUsername = update.message
         ? update.message.from.username
         : (update.callbackQuery ? update.callbackQuery.from.username : null)
 
-    let telegramUserId = update.message.from
+    // Get user id from update
+    let telegramUserId = update.message
         ? update.message.from.id
         : (update.callbackQuery ? update.callbackQuery.from.id : null)
 
@@ -48,23 +51,27 @@ tg.before((update, cb) => {
         return cb(false)
     }
 
+    // Check username for admin
     let isAdmin = App.getAdminUsernames().includes(telegramUsername);
 
-    // Authentication
+    // Authentication and getting user data
     App.api.checkAuth(isAdmin).then(auth => {
-        console.log(auth)
+
         if (!auth) {
-            return isAdmin ? App.api.authenticationAdmin(telegramUsername) : App.api.accessTokenUser()
+            return isAdmin
+                ? App.api.authenticationUser().then(authData => App.api.authenticationAdmin(telegramUsername))
+                : App.api.authenticationUser()
         }
 
         return true
-    }).then(respone => tg.logger.log({respone_auth: respone})).catch(err => {
+    }).then(authData => {
+        return cb(true)
+    }).catch(err => {
         tg.logger.error({error_authentication_api: err})
 
-        cb(false)
+        return cb(false)
     })
 
-    return cb(true)
 })
 
 // Routes

@@ -42,39 +42,42 @@ class StartMenu extends BaseMenu {
             }]
         }*/
 
-        let menuCreator = (data) => {
-            let menu = {
-                layout: 2, //some layouting here
-                method: 'sendMessage', //here you must pass the method name
-                params: [data.message, {'parse_mode': 'markdown'}], //here you must pass the parameters for that method
-                menu: [
-                    {
-                        text: '📄 ПРАЙС', //text of the button
-                        callback: () => {
+        return this.app.render('main.start_message').then(content => {
+            return this.botScope.runInlineMenu(this.makeMenu({message: content}))
+        }).catch(this.app.logger.error)
+    }
 
-                        }
-                    },
-                    {
-                        text: '📜 Личный кабинет'
-                    },
-                    {
-                        text: '🔋 Корзина',
-                    },
-                    {
-                        text: '🔄 Обновить',
-                        callback: (continueQuery, message) => {
-
-                        }
+    makeMenu(data) {
+        let menu = {
+            layout: 2, //some layouting here
+            method: 'sendMessage', //here you must pass the method name
+            params: [data.message, {'parse_mode': 'markdown'}], //here you must pass the parameters for that method
+            menu: [
+                {
+                    text: '📄 ПРАЙС', //text of the button
+                    callback: () => {
+                        this.app.includeMenu('Showcase').run()
                     }
-                ]
-            }
+                },
+                {
+                    text: '📜 Личный кабинет',
+                    callback: () => {
+                        return this.app.includeMenu('UserCabinet').run()
+                    }
+                },
+                {
+                    text: '🔋 Корзина',
+                },
+                {
+                    text: '🔄 Обновить',
+                    callback: (continueQuery, message) => {
 
-            return menu
+                    }
+                }
+            ]
         }
 
-        return this.app.render('main.start_message').then(content => {
-            return this.botScope.runInlineMenu(menuCreator({message: content}))
-        }).catch(console.error)
+        return menu
     }
 }
 
