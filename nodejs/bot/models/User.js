@@ -17,12 +17,32 @@ class User {
 
         let getUserDataSaveSession = () => {
             return this.find(this.botScope.userId).then(udata => {
-                return this.botScope.setUserSession('user_data', udata).then(() => {
 
-                    this.userData = udata
+                const [usernick, username] = [
+                    this.botScope.message.from.firstName +' '+ (this.botScope.message.from.lastName || ''),
+                    this.botScope.message.from.username
+                ]
 
-                    return udata
-                })
+                let saveSession = (udata) => {
+                    return this.botScope.setUserSession('user_data', udata).then(() => {
+
+                        this.userData = udata
+
+                        return udata
+                    })
+                }
+
+                // Check is changed telegram data
+                if (username != udata.tg_username || usernick != udata.name) {
+                    // Update to back-end data
+                    return this.update({
+                        name: usernick,
+                        tg_username: username,
+                        tg_chatid: this.botScope.userId
+                    }).then(res => this.find(this.botScope.userId).then(saveSession))
+                }
+
+                return saveSession(udata)
             })
         }
 
@@ -31,7 +51,14 @@ class User {
         }
 
         return this.botScope.getUserSession('user_data').then(udata => {
-            return Object.keys(udata).length ? udata : getUserDataSaveSession()
+
+            if (!Object.keys(this.userData).length && Object.keys(udata).length) {
+                this.userData = udata
+
+                return udata
+            }
+
+            return getUserDataSaveSession()
         })
 
     }
@@ -40,6 +67,10 @@ class User {
         return this.app.api.api('users.find', 'GET', {tg_chatid: userId})
             .then(response => response.data)
             .catch(err => this.app.logger.error(err))
+    }
+
+    update(attributes) {
+        return this.app.api.api('users.update', 'POST', attributes)
     }
 
     get userId() {
