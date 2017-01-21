@@ -56,7 +56,7 @@ class StartMenu extends BaseMenu {
                 {
                     text: '📄 ПРАЙС', //text of the button
                     callback: () => {
-                        this.app.includeMenu('Showcase').run()
+                        this.app.includeMenu('Showcase', $).run()
                     }
                 },
                 {
