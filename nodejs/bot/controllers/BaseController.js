@@ -6,7 +6,7 @@
 
 const Telegram = require('telegram-node-bot')
 const TelegramBaseController = Telegram.TelegramBaseController
-const User = require('../Models/User')
+const User = require('../models/User')
 
 class BaseController extends TelegramBaseController {
 
@@ -19,7 +19,13 @@ class BaseController extends TelegramBaseController {
     before(scope) {
         scope.user = new User(this.app, scope)
 
-        return scope.user.load().then(udata => scope)
+        return scope.user.load()
+            .then(udata => scope)
+            .catch(err => {
+                scope.sendMessage('Произошла ошибка')
+
+                return false
+            })
     }
 }
 

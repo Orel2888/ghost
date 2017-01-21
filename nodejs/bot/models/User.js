@@ -15,22 +15,22 @@ class User {
 
     load(forceUpdate = false) {
 
-        let getUserDataSaveSession = () => {
+        const [usernick, username] = [
+            this.botScope.message.from.firstName +' '+ (this.botScope.message.from.lastName || ''),
+            this.botScope.message.from.username
+        ]
+
+        let saveUserDataSession = (udata) => {
+            return this.botScope.setUserSession('user_data', udata).then(() => {
+
+                this.userData = udata
+
+                return udata
+            })
+        }
+
+        let getUserData = () => {
             return this.find(this.botScope.userId).then(udata => {
-
-                const [usernick, username] = [
-                    this.botScope.message.from.firstName +' '+ (this.botScope.message.from.lastName || ''),
-                    this.botScope.message.from.username
-                ]
-
-                let saveSession = (udata) => {
-                    return this.botScope.setUserSession('user_data', udata).then(() => {
-
-                        this.userData = udata
-
-                        return udata
-                    })
-                }
 
                 // Check is changed telegram data
                 if (username != udata.tg_username || usernick != udata.name) {
@@ -39,10 +39,24 @@ class User {
                         name: usernick,
                         tg_username: username,
                         tg_chatid: this.botScope.userId
-                    }).then(res => this.find(this.botScope.userId).then(saveSession))
+                    }).then(res => this.find(this.botScope.userId).then(saveUserDataSession))
                 }
 
-                return saveSession(udata)
+                return saveUserDataSession(udata)
+            }).catch(err => {
+
+                // Registration a user
+                if (err.statusCode == 404) {
+                    return this.register({
+                        name: usernick,
+                        tg_username: username,
+                        tg_chatid: this.botScope.userId
+                    }).then(() => {
+                        return getUserData()
+                    })
+                }
+
+                return err;
             })
         }
 
@@ -58,7 +72,7 @@ class User {
                 return udata
             }
 
-            return getUserDataSaveSession()
+            return getUserData()
         })
 
     }
@@ -66,11 +80,14 @@ class User {
     find(userId) {
         return this.app.api.api('users.find', 'GET', {tg_chatid: userId})
             .then(response => response.data)
-            .catch(err => this.app.logger.error(err))
     }
 
     update(attributes) {
         return this.app.api.api('users.update', 'POST', attributes)
+    }
+
+    register(attributes) {
+        return this.app.api.api('users.reg', 'POST', attributes)
     }
 
     get userId() {

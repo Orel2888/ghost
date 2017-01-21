@@ -44,14 +44,14 @@ class StartMenu extends BaseMenu {
 
         return this.app.render('main.start_message').then(content => {
             return this.botScope.runInlineMenu(this.makeMenu({message: content}))
-        }).catch(this.app.logger.error)
+        }).catch(err => this.app.logger.error(err))
     }
 
     makeMenu(data) {
         let menu = {
             layout: 2, //some layouting here
             method: 'sendMessage', //here you must pass the method name
-            params: [data.message, {'parse_mode': 'markdown'}], //here you must pass the parameters for that method
+            params: [data.message, {'parse_mode': 'markdown', 'disable_web_page_preview': true}], //here you must pass the parameters for that method
             menu: [
                 {
                     text: '📄 ПРАЙС', //text of the button

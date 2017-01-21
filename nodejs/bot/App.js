@@ -9,7 +9,6 @@ const swig  = require('swig')
 const promisify = require("promisify-node")
 const GhostApi  = require('../ghost-api/GhostApi')
 const Logger = require('./Logger')
-const User = require('./Models/User')
 
 class App {
 
@@ -105,10 +104,6 @@ class App {
         }
 
         return new Menu(this, menuName, botScope, params)
-    }
-
-    user(botScope) {
-        return new User(botScope)
     }
 }
 
