@@ -5,5 +5,7 @@
  */
 
 module.exports = {
-    bot_mode: 'inline_menu'
+    bot_mode: 'inline_menu',
+    divider: '➖',
+    pricelist_sort_city: true
 };
