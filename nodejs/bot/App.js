@@ -35,6 +35,10 @@ class App {
         this._bootstrapControllers()
         this._bootstrapTemplatter()
         this._bootstrapApi()
+
+        this._templateShareData = {
+            divider: this.config.divider
+        }
     }
 
     _bootstrapControllers() {
@@ -78,6 +82,11 @@ class App {
     }
 
     render(templateFile, data = {}) {
+
+        if (Object.keys(data).length)
+            data = Object.assign(this._templateShareData, data)
+        else
+            data = this._templateShareData
 
         if (templateFile.indexOf('.') != -1) {
             templateFile = templateFile.replace('.', '/');
