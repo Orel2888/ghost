@@ -10,11 +10,16 @@ class StartMenu extends BaseMenu {
 
     run() {
 
-        /*let cities = {
-            1: 'City1',
-            2: 'City2',
-            3: 'City3'
-        }
+        /*let cities = [{
+            id: 1,
+            name: 'City1'
+          },{
+            id: 2,
+            name: 'City2'
+          },{
+            id: 3,
+            name: 'City3'
+         }]
 
         let goods = {
             'City1': [{
@@ -42,7 +47,15 @@ class StartMenu extends BaseMenu {
             }]
         }*/
 
-        return this.app.render('main.start_message').then(content => {
+        let Product = this.params.product
+
+        let dataTpl = {
+            product: Product,
+            cities: this.app.config.pricelist_sort_city ? Product.citiesSorted : Product.cities,
+            space: ' '.repeat(4)
+        }
+
+        return this.app.render('main.start_message', dataTpl).then(content => {
             return this.botScope.runInlineMenu(this.makeMenu({message: content}))
         }).catch(err => this.app.logger.error(err))
     }
