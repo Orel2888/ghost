@@ -5,11 +5,16 @@ const Product = require('../../models/Product')
 describe('Testing product model', function () {
 
     let dataGoods = {
-        cities: {
-            1: 'City1',
-            2: 'City2',
-            3: 'City3'
-        },
+        cities: [{
+            id: 1,
+            name: 'City1'
+        },{
+            id: 2,
+            name: 'City2'
+        },{
+            id: 3,
+            name: 'City3'
+        }],
         goods: {
             'City1': [{
                 id: 1,
@@ -48,6 +53,7 @@ describe('Testing product model', function () {
 
     it ('Get cities', () => {
         assert.equal(product.cities, dataGoods.cities)
+        assert.equal(product.getCity(product.cities[0].id), product.cities[0])
     })
 
     it ('Has product by city', () => {
@@ -58,6 +64,39 @@ describe('Testing product model', function () {
     it ('Has product by goods', () => {
         assert.isOk(product.hasProduct({goods_id: 1}))
         assert.isNotOk(product.hasProduct({goods_id: 2}))
+    })
+
+    it ('Make data', () => {
+        product.clearData()
+
+        product.makeData([{
+            name: 'Magnitor',
+            goods: [{
+                name: 'Apilsin',
+                products: [{
+                    weight: 0.5,
+                    cost: 1500,
+                    count: 5
+                }]
+            },{
+                name: 'Limon',
+                products: [{
+                    weight: 1,
+                    cost: 2500,
+                    count: 7
+                }]
+            }]
+        }])
+
+        let cities = product.cities
+
+        let cityId = cities[0].id
+
+        assert.isOk(product.hasProduct({city_id: cityId}))
+
+        product._goods[product.getCity(cityId).name].forEach((goods, index) => {
+            assert.isOk(product.hasProduct({goods_id: goods.id}))
+        })
     })
 
 })
