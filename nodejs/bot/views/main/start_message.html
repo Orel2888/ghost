@@ -11,22 +11,5 @@
 
 🏣 *Наличие по городам*
 
-{% for city in cities -%}
-🏡 *{{ city.name }}*
-{%- if product.hasProduct({city_id: city.id}) -%}
-{%- for goods in product.getGoodsByCityName(city.name) -%}
-🎁 *{{ goods.name }}*
-{%- if product.hasProduct({goods_id: goods.id}) -%}
-{%- for productItem in product.getProduct(goods.id) -%}
-{{ space }}📦 {{ product.weightForHumans(productItem.weight) }} - 💰 {{ productItem.cost }}
-{%- if !loop.last -%}
-{{ space }}{{ divider.repeat(6) }}
-{%- endif -%}
-{%- endfor -%}
-{%- endif -%}
-{%- endfor -%}
-{%- else -%}
-⭕️ Пусто
-{%- endif -%}
-{%- endfor -%}
+{% include './available_product.html' -%}
 {% endblock %}
