@@ -7,7 +7,6 @@ class Product {
     constructor(app, botScope) {
         this.app      = app
         this.botScope = botScope
-        this.loadDisable = false
 
         this._cities   = []
         this._goods    = {}
@@ -15,14 +14,14 @@ class Product {
     }
 
     load() {
-        if (this.loadDisable) return Promise.resolve()
+        if (this.app.config.model_product_test_mode) return Promise.resolve(this.fillTestData())
 
         return this.getDataGoods().then(goodsData => {
             this._cities   = goodsData.cities
             this._goods    = goodsData.goods
             this._products = goodsData.products
 
-            return true
+            return goodsData
         })
     }
 
@@ -148,6 +147,49 @@ class Product {
 
             })
         })
+    }
+
+    fillTestData() {
+        try {
+            return this.makeData([{
+                name: 'Moscov',
+                goods: []
+            },{
+                name: 'Netherlands',
+                goods: []
+            },{
+                name: 'Albania',
+                goods: [{
+                    name: 'Banan',
+                    products: [{
+                        weight: 0.5,
+                        cost: 1500,
+                        count: 3
+                    }, {
+                        weight: 1,
+                        cost: 2500,
+                        count: 4
+                    },{
+                        weight: 0.33,
+                        cost: 1000,
+                        count: 3
+                    }]
+                }, {
+                    name: 'Cocks',
+                    products: [{
+                        weight: 1,
+                        cost: 2500,
+                        count: 5
+                    }, {
+                        weight: 2,
+                        cost: 4500,
+                        count: 3
+                    }]
+                }]
+            }])
+        } catch(e) {
+            return this.app.logger.error(e.message)
+        }
     }
 
     clearData() {
