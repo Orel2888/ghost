@@ -8,7 +8,6 @@ const path = require('path')
 const swig  = require('swig')
 const promisify = require("promisify-node")
 const GhostApi  = require('../ghost-api/GhostApi')
-const Logger = require('./Logger')
 
 class App {
 
@@ -22,7 +21,7 @@ class App {
          */
         this._controllers    = {}
         this.templatter      = null
-        this.logger          = new Logger()
+        this.logger          = null
 
         if (Object.keys(config).length) {
             for (let k in config) {
