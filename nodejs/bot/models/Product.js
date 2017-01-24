@@ -51,7 +51,7 @@ class Product {
     }
 
     get cities() {
-        return this._cities
+        return this.app.config.pricelist_sort_city ? this.citiesSorted : this._cities
     }
 
     get citiesSorted() {
