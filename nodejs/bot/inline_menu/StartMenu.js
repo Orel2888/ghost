@@ -50,9 +50,7 @@ class StartMenu extends BaseMenu {
         let Product = this.params.product
 
         let dataTpl = {
-            product: Product,
-            cities: this.app.config.pricelist_sort_city ? Product.citiesSorted : Product.cities,
-            space: ' '.repeat(4)
+            product: Product
         }
 
         return this.app.render('main.start_message', dataTpl).then(content => {
