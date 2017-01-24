@@ -99,8 +99,9 @@ class Product {
     }
 
     /**
+     * Fill test data
      * @param data [{
-     *      city_name,
+     *      name,
      *      goods: [
      *          {
      *              name: 'name',
