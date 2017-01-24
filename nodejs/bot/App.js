@@ -36,7 +36,8 @@ class App {
         this._bootstrapApi()
 
         this._templateShareData = {
-            divider: this.config.divider
+            divider: this.config.divider,
+            space: ' '.repeat(4)
         }
     }
 
