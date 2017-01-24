@@ -2,24 +2,24 @@
  * Logger
  */
 
-const BaseLogger = require('./BaseLogger')
+const WebAdminLogger = require('telegram-node-bot/lib/logger/WebAdminLogger')
 
-class Logger extends BaseLogger {
+class Logger extends WebAdminLogger {
 
-    warn(message) {
-        return this.log('warn', message)
+    warn(data) {
+        return super.warn(this.stringToObject(data))
     }
 
-    error(message) {
-        return this.log('error', message)
+    error(data) {
+        return super.error(this.stringToObject(data))
     }
 
-    info(message) {
-        return this.log('info', message)
+    info(data) {
+        return super.log(this.stringToObject(data))
     }
 
-    log(type, content) {
-        return console[type](content)
+    stringToObject(data) {
+        return typeof data == 'object' ? data : {message: data}
     }
 }
 

@@ -11,6 +11,7 @@ const TextCommand = Telegram.TextCommand
 const path = require('path')
 const config = require('dotenv').config({path: require('path').join(__dirname, '../../.env')})
 const app = require('./App')
+const Logger = require('./logger/Logger')
 
 // Initialization App
 const App = new app({
@@ -18,11 +19,14 @@ const App = new app({
     // Bot controllers
     mapControllers: [
         'MainController'
-    ]
+    ],
+    logger: new Logger()
 })
 
 // Initialization bot
-const tg = new Telegram.Telegram(config.TGBOT_TOKEN)
+const tg = new Telegram.Telegram(config.TGBOT_TOKEN, {
+    logger: App.logger
+})
 
 // Send message a user about required username
 let messageUsernameNotRegistered = userId => {
