@@ -18,7 +18,7 @@
 🎁 *{{ goods.name }}*
 {%- if product.hasProduct({goods_id: goods.id}) -%}
 {%- for productItem in product.getProduct(goods.id) -%}
-{{ space }}📦 {{ productItem.weight }} - 💰 {{ productItem.cost }}
+{{ space }}📦 {{ product.weightForHumans(productItem.weight) }} - 💰 {{ productItem.cost }}
 {%- if !loop.last -%}
 {{ space }}{{ divider.repeat(6) }}
 {%- endif -%}

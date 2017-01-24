@@ -98,6 +98,10 @@ class Product {
         return this._cities.filter(item => item.id == cityId)[0]
     }
 
+    weightForHumans(weight) {
+        return weight < 0.99 ? `${weight}мг` : `${weight}г`
+    }
+
     /**
      * Fill test data
      * @param data [{
