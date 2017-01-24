@@ -84,7 +84,7 @@ class StartMenu extends BaseMenu {
                 {
                     text: '🔄 Обновить',
                     callback: (continueQuery, message) => {
-
+                        return this.app.getController('MainController').startHandler(this.botScope)
                     }
                 }
             ]
