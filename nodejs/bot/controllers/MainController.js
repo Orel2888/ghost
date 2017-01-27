@@ -13,7 +13,7 @@ class MainController extends BaseController {
         const product = new Product(this.app, $)
 
         return product.load().then(() => {
-            return this.app.includeMenu('start', $, {product}).run()
+            return this.app.includeMenu('Start', $, {product}).run()
         })
     }
 
