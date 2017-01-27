@@ -4,6 +4,8 @@ const Product = require('../../models/Product')
 
 describe('Testing product model', function () {
 
+    const App = require('../appInit')
+
     let dataGoods = {
         cities: [{
             id: 1,
@@ -33,11 +35,11 @@ describe('Testing product model', function () {
                 cost: 1500,
                 count: 2
             },
-                {
-                    weight: 1,
-                    cost: 2500,
-                    count: 4
-                }]
+            {
+                weight: 1,
+                cost: 2500,
+                count: 4
+            }]
         }
     }
 
@@ -45,7 +47,9 @@ describe('Testing product model', function () {
         return Promise.resolve(dataGoods)
     }
 
-    const product = new Product()
+    App.config.model_product_test_mode = false
+
+    const product = new Product(App)
 
     it ('Load data goods', () => {
         return product.load()
@@ -54,6 +58,12 @@ describe('Testing product model', function () {
     it ('Get cities', () => {
         assert.equal(product.cities, dataGoods.cities)
         assert.equal(product.getCity(product.cities[0].id), product.cities[0])
+    })
+
+    it ('Get goods', () => {
+        let goods = dataGoods.goods[dataGoods.cities[0].name][0]
+
+        assert.equal(product.getGoods(goods.id), goods)
     })
 
     it ('Has product by city', () => {
