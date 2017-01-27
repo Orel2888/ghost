@@ -1,0 +1,10 @@
+{% extends '../app.html' %}
+
+{% block content %}
+{% include './selected_items.html' %}
+
+*Выберите товар:*
+{% if !goods.length -%}
+⭕️ Нет товара в этом городе
+{%- endif %}
+{% endblock %}

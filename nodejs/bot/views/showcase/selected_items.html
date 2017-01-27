@@ -1,0 +1,6 @@
+✅ *Ваш выбор:*
+
+🏡 Город: *{{ product.getCity(selected_items.city_id).name }}*
+{%- if selected_items.hasOwnProperty('goods_id') %}
+🎁 Товар: *{{ product.getGoods(selected_items.goods_id).name }}*
+{%- endif -%}
