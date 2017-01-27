@@ -1,4 +1,4 @@
-{% for city in product.cities -%}
+{% for city in product.citiesSorted -%}
 🏡 *{{ city.name }}*
 {% if product.hasProduct({city_id: city.id}) -%}
 {%- for goods in product.getGoodsByCityName(city.name) -%}
