@@ -51,7 +51,7 @@ class Product {
     }
 
     get cities() {
-        return this.app.config.pricelist_sort_city ? this.citiesSorted : this._cities
+        return this._cities
     }
 
     get citiesSorted() {
@@ -73,11 +73,11 @@ class Product {
     }
 
     getGoodsByCityId(id) {
-        return this._goods[this.getCity(id).name];
+        return this._goods[this.getCity(id).name] || [];
     }
 
     getGoodsByCityName(cityName) {
-        return this._goods[cityName]
+        return this._goods[cityName] || []
     }
 
     getProduct(goodsId) {
@@ -95,6 +95,16 @@ class Product {
 
     getCity(cityId) {
         return this._cities.filter(item => item.id == cityId)[0]
+    }
+
+    getGoods(goodsId) {
+        for (let city in this._goods) {
+            let goods = this._goods[city].filter(goods => goods.id == goodsId)
+
+            if (goods.length) return goods[0]
+        }
+
+        return null
     }
 
     weightForHumans(weight) {
