@@ -5,8 +5,15 @@
  */
 
 const BaseMenu = require('./BaseMenu')
+const Product = require('../models/Product')
 
 class StartMenu extends BaseMenu {
+
+    constructor() {
+        super(...arguments)
+
+        this.product = new Product(this.app, this.botScope)
+    }
 
     run() {
 
@@ -47,48 +54,62 @@ class StartMenu extends BaseMenu {
             }]
         }*/
 
-        let Product = this.params.product
-
         let dataTpl = {
-            product: Product
+            product: this.product
         }
 
-        return this.app.render('main.start_message', dataTpl).then(content => {
-            return this.botScope.runInlineMenu(this.makeMenu({message: content}))
-        }).catch(err => this.app.logger.error(err))
+        return this.product.load().then(() => {
+            return this.app.render('main.start_message', dataTpl).then(content => {
+                return this.botScope.runInlineMenu(this.makeMenu({message: content}), this.params.prev_message)
+            }).catch(err => this.app.logger.error(err))
+        })
     }
 
     makeMenu(data) {
-        let menu = {
-            layout: 2, //some layouting here
-            method: 'sendMessage', //here you must pass the method name
-            params: [data.message, {'parse_mode': 'markdown', 'disable_web_page_preview': true}], //here you must pass the parameters for that method
-            menu: [
-                {
-                    text: '📄 ПРАЙС', //text of the button
-                    callback: () => {
-                        this.app.includeMenu('Showcase', $).run()
-                    }
-                },
-                {
-                    text: '📜 Личный кабинет',
-                    callback: () => {
-                        return this.app.includeMenu('UserCabinet').run()
-                    }
-                },
-                {
-                    text: '🔋 Корзина',
-                },
-                {
-                    text: '🔄 Обновить',
-                    callback: (continueQuery, message) => {
-                        return this.app.getController('MainController').startHandler(this.botScope)
-                    }
+
+        let menuButtons = [
+            {
+                text: '📄 ПРАЙС',
+                callback: (callbackQuery, message) => {
+                    this.app.includeMenu('Showcase', this.botScope, {prev_message: message}).run()
                 }
-            ]
+            },
+            {
+                text: '📜 Личный кабинет',
+                callback: () => {
+                    return this.app.includeMenu('UserCabinet').run()
+                }
+            },
+            {
+                text: '🔋 Корзина',
+            },
+            {
+                text: '🔄 Обновить',
+                callback: (continueQuery, message) => {
+                    return this.app.getController('MainController').startHandler(this.botScope)
+                }
+            }
+        ]
+
+        let menuScheme
+
+        if (!this.params.hasOwnProperty('prev_message')) {
+            menuScheme = {
+                layout: 2,
+                method: 'sendMessage',
+                params: [data.message, {parse_mode: 'markdown', disable_web_page_preview: true}],
+                menu: menuButtons
+            }
+        } else {
+            menuScheme = {
+                layout: 2,
+                message: data.message,
+                params: [{parse_mode: 'markdown', disable_web_page_preview: true}],
+                menu: menuButtons
+            }
         }
 
-        return menu
+        return menuScheme
     }
 }
 
