@@ -4,6 +4,7 @@
 
 const BaseMenu = require('./BaseMenu')
 const Product = require('../models/Product')
+const Purse = require('../models/Purse')
 
 class ShowcaseMenu extends BaseMenu {
 
@@ -12,15 +13,6 @@ class ShowcaseMenu extends BaseMenu {
 
         this.product = new Product(this.app, this.botScope)
         this.selectedItems = {}
-
-        this.menuCitiesScheme = {}
-        this.buttonsCities = []
-
-        this.menuGoodsScheme = {}
-        this.menuGoodsButtons = []
-
-        this.menuWeightOfGoodsScheme = {}
-        this.menuWeightOfGoodsButtons = []
     }
 
     run() {
@@ -31,7 +23,7 @@ class ShowcaseMenu extends BaseMenu {
 
     menuCity() {
 
-        this.buttonsCities = this.product.citiesSorted.map(city => {
+        let buttonsCities = this.product.citiesSorted.map(city => {
             return {
                 text: `🏡 ${city.name}`,
                 callback: (callbackQuery, message) => {
@@ -43,18 +35,18 @@ class ShowcaseMenu extends BaseMenu {
             }
         })
 
-        this.buttonsCities.push(this._commonButtons.start({prev_message: this.params.prev_message}))
+        buttonsCities.push(this._commonButtons.start({prev_message: this.params.prev_message}))
 
         return this.app.render('showcase.index').then(content => {
 
-            this.menuCitiesScheme = {
+            let menuCitiesScheme = {
                 layout: this.layoutTwoColumns(this.product.cities.length, 1),
                 message: content,
                 params: [{parse_mode: 'markdown'}],
-                menu: this.buttonsCities
+                menu: buttonsCities
             }
 
-            return this.botScope.runInlineMenu(this.menuCitiesScheme, this.params.prev_message)
+            return this.botScope.runInlineMenu(menuCitiesScheme, this.params.prev_message)
         }).catch(err => this.app.logger.error(err))
     }
 
@@ -74,14 +66,14 @@ class ShowcaseMenu extends BaseMenu {
             }
         })
 
-        this.menuGoodsButtons = this.product.hasProduct({city_id: this.selectedItems.city_id}) ? menuGoods : []
+        let menuGoodsButtons = this.product.hasProduct({city_id: this.selectedItems.city_id}) ? menuGoods : []
 
-        this.menuGoodsButtons.push({
+        menuGoodsButtons.push({
             text: '❰ К выбору города',
             callback: () => this.menuCity()
         })
 
-        this.menuGoodsButtons.push(this._commonButtons.start({prev_message: prevMessage}))
+        menuGoodsButtons.push(this._commonButtons.start({prev_message: prevMessage}))
 
         let tplData = {
             selected_items: this.selectedItems,
@@ -91,14 +83,14 @@ class ShowcaseMenu extends BaseMenu {
 
         return this.app.render('showcase.choice_goods', tplData).then(content => {
 
-            this.menuGoodsScheme = {
+            let menuGoodsScheme = {
                 layout: this.layoutTwoColumns(goodsOfcity.length, 2),
                 message: content,
                 params: [{parse_mode: 'markdown'}],
-                menu: this.menuGoodsButtons
+                menu: menuGoodsButtons
             }
 
-            return this.botScope.runInlineMenu(this.menuGoodsScheme, prevMessage)
+            return this.botScope.runInlineMenu(menuGoodsScheme, prevMessage)
         }).catch(err => this.app.logger.error(err))
     }
 
@@ -112,7 +104,7 @@ class ShowcaseMenu extends BaseMenu {
         let products = this.product.getProduct(this.selectedItems.goods_id)
 
         // Menu choice weight of goods
-        this.menuWeightOfGoodsButtons = products.map(product => {
+        let menuWeightOfGoodsButtons = products.map(product => {
             return {
                 text: `📦 ${this.product.weightForHumans(product.weight)} - 💰 ${product.cost}`,
                 callback: (callbackQuery, message) => {
@@ -123,7 +115,7 @@ class ShowcaseMenu extends BaseMenu {
             }
         })
 
-        this.menuWeightOfGoodsButtons.push({
+        menuWeightOfGoodsButtons.push({
             text: '❰ К выбору товара',
             callback: () => {
                 delete this.selectedItems.goods_id
@@ -131,27 +123,169 @@ class ShowcaseMenu extends BaseMenu {
                 return this.menuGoods(prevMessage)
             }
         })
-        this.menuWeightOfGoodsButtons.push({
+        menuWeightOfGoodsButtons.push({
             text: '❰ К выбору города',
             callback: () => this.menuCity()
         })
-        this.menuWeightOfGoodsButtons.push(this._commonButtons.start({prev_message: prevMessage}))
+        menuWeightOfGoodsButtons.push(this._commonButtons.start({prev_message: prevMessage}))
 
         return this.app.render('showcase.choice_weight_of_goods', tplData).then(content => {
 
-            this.menuWeightOfGoodsScheme = {
+            let menuWeightOfGoodsScheme = {
                 layout: this.layoutTwoColumns(products.length, 2, 1),
                 message: content,
                 params: [{parse_mode: 'markdown'}],
-                menu: this.menuWeightOfGoodsButtons
+                menu: menuWeightOfGoodsButtons
             }
 
-            return this.botScope.runInlineMenu(this.menuWeightOfGoodsScheme, prevMessage)
+            return this.botScope.runInlineMenu(menuWeightOfGoodsScheme, prevMessage)
         }).catch(err => this.app.logger.error(err))
     }
 
-    menuCountPackage(prevMessage) {
+    menuCountPackage(prevMessage, errorMessage) {
 
+        if (errorMessage) delete this.selectedItems.count_package
+
+        let tplData = {
+            product: this.product,
+            selected_items: this.selectedItems,
+            errorMessage,
+            count_package: 1
+        }
+
+        // Buttons count
+        let menuCountPackageButtons = []
+
+        for (let i = 1; i<=6; i++) {
+            menuCountPackageButtons.push({
+                text: `📦 ${i.toString()}`,
+                callback: () => {
+                    this.selectedItems.count_package = i
+
+                    // Check count product
+                    let products = this.product.getProduct(this.selectedItems.goods_id, this.selectedItems.weight)
+
+                    if (!products.length)
+                        return this.menuCountPackage(prevMessage, 'Нет товара или он кончился в самый неподходящий момент')
+                    else if (products.length < i)
+                        return this.menuCountPackage(prevMessage, 'Нет такого количества товара')
+
+                    return this.menuOrder(prevMessage)
+                }
+            })
+        }
+
+        // Navigation buttons
+        menuCountPackageButtons.push({
+            text: '❰ К выбору веса',
+            callback: () => {
+                delete this.selectedItems.weight
+
+                return this.menuWeightOfGoods(prevMessage)
+            }
+        })
+
+        menuCountPackageButtons.push({
+            text: '❰ К выбору товара',
+            callback: () => {
+                delete this.selectedItems.goods_id
+                delete this.selectedItems.weight
+
+                return this.menuGoods(prevMessage)
+            }
+        })
+
+        menuCountPackageButtons.push({
+            text: '❰ К выбору города',
+            callback: () => {
+                delete this.selectedItems.city_id
+                delete this.selectedItems.goods_id
+                delete this.selectedItems.weight
+
+                return this.menuCity(prevMessage)
+            }
+        })
+
+        menuCountPackageButtons.push(this._commonButtons.start({prev_message: prevMessage}))
+
+        return this.app.render('showcase.choice_count_package', tplData).then(content => {
+
+            let menuCountPackageScheme = {
+                layout: [3, 3, 2, 2],
+                message: content,
+                params: [{parse_mode: 'markdown'}],
+                menu: menuCountPackageButtons
+            }
+
+            return this.botScope.runInlineMenu(menuCountPackageScheme, prevMessage)
+        }).catch(err => this.app.logger.error(err))
+    }
+
+    menuOrder(prevMessage) {
+
+        let wordOrder = (count) => {
+            if (count == 1)
+                return 'заказ'
+            else if (count > 1 && count <= 4)
+                return 'заказа'
+
+            return 'Заказов'
+        }
+
+        let tplData = {
+            product: this.product,
+            selected_items: this.selectedItems,
+            count_package: this.selectedItems.count_package,
+            word_order: wordOrder
+        }
+
+        let menuOrderButtons = [{
+            text: `✅ Оформить ${this.selectedItems.count_package == 1 ? 'заказ' : 'заказы'}`,
+        }]
+
+        menuOrderButtons.push({
+            text: '❰ Выбрать другое кол-во',
+            callback: () => {
+                delete this.selectedItems.count_package
+
+                return this.menuCountPackage(prevMessage)
+            }
+        })
+
+        menuOrderButtons.push({
+            text: '❰ К выбору веса',
+            callback: () => {
+                delete this.selectedItems.count_package
+                delete this.selectedItems.weight
+
+                return this.menuWeightOfGoods(prevMessage)
+            }
+        })
+
+        menuOrderButtons.push({
+            text: '❰ К выбору товара',
+            callback: () => {
+                delete this.selectedItems.count_package
+                delete this.selectedItems.weight
+                delete this.selectedItems.goods_id
+
+                return this.menuGoods(prevMessage)
+            }
+        })
+
+        menuOrderButtons.push(this._commonButtons.start({prev_message: prevMessage}))
+
+        return this.app.render('showcase.order', tplData).then(content => {
+
+            let menuOrderScheme = {
+                layout: [1, 2],
+                message: content,
+                params: [{parse_mode: 'markdown'}],
+                menu: menuOrderButtons
+            }
+
+            return this.botScope.runInlineMenu(menuOrderScheme, prevMessage)
+        })
     }
 }
 

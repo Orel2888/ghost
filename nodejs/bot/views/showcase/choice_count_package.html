@@ -1,0 +1,10 @@
+{% extends '../app.html' %}
+
+{% block content %}
+{% include './selected_items.html' %}
+
+*Выберите количество упаковок:*
+{%- if errorMessage %}
+❌ {{ errorMessage }}
+{% endif -%}
+{% endblock %}
