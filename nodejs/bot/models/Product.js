@@ -80,8 +80,14 @@ class Product {
         return this._goods[cityName] || []
     }
 
-    getProduct(goodsId) {
-        return this._products[goodsId].sort((a, b) => {
+    getProduct(goodsId, weight) {
+        let products = this._products[goodsId]
+
+        if (weight) {
+            products = products.filter(item => item.weight == weight)
+        }
+
+        return products.sort((a, b) => {
             if (a.weight < b.weight) return -1
             if (a.weight > b.weight) return 1
 
