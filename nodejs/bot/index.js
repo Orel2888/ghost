@@ -84,6 +84,6 @@ tg.router
     .otherwise(new class OtherwiseController extends TelegramBaseController {
         // For any messages run main controller startHandler
         handle($) {
-            return controllers.get('main').startHandler($);
+            return App.getController('MainController').startHandler($);
         }
     })
