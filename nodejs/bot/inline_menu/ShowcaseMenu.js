@@ -170,7 +170,7 @@ class ShowcaseMenu extends BaseMenu {
                     else if (products.length < i)
                         return this.menuCountPackage(prevMessage, 'Нет такого количества товара')
 
-                    return this.menuOrder(prevMessage)
+                    return this.menuPreOrder(prevMessage)
                 }
             })
         }
@@ -221,7 +221,7 @@ class ShowcaseMenu extends BaseMenu {
         }).catch(err => this.app.logger.error(err))
     }
 
-    menuOrder(prevMessage) {
+    menuPreOrder(prevMessage) {
 
         let wordOrder = (count) => {
             if (count == 1)
@@ -241,6 +241,9 @@ class ShowcaseMenu extends BaseMenu {
 
         let menuOrderButtons = [{
             text: `✅ Оформить ${this.selectedItems.count_package == 1 ? 'заказ' : 'заказы'}`,
+            callback: () => {
+
+            }
         }]
 
         menuOrderButtons.push({
@@ -275,7 +278,7 @@ class ShowcaseMenu extends BaseMenu {
 
         menuOrderButtons.push(this._commonButtons.start({prev_message: prevMessage}))
 
-        return this.app.render('showcase.order', tplData).then(content => {
+        return this.app.render('showcase.pre_order', tplData).then(content => {
 
             let menuOrderScheme = {
                 layout: [1, 2],
