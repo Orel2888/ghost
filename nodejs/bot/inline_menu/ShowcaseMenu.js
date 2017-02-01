@@ -223,26 +223,16 @@ class ShowcaseMenu extends BaseMenu {
 
     menuPreOrder(prevMessage) {
 
-        let wordOrder = (count) => {
-            if (count == 1)
-                return 'заказ'
-            else if (count > 1 && count <= 4)
-                return 'заказа'
-
-            return 'Заказов'
-        }
-
         let tplData = {
             product: this.product,
             selected_items: this.selectedItems,
-            count_package: this.selectedItems.count_package,
-            word_order: wordOrder
+            count_package: this.selectedItems.count_package
         }
 
         let menuOrderButtons = [{
             text: `✅ Оформить ${this.selectedItems.count_package == 1 ? 'заказ' : 'заказы'}`,
             callback: () => {
-
+                return this.menuOrder(prevMessage)
             }
         }]
 
@@ -279,6 +269,7 @@ class ShowcaseMenu extends BaseMenu {
         menuOrderButtons.push(this._commonButtons.start({prev_message: prevMessage}))
 
         return this.app.render('showcase.pre_order', tplData).then(content => {
+            console.log(content)
 
             let menuOrderScheme = {
                 layout: [1, 2],
@@ -288,6 +279,34 @@ class ShowcaseMenu extends BaseMenu {
             }
 
             return this.botScope.runInlineMenu(menuOrderScheme, prevMessage)
+        })
+    }
+
+    menuOrder(prevMessage) {
+
+        let sendData = {
+            goods_id: this.selectedItems.goods_id,
+            weight: this.selectedItems.weight,
+            count: this.selectedItems.count_package,
+            client_id: this.botScope.user.userId
+        }
+
+        return this.app.api.api('order.create', 'POST', sendData).then(response => {
+
+            let tplData = {
+                status: response.status == 'ok',
+                message: response.message || null,
+                data: response.data || null,
+                selected_items: this.selectedItems
+            }
+
+            return this.app.render('showcase.order', tplData).then(content => {
+
+            })
+        }).catch(err => {
+            this.app.logger.error(err)
+
+            return this.botScope.sendMessage('Произошла ошибка')
         })
     }
 }
