@@ -7,6 +7,6 @@
 {%- if selected_items.hasOwnProperty('weight') %}
 📦 Вес: *{{ product.weightForHumans(selected_items.weight) }}*
 💰 Цена: *{{ product.getProduct(selected_items.goods_id, selected_items.weight)[0].cost * count_package }}*
-{%- if selected_items.hasOwnProperty('count_package') %}🛍 Количество: *{{ selected_items.count_package }}*
-{%- endif -%}
+{%- if selected_items.hasOwnProperty('count_package') %}
+🍭 Количество: *{{ selected_items.count_package }}*{%- endif -%}
 {%- endif -%}
