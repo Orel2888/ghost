@@ -41,8 +41,8 @@ class DocApi
         $duplicateRequests = array_filter($docRequests, function ($docRequest) use($apiMethod, $httpMethod, $formParams, $response) {
             return $docRequest['method'] == $apiMethod
                 && $docRequest['http_method'] == $httpMethod
-                && $docRequest['form_params'] == $formParams
-                && $docRequest['response'] == $response;
+                && $docRequest['form_params'] == $formParams;
+                // && $docRequest['response'] == $response;
         });
 
         $docUpdated = false;
