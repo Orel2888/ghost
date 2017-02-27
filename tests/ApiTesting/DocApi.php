@@ -17,9 +17,16 @@ class DocApi
     {
         $docs = $this->getDocApi(true);
 
-        $chunksMethod = explode('.', $apiMethod);
+        $firstNameMethod = null;
+        $lastNameMethod  = null;
 
-        list($firstNameMethod, $lastNameMethod) = $chunksMethod;
+        if (strpos($apiMethod, '.') !== false) {
+            $chunksMethod = explode('.', $apiMethod);
+
+            list($firstNameMethod, $lastNameMethod) = $chunksMethod;
+        } else {
+            $firstNameMethod = $apiMethod;
+        }
 
         if (!isset($docs[$firstNameMethod])) {
             $docs[$firstNameMethod] = [];
@@ -67,6 +74,13 @@ class DocApi
     public function clearDocs()
     {
         Storage::put($this->pathDocFile, json_encode([]));
+
+        return $this;
+    }
+
+    public function setPathDocFile($pathFile)
+    {
+        $this->pathDocFile = $pathFile;
 
         return $this;
     }
