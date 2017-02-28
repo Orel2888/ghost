@@ -37,4 +37,9 @@ class MadePurchaseTest extends TestCase
 
         dispatch(new MadePurchase(['orders_ids_successful' => [$models->order->id]]));
     }
+
+    public function test_end()
+    {
+        $this->testTools->cleaningTemporaryRows();
+    }
 }
