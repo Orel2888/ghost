@@ -34,7 +34,7 @@ class NotifyAdminToTelegram
 
         if (!empty($event->orders)) {
 
-            $sep = str_repeat('❄️', 10);
+            $sep = str_repeat('🍃', 10);
             $notifyMessage = view('telegram.admin_about_purchase', ['orders' => $event->orders, 'sep' => $sep])->render();
 
             foreach ($admins as $admin) {
@@ -46,6 +46,7 @@ class NotifyAdminToTelegram
                         'parse_mode'    => 'markdown'
                     ]);
                 } catch (TelegramException $e) {
+                    //dump($notifyMessage);
                     echo $e->getMessage();
                 }
             }

@@ -46,7 +46,7 @@ class NotifyClientToTelegram
                         'parse_mode' => 'markdown'
                     ]);
                 } catch (TelegramException $e) {
-                    //var_dump($e);
+                    //dump($e);
                     echo $e->getMessage();
                 }
             }

@@ -7,7 +7,16 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
      *
      * @var string
      */
-    protected $baseUrl = 'http://ghost.projects.dev';
+    protected $baseUrl = 'http://gst.dev';
+
+    protected $sqlite_in_memory = false;
+
+    protected $databaseSeed = false;
+
+    /**
+     * @var TestTools
+     */
+    protected $testTools;
 
     /**
      * Creates the application.
@@ -21,5 +30,25 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
         $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
         return $app;
+    }
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        if ($this->databaseSeed) {
+            if (!$this->sqlite_in_memory) {
+                /*DB::statement('DELETE FROM clients');
+                DB::statement('DELETE FROM citys');
+                DB::statement('DELETE FROM miners');*/
+            } else {
+                $this->app->config->set('database.default', 'testing');
+
+                Artisan::call('migrate');
+                Artisan::call('db:seed');
+            }
+        }
+
+        $this->testTools = new TestTools();
     }
 }

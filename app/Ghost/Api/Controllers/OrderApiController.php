@@ -5,7 +5,6 @@ namespace App\Ghost\Api\Controllers;
 use Validator;
 use App\{
     Client,
-    Goods,
     GoodsOrder,
     Purse
 };

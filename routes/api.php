@@ -18,7 +18,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
         Route::get('users.find', 'UsersApiController@getFind');
         Route::post('users.reg', 'UsersApiController@postReg');
         Route::post('users.update', 'UsersApiController@postUpdate');
-        Route::get('purse', 'UsersApiController@getPurse');
+        Route::get('users.purse', 'UsersApiController@getPurse');
     });
 
     /**
@@ -50,15 +50,14 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
     /**
      * Admin methods
      */
-
     Route::group(['prefix' => 'admin', 'middleware' => 'api:admin'], function () {
-        Route::get('qiwi-transaction', 'AdminApiController@getQiwiTransaction');
+        Route::get('qiwi.transaction', 'AdminApiController@getQiwiTransaction');
 
-        Route::post('goods-price/purchase', 'AdminApiController@getGoodsPricePurchase');
-        Route::get('goods-price/available', 'AdminApiController@getGoodsPriceAvailable');
-        Route::get('goods-price', 'AdminApiController@getGoodsPrice');
+        Route::post('product.purchase', 'AdminApiController@postProductPurchase');
+        Route::get('product.available', 'AdminApiController@getProductAvailable');
+        Route::get('product.list', 'AdminApiController@getProductList');
 
-        Route::post('purse/set', 'AdminApiController@postPurseSet');
+        Route::post('purse.set', 'AdminApiController@postPurseSet');
         Route::get('purse', 'AdminApiController@getPurse');
     });
 

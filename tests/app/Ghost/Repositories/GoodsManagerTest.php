@@ -3,22 +3,25 @@
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-
 use App\Ghost\Repositories\Goods\GoodsManager;
-use App\City;
-use App\Miner;
-use App\Client;
 use Carbon\Carbon;
-use App\Ghost\Libs\GibberishAES;
+use App\{
+    City,
+    Client,
+    Miner
+};
 
 class GoodsManagerTest extends TestCase
 {
-    use BaseTestsHelper;
+
+    protected $databaseSeed = true;
 
     /**
      * @var GoodsManager
      */
-    private $goodsManager;
+    public $goodsManager;
+
+    public $countGoodsPriceType = 2;
 
     public function setUp()
     {
@@ -29,30 +32,25 @@ class GoodsManagerTest extends TestCase
 
     public function test_find_city()
     {
-        $city = $this->createCity();
+        $city = City::first();
 
         $this->goodsManager->findCity($city->id);
         $this->goodsManager->findCity($city->name);
-
-        $city->delete();
     }
 
     public function test_add_goods()
     {
-        $city = $this->createCity();
+        $city = City::first();
 
         $goods = $this->goodsManager->addGoods([
             'goods_name'    => 'Апельсины',
             'city_id'       => $city->id
         ]);
-
-        $goods->delete();
-        $city->delete();
     }
 
     public function test_find_goods()
     {
-        $city = $this->createCity('Новосибирск');
+        $city = City::first();
 
         $goods = $this->goodsManager->addGoods([
             'goods_name'    => 'Апельсин',
@@ -60,18 +58,13 @@ class GoodsManagerTest extends TestCase
         ]);
 
         $this->goodsManager->findGoods($goods->id);
-
-        $city->delete();
     }
 
     public function test_add_goods_price()
     {
-        $city = $this->createCity();
-        $client = $this->createClient();
-
-        $miner = Miner::create([
-            'name'  => 'Vadim'
-        ]);
+        $city   = City::first();
+        $client = Client::first();
+        $miner  = Miner::first();
 
         $goods = $this->goodsManager->addGoods([
             'goods_name'    => 'Апельсины',
@@ -94,12 +87,6 @@ class GoodsManagerTest extends TestCase
         ]);
 
         $this->assertGreaterThan(0, Miner::find($miner->id)->counter_goods);
-
-        $city->delete();
-        $miner->delete();
-        $goods->delete();
-        $goodsPrice->delete();
-        $goodsPriceReserved->delete();
     }
 
     public function test_parse_addresses()
@@ -113,16 +100,18 @@ class GoodsManagerTest extends TestCase
 
     public function test_goods_weights_and_count()
     {
-        $city = $this->goodsManager->findCity('Светлоград');
+        $city = City::first();
 
         $goods = $this->goodsManager->goods->where('city_id', $city->id)->first();
 
-        $this->assertEquals(3, count($this->goodsManager->getGoodsWeightsAndCount($goods->id)));
+        $this->assertEquals($this->countGoodsPriceType, count($this->goodsManager->getGoodsWeightsAndCount($goods->id)));
 
         $goodsWeights = $this->goodsManager->getGoodsWeightsAndCount($goods->id, ['cost']);
 
-        $this->assertArrayHasKey('count', $goodsWeights['0.2']);
-        $this->assertArrayHasKey('cost', $goodsWeights['0.2']);
+        foreach ($goodsWeights as $weight => $attributes) {
+            $this->assertArrayHasKey('count', $goodsWeights[$weight]);
+            $this->assertArrayHasKey('cost', $goodsWeights[$weight]);
+        }
     }
 
     public function test_goods_price_list()
@@ -138,13 +127,28 @@ class GoodsManagerTest extends TestCase
     {
         $goods = $this->goodsManager->goods->first();
 
-        $this->assertTrue($this->goodsManager->goodsPriceCheckExists($goods->id, 0.2, 2));
-    }
+        $minerId = Miner::first()->id;
 
-    public function test_get_goods_type_by_weight()
-    {
-        $goods = $this->goodsManager->goods->first();
+        $randomWeight = '0.'. mt_rand(1, 99);
 
-        $this->assertCount(2, $this->goodsManager->getGoodsPriceByWeight($goods->id, 0.2, 2));
+        $goodsPrices = [];
+
+        $i = 0;
+        while ($i < 2) {
+            $goodsPrices[] = $this->goodsManager->addGoodsPrice([
+                'goods_id'  => $goods->id,
+                'miner_id'  => $minerId,
+                'weight'    => $randomWeight,
+                'address'   => 'Test',
+                'cost'      => 1005
+            ]);
+            $i++;
+        }
+
+        $this->assertTrue($this->goodsManager->goodsPriceCheckExists($goods->id, $randomWeight, 2));
+
+        foreach ($goodsPrices as $goodsPrice) {
+            $goodsPrice->delete();
+        }
     }
 }

@@ -32,29 +32,31 @@ class SystemApiController extends BaseApiController
         $clientsIdsUpdatedBalance  = [];
         $numberNewTransactions     = $newTransaction->count();
         $numberSuccessfulTrans     = 0;
-        $transactions_ids_abuse    = [];
+        $transactionsIdsAbuse      = [];
 
+        // Processing for news a transactions
         foreach ($newTransaction as $transaction) {
-            if ($transaction->comment) {
-                $amount = $transaction->amount;
 
-                if ($amount > 300) {
-                    $amount -= $amount % 100;
-                }
+            // Checking for existence user with this comment
+            if (!$transaction->comment || !$client = Client::whereComment($transaction->comment)->first()) {
+                $transactionsIdsAbuse[] = $transaction->id;
 
-                if ($client = Client::whereComment($transaction->comment)->first()) {
-                    $clientsIdsUpdatedBalance[] = $client->id;
-
-                    $client->increment('balance', $amount);
-
-                    $numberSuccessfulTrans++;
-                } else {
-                    $transactions_ids_abuse[] = $transaction->id;
-                }
-
-            } else {
-                $transactions_ids_abuse[] = $transaction->id;
+                $transaction->update(['status' => 1]);
+                continue;
             }
+
+            // Correction a amount
+            $amount = $transaction->amount;
+
+            if ($amount > 300) {
+                $amount -= $amount % 100;
+            }
+
+            $client->increment('balance', $amount);
+
+            $numberSuccessfulTrans++;
+
+            $clientsIdsUpdatedBalance[] = $client->id;
 
             $transaction->update(['status' => 1]);
         }
@@ -79,7 +81,7 @@ class SystemApiController extends BaseApiController
                     try {
                         $purchase = $this->goodsOrder->buy($order);
 
-                        $wasPurchases[] = $purchase->id;
+                        $wasPurchasesIds[]     = $purchase->id;
                         $ordersIdsSuccessful[] = $order->id;
                     } catch (GoodsEndedException $e) {
                         $order->update(['status' => 2]);
@@ -95,8 +97,8 @@ class SystemApiController extends BaseApiController
         }
 
         // Insert abuse transactions
-        if (count($transactions_ids_abuse)) {
-            foreach ($transactions_ids_abuse as $transId) {
+        if (count($transactionsIdsAbuse)) {
+            foreach ($transactionsIdsAbuse as $transId) {
                 QiwiTransactionAbuse::create(['transaction_id' => $transId]);
             }
         }
@@ -107,7 +109,7 @@ class SystemApiController extends BaseApiController
             'orders_ids_ended_goods'        => $ordersIdsEndedGoods,
             'orders_ids_not_enough_money'   => $ordersIdsNotEnoughMoney,
             'number_successfull_trans'      => $numberSuccessfulTrans,
-            'transactions_ids_abuse'        => $transactions_ids_abuse,
+            'transactions_ids_abuse'        => $transactionsIdsAbuse,
             'purchases_ids'                 => $wasPurchasesIds
         ];
 

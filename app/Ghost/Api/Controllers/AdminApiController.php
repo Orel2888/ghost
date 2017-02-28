@@ -22,7 +22,7 @@ class AdminApiController extends BaseApiController
         ]);
     }
 
-    public function getGoodsPrice()
+    public function getProductList()
     {
         $goodsPrice = GoodsPrice::with('goods.city')->get();
 
@@ -40,7 +40,7 @@ class AdminApiController extends BaseApiController
         return response()->json($this->apiResponse->ok(['data' => $goods]));
     }
 
-    public function getGoodsPricePurchase()
+    public function postProductPurchase()
     {
         $valid = Validator::make(app('request')->all(), [
             'goods_price_id'    => 'required'
@@ -74,7 +74,7 @@ class AdminApiController extends BaseApiController
         return response()->json($this->apiResponse->ok(['data' => $purchases]));
     }
 
-    public function getGoodsPriceAvailable()
+    public function getProductAvailable()
     {
         $goodsAvailable = [];
 

@@ -86,7 +86,7 @@ class UsersApiController extends BaseApiController
 
         try {
             $this->clientManager->findByTgChatId(app('request')->input('tg_chatid'))
-                ->update(app('request')->only('name', 'tg_username', 'tg_chatid', 'comment'));
+                ->update(app('request')->only('name', 'tg_username', 'tg_chatid') + ['comment' => app('request')->input('tg_username')]);
 
             return response()->json($this->apiResponse->ok());
         } catch (ModelNotFoundException $e) {

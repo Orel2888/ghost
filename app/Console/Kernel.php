@@ -17,7 +17,8 @@ class Kernel extends ConsoleKernel
         Commands\FillTestData::class,
         Commands\PathUpdateDb::class,
         Commands\TgNewsletter::class,
-        Commands\TgNewsletterText::class
+        Commands\TgNewsletterText::class,
+        Commands\Testing::class
     ];
 
     /**
