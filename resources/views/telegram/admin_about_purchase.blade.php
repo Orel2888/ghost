@@ -1,7 +1,7 @@
 💡 *Уведомление о {{ count($orders) == 1 ? 'покупке' : 'покупках' }} ({{ count($orders) }})*
 
 @foreach ($orders as $order)
-👱 Покупатель: {{ $order->client->name }} {{ '@'. $order->client->tg_username }}
+👱 Покупатель: {{ tg_name_escape($order->client->name) }} {{ '@'. tg_name_escape($order->client->tg_username) }}
 🏡 Город: *{{ $order->goods->city->name }}*
 🎁 Товар: *{{ $order->goods->name }}*
 📦 Вес: *{{ wcorrect($order->weight) }}*
