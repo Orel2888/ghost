@@ -60,7 +60,7 @@ class DocApi
         }
 
         if ($docUpdated) {
-            Storage::put($this->pathDocFile, json_encode($docs, JSON_PRETTY_PRINT));
+            Storage::put($this->pathDocFile, json_encode($docs, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
         }
 
         return $docUpdated;
