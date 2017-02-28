@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Event;
 use App\GoodsOrder;
 use App\Jobs\Job;
 use Illuminate\Queue\SerializesModels;
@@ -17,10 +18,10 @@ class MadePurchase extends Job implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
+     * @param $dataOrders array
      * @return void
      */
-    public function __construct($dataOrders)
+    public function __construct(array $dataOrders)
     {
         //
         $this->dataOrders = $dataOrders;
@@ -42,7 +43,7 @@ class MadePurchase extends Job implements ShouldQueue
             }
 
             // Fire event about made purchase
-            event(new WasPurchases($orders));
+            Event::fire(new WasPurchases($orders));
         }
     }
 }
