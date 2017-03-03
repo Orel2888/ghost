@@ -61,7 +61,7 @@ class StartMenu extends BaseMenu {
         return this.product.load().then(() => {
             return this.app.render('main.start_message', dataTpl).then(content => {
                 return this.botScope.runInlineMenu(this.makeMenu({message: content}), this.params.prev_message)
-            }).catch(err => this.app.logger.error(err))
+            }).catch(err => this.app.logger.error({error_start_menu: err}))
         })
     }
 
