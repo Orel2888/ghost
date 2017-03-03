@@ -159,14 +159,14 @@ class GoodsManager extends Goods
                 'name' => $city->name
             ];
 
-            $goods[$city->name] = $cityGoods->map(function ($goods) {
+            $goodsItemsByCity = $cityGoods->map(function ($goods) {
 
                 $countProduct = GoodsPrice::whereGoodsId($goods->id)->whereReserve(0)->count();
 
                 if ($countProduct) {
                     return [
-                        'id' => $goods->id,
-                        'name' => $goods->name,
+                        'id'    => $goods->id,
+                        'name'  => $goods->name,
                         'count' => $countProduct
                     ];
                 }
@@ -175,6 +175,12 @@ class GoodsManager extends Goods
             })->filter(function ($item) {
                 return !is_null($item);
             })->toArray();
+
+            // Reset keys for correct json_encode
+            $goodsItemsByCity = array_values($goodsItemsByCity);
+
+            $goods[$city->name] = $goodsItemsByCity;
+
         }
 
         GoodsPrice::select(\DB::raw('*, COUNT(*) as count'))
