@@ -3,7 +3,8 @@
 class GoodsApi extends BaseApi
 {
     protected $apiMethodMaps = [
-        'goods.pricelist'
+        'goods.pricelist',
+        'goods.list'
     ];
 
     /**
@@ -13,5 +14,10 @@ class GoodsApi extends BaseApi
     public function goodsPricelist(Closure $closure)
     {
         return $this->run('goods.pricelist', 'GET', null, $closure);
+    }
+
+    public function goodsList(Closure $closure)
+    {
+        return $this->run('goods.list', 'GET', null, $closure);
     }
 }
