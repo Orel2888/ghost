@@ -23,6 +23,13 @@ abstract class BaseApi
 
     protected $apiMethodMaps = [];
 
+    /**
+     * @var DocApi
+     */
+    protected $docApi;
+
+    protected $writeDoc = true;
+
     const DEBUG = true;
     const DEBUG_DISPLAY_DUMP_FULL_EXCEPTION = false;
 
@@ -34,6 +41,7 @@ abstract class BaseApi
 
         $this->http    = new Client(['base_uri'  => $this->baseApiUrl]);
         $this->apiKey  = env('API_KEY');
+        $this->docApi  = new DocApi();
     }
 
     public function authentication($loginAdmin = null, $withoutFormParams = false)
@@ -182,7 +190,14 @@ abstract class BaseApi
             return $closure(null, $e);
         }
 
-        return $this->handleResponseApi($response);
+        $handledResponse = $this->handleResponseApi($response);
+
+        // Save docs by api methods
+        if ($this->writeDoc) {
+            $this->docApi->writeDocApi($apiMethod, $method, $params, (array)$handledResponse);
+        }
+
+        return $handledResponse;
     }
 
     public static function throwException($exception)

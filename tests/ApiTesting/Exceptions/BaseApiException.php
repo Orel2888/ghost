@@ -16,6 +16,11 @@ class BaseApiException extends Exception
         return json_decode($this->rawContent);
     }
 
+    public function getContent()
+    {
+        return $this->rawContent;
+    }
+
     public function hasApiResponse()
     {
         return !is_null($this->rawContent);

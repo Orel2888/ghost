@@ -5,6 +5,7 @@ namespace App\Ghost\Repositories\Goods;
 use App\City;
 use App\Ghost\Repositories\Miner\MinerManager;
 use App\Ghost\Repositories\Goods\GoodsReserve as RepoGoodsReserve;
+use App\GoodsPrice;
 
 class GoodsManager extends Goods
 {
@@ -122,6 +123,64 @@ class GoodsManager extends Goods
         }
 
         return $goodsPrice;
+    }
+
+    /**
+     * returns cities, goods and product group by goods_id and weight
+     * @return array [
+     *      cities => [
+     *          [id, name],...
+     *      ],
+     *      goods => [
+     *          city_name => [
+     *              [id, name, count],...
+     *          ]
+     *      ],
+     *      product => [
+     *          goods_id => [
+     *              [weight, cost, count],...
+     *          ]
+     *      ]
+     * ]
+     */
+    public function getGoodsList()
+    {
+        $cities  = [];
+        $goods   = [];
+        $product = [];
+
+        $getCities = City::with('goods')->get();
+
+        foreach ($getCities as $city) {
+            $cityGoods   = $city->goods;
+
+            $cities[] = [
+                'id'    => $city->id,
+                'name'  => $city->name
+            ];
+
+            $goods[$city->name] = $cityGoods->map(function ($goods) {
+                return [
+                    'id'    => $goods->id,
+                    'name'  => $goods->name,
+                    'count' => GoodsPrice::whereGoodsId($goods->id)->whereReserve(0)->count()
+                ];
+            });
+        }
+
+        GoodsPrice::select(\DB::raw('*, COUNT(*) as count'))
+            ->whereReserve(0)
+            ->groupBy('goods_id', 'weight')
+            ->get()
+            ->each(function ($goodsFromPrice) use (&$product) {
+            $product[$goodsFromPrice->goods_id][] = [
+                'weight'    => $goodsFromPrice->weight,
+                'cost'      => $goodsFromPrice->cost,
+                'count'     => $goodsFromPrice->count
+            ];
+        });
+
+        return compact('cities', 'goods', 'product');
     }
 
     public function goodsPriceCheckExists($goodsId, $weight, $count)

@@ -123,6 +123,13 @@ class GoodsManagerTest extends TestCase
         $this->assertNotEmpty(isset($priceList));
     }
 
+    public function test_goods_list()
+    {
+        $goodsList = $this->goodsManager->getGoodsList();
+
+        $this->assertNotEmpty($goodsList);
+    }
+
     public function test_goods_check_exists()
     {
         $goods = $this->goodsManager->goods->first();

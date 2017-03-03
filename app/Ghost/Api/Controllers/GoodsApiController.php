@@ -10,4 +10,11 @@ class GoodsApiController extends BaseApiController
 
         return response()->json($this->apiResponse->ok(['data' => $priceList]));
     }
+
+    public function getGoodsList()
+    {
+        $goodsList = $this->goodsManager->getGoodsList();
+
+        return response()->json($this->apiResponse->ok(['data' => $goodsList]));
+    }
 }

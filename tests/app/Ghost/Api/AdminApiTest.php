@@ -28,6 +28,8 @@ class AdminApiTest extends TestCase
 
     public function test_qiwi_transaction()
     {
+        $this->testTools->createTransaction(1000, 'comment');
+
         $this->api->qiwiTransaction(function ($responseJson, $e) {
             BaseApi::throwException($e);
 

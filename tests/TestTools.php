@@ -94,7 +94,17 @@ class TestTools
 
     public function createTransaction($amount = 0, $comment = '', $count = 1)
     {
-        return factory(QiwiTransaction::class, $count)->create(compact('amount', 'comment'));
+        $transaction = factory(QiwiTransaction::class, $count)->create(compact('amount', 'comment'));
+
+        if ($count > 1) {
+            $transaction->each(function ($item) {
+                $this->storage->add('qiwi_transactions', $item->id);
+            });
+        } else {
+            $this->storage->add('qiwi_transactions', $transaction->id);
+        }
+
+        return $transaction;
     }
 
     public function cleaningTemporaryRows()

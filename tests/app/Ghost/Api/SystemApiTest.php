@@ -70,8 +70,6 @@ class SystemApiTest extends TestCase
             // Collect a trash
             $this->testTools->storage->add('goods_purchases', $responseJson->data->purchases_ids[0]);
         });
-        
-        $this->testTools->storage->add('qiwi_transactions', $transaction->id);
     }
 
     public function test_purse_update_balance()

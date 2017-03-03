@@ -16,6 +16,8 @@ class AdminApi extends BaseApi
         $this->baseApiUrl = env('API_URL') .'/admin/';
 
         parent::__construct();
+
+        $this->docApi->setPathDocFile('admin_api_docs.json');
     }
 
     /**
@@ -71,6 +73,6 @@ class AdminApi extends BaseApi
      */
     public function purseSet($id, Closure $closure)
     {
-        return $this->run('purse.set', 'GET', compact('id'), $closure);
+        return $this->run('purse.set', 'POST', compact('id'), $closure);
     }
 }

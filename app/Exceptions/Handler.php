@@ -63,7 +63,7 @@ class Handler extends ExceptionHandler
             }
 
             return response()->json(
-                (new ApiResponse())->fail($responseData, $this->isHttpException($e) ? $e->getStatusCode() : 400)
+                (new ApiResponse())->fail($responseData), $this->isHttpException($e) ? $e->getStatusCode() : 400
             );
         }
 
