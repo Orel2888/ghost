@@ -31,4 +31,13 @@ class GoodsApiTest extends TestCase
             $this->assertNotEmpty($responseData->data);
         });
     }
+
+    public function test_goods_list()
+    {
+        $this->api->goodsList(function ($responseData, $e) {
+            BaseApi::throwException($e);
+
+            $this->assertNotEmpty($responseData);
+        });
+    }
 }
