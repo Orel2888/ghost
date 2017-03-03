@@ -174,7 +174,7 @@ class GoodsManager extends Goods
                 return null;
             })->filter(function ($item) {
                 return !is_null($item);
-            });
+            })->toArray();
         }
 
         GoodsPrice::select(\DB::raw('*, COUNT(*) as count'))
