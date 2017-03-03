@@ -189,7 +189,7 @@ class GoodsManager extends Goods
             ->get()
             ->each(function ($goodsFromPrice) use (&$product) {
             $product[$goodsFromPrice->goods_id][] = [
-                'weight'    => $goodsFromPrice->weight,
+                'weight'    => wcorrect($goodsFromPrice->weight),
                 'cost'      => $goodsFromPrice->cost,
                 'count'     => $goodsFromPrice->count
             ];
