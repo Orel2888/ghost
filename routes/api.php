@@ -26,6 +26,7 @@ Route::group(['prefix' => 'api', 'namespace' => 'App\Ghost\Api\Controllers'], fu
      */
     Route::group(['middleware' => 'api:user'], function () {
         Route::get('goods.pricelist', 'GoodsApiController@getPriceList');
+        Route::get('goods.list', 'GoodsApiController@getGoodsList');
     });
 
     /**
