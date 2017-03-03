@@ -114,13 +114,13 @@ class SystemApiController extends BaseApiController
         ];
 
         // Add a job about purchase
-        if (count($infoProcessing['orders_ids_successful'])) {
+        if (count($infoProcessing['orders_ids_successful']) && (env('APP_ENV') == 'testing' && config('shop.test_execute_async_jobs'))) {
             $this->dispatch(
                 (new MadePurchase($infoProcessing))->onQueue('made_purchase')
             );
         }
         // Add a job about abuse transactions
-        if (count($infoProcessing['transactions_ids_abuse'])) {
+        if (count($infoProcessing['transactions_ids_abuse']) && (env('APP_ENV') == 'testing' && config('shop.test_execute_async_jobs'))) {
             $this->dispatch(
                 (new JobQiwiTransaction($infoProcessing))
             );
