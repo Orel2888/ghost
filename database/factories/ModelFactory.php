@@ -12,6 +12,9 @@
 */
 
 $factory->define(App\User::class, function (Faker\Generator $faker) {
+
+    $faker = Faker\Factory::create('ru_RU');
+
     return [
         'name' => $faker->name,
         'email' => $faker->safeEmail,
@@ -22,7 +25,9 @@ $factory->define(App\User::class, function (Faker\Generator $faker) {
 
 $factory->define(App\Client::class, function (Faker\Generator $faker) {
 
-    $username = str_random(8);
+    $faker = Faker\Factory::create('ru_RU');
+
+    $username = str_replace('.', '_', $faker->userName);
 
     return [
         'name'          => $faker->name,
@@ -34,18 +39,27 @@ $factory->define(App\Client::class, function (Faker\Generator $faker) {
 });
 
 $factory->define(App\City::class, function (Faker\Generator $faker) {
+
+    $faker = Faker\Factory::create('ru_RU');
+
     return [
         'name'  => $faker->city
     ];
 });
 
 $factory->define(App\Goods::class, function (Faker\Generator $faker) {
+
+    $faker = Faker\Factory::create('ru_RU');
+
     return [
-        'name'      => $faker->name,
+        'name'      => $faker->word,
     ];
 });
 
 $factory->define(App\Miner::class, function (Faker\Generator $faker) {
+
+    $faker = Faker\Factory::create('ru_RU');
+
     return [
         'name'  => $faker->name,
         'ante'  => 150
@@ -53,6 +67,9 @@ $factory->define(App\Miner::class, function (Faker\Generator $faker) {
 });
 
 $factory->define(App\QiwiTransaction::class, function (Faker\Generator $faker) {
+
+    $faker = Faker\Factory::create('ru_RU');
+
     return [
         'qiwi_id'   => $faker->randomNumber(),
         'purse'     => '79111111111',
