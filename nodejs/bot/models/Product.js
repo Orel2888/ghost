@@ -27,6 +27,7 @@ class Product {
 
     getDataGoods() {
         return this.app.api.api('goods.list', 'GET').then(response => {
+            this.app.logger.info(response.data)
             return response.data
         })
     }
