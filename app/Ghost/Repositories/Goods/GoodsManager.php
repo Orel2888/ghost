@@ -172,6 +172,8 @@ class GoodsManager extends Goods
                 }
 
                 return null;
+            })->filter(function ($item) {
+                return !is_null($item);
             });
         }
 
