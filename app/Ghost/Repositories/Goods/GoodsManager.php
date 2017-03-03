@@ -152,19 +152,26 @@ class GoodsManager extends Goods
         $getCities = City::with('goods')->get();
 
         foreach ($getCities as $city) {
-            $cityGoods   = $city->goods;
+            $cityGoods = $city->goods;
 
             $cities[] = [
-                'id'    => $city->id,
-                'name'  => $city->name
+                'id' => $city->id,
+                'name' => $city->name
             ];
 
             $goods[$city->name] = $cityGoods->map(function ($goods) {
-                return [
-                    'id'    => $goods->id,
-                    'name'  => $goods->name,
-                    'count' => GoodsPrice::whereGoodsId($goods->id)->whereReserve(0)->count()
-                ];
+
+                $countProduct = GoodsPrice::whereGoodsId($goods->id)->whereReserve(0)->count();
+
+                if ($countProduct) {
+                    return [
+                        'id' => $goods->id,
+                        'name' => $goods->name,
+                        'count' => $countProduct
+                    ];
+                }
+
+                return null;
             });
         }
 
