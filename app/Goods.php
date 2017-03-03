@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use App\GoodsPrice;
 
 class Goods extends Model
 {
@@ -12,6 +13,11 @@ class Goods extends Model
     public function goodsPrice()
     {
         return $this->hasMany('App\GoodsPrice');
+    }
+
+    public function product()
+    {
+        return $this->hasMany(GoodsPrice::class);
     }
 
     public function city()
