@@ -14,6 +14,8 @@ class MainController extends BaseController {
 
         return product.load().then(() => {
             return this.app.includeMenu('Start', $, {product}).run()
+        }).catch(err => {
+            this.app.logger.error({model_product_load: err})
         })
     }
 

@@ -19,14 +19,15 @@ class Product {
         return this.getDataGoods().then(goodsData => {
             this._cities   = goodsData.cities
             this._goods    = goodsData.goods
-            this._products = goodsData.products
+            this._products = goodsData.product
 
             return goodsData
         })
     }
 
     getDataGoods() {
-        return this.app.api.api('goods.pricelist', 'GET').then(response => {
+        return this.app.api.api('goods.list', 'GET').then(response => {
+            this.app.logger.info(response)
             return response.data
         })
     }

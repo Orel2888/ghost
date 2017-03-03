@@ -8,5 +8,5 @@ module.exports = {
     bot_mode: 'inline_menu',
     divider: '➖',
     pricelist_sort_city: true,
-    model_product_test_mode: true
+    model_product_test_mode: false
 };
