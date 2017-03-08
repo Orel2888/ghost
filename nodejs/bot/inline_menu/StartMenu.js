@@ -61,32 +61,22 @@ class StartMenu extends BaseMenu {
         return this.product.load().then(() => {
             return this.app.render('main.start_message', dataTpl).then(content => {
                 return this.botScope.runInlineMenu(this.makeMenu({message: content}), this.params.prev_message)
-            }).catch(err => this.app.logger.error({error_start_menu: err}))
-        })
+            }).catch(err => this.app.logger.error({start_menu: err}))
+        }).catch(err => this.app.logger.error({start_menu_product_load: err}))
     }
 
     makeMenu(data) {
 
         let menuButtons = [
-            {
-                text: '📄 ПРАЙС',
-                callback: (callbackQuery, message) => {
-                    this.app.includeMenu('Showcase', this.botScope, {prev_message: message}).run()
-                }
-            },
-            {
-                text: '📜 Личный кабинет',
-                callback: () => {
-                    return this.app.includeMenu('UserCabinet').run()
-                }
-            },
-            {
-                text: '🔋 Корзина',
-            },
+            this._commonButtons.showcase(this.params),
+            this._commonButtons.lk(this.params),
+            this._commonButtons.shopping_cart(this.params),
+            this._commonButtons.purchases(this.params),
+            this._commonButtons.payment(this.params),
             {
                 text: '🔄 Обновить',
                 callback: (continueQuery, message) => {
-                    return this.app.getController('MainController').startHandler(this.botScope)
+                    return this.app.includeMenu('Start', this.botScope).run()
                 }
             }
         ]
