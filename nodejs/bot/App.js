@@ -106,7 +106,7 @@ class App {
         try {
             var Menu = require(pathLoadMenu)
         } catch (e) {
-            this.logger.error(e);
+            this.logger.error({error_app_include_menu: e});
             throw new Error(`Error load menu ${menuName}`)
 
             return
