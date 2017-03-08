@@ -47,7 +47,7 @@ class ShowcaseMenu extends BaseMenu {
             }
 
             return this.botScope.runInlineMenu(menuCitiesScheme, this.params.prev_message)
-        }).catch(err => this.app.logger.error(err))
+        }).catch(err => this.app.logger.error({showcase_menu_city: err}))
     }
 
     menuGoods(prevMessage) {
@@ -269,7 +269,6 @@ class ShowcaseMenu extends BaseMenu {
         menuOrderButtons.push(this._commonButtons.start({prev_message: prevMessage}))
 
         return this.app.render('showcase.pre_order', tplData).then(content => {
-            console.log(content)
 
             let menuOrderScheme = {
                 layout: [1, 2],
@@ -296,15 +295,49 @@ class ShowcaseMenu extends BaseMenu {
             let tplData = {
                 status: response.status == 'ok',
                 message: response.message || null,
-                data: response.data || null,
                 selected_items: this.selectedItems
             }
 
+            let [orderProcessed, countPackage] = [response.data.order_processed, this.selectedItems.count_package]
+
+            // Message about a created orders
+            if (orderProcessed) {
+                tplData.message = `✅ Успешно выполненные заказы: *${orderProcessed}*`
+
+                if (orderProcessed < countPackage)
+                    tplData.message += `, оставшиеся *${countPackage-orderProcessed}* помещены в корзину`
+            } else {
+                tplData.message = `🏒 Заказы помещены в корзину *${countPackage}*`
+            }
+
+            let buttons = [this._commonButtons.payment({prev_message: prevMessage})]
+
+            buttons.push({
+                text: '🔁 Повторить заказ',
+                callback: () => {
+                    delete this.selectedItems.count_package
+
+                    return this.menuCountPackage(prevMessage)
+                }
+            })
+
+            buttons.push(this._commonButtons.purchases({prev_message: prevMessage}))
+            buttons.push(this._commonButtons.shopping_cart({prev_message: prevMessage}))
+            buttons.push(this._commonButtons.start({prev_message: prevMessage}))
+
             return this.app.render('showcase.order', tplData).then(content => {
 
+                let menuOrderScheme = {
+                    layout: [1, 2],
+                    message: content,
+                    params: [{parse_mode: 'markdown'}],
+                    menu: buttons
+                }
+
+                return this.botScope.runInlineMenu(menuOrderScheme, prevMessage)
             })
         }).catch(err => {
-            this.app.logger.error(err)
+            this.app.logger.error({menuOrder: err})
 
             return this.botScope.sendMessage('Произошла ошибка')
         })
