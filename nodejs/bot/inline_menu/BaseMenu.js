@@ -12,12 +12,54 @@ class BaseMenu {
         this.botScope = botScope
         this.params   = params || {}
 
+        let prevMessage = this.params.prev_message || null
+
         this._commonButtons = {
             start: (params) => {
                 return {
                     text: '❰ Главная',
                     callback: () => {
                         return this.app.includeMenu('Start', this.botScope, params).run()
+                    }
+                }
+            },
+            showcase: (params) => {
+                return {
+                    text: '📄 ПРАЙС',
+                    callback: (callbackQuery, message) => {
+                        this.app.includeMenu('Showcase', this.botScope, prevMessage || {prev_message: message}).run()
+                    }
+                }
+            },
+            lk: (params) => {
+                return {
+                    text: '📜 Личный кабинет',
+                    callback: (callbackQuery, message) => {
+                        return this.app.includeMenu('UserCabinet', this.botScope, prevMessage || {prev_message: message}).run()
+                    }
+                }
+            },
+            shopping_cart: (params) => {
+                return {
+                    text: '🔋 Корзина',
+                    callback: (callbackQuery, message) => {
+                        return this.app.includeMenu('ShoppingCart', this.botScope, prevMessage || {prev_message: message}).run()
+                    }
+                }
+            },
+            purchases: (params) => {
+                return {
+                    text: '🎁 Покупки',
+                    callback: (callbackQuery, message) => {
+                        return this.app.includeMenu('Purchases', this.botScope, prevMessage || {prev_message: message}).run()
+                    }
+                }
+            },
+            payment: (params) => {
+                return {
+                    text: '💵 Оплата',
+                    callback: (callbackQuery, message) => {
+                        return this.app.includeMenu('Payment', this.botScope, prevMessage || {prev_message: message}).run()
                     }
                 }
             }
