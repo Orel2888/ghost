@@ -22,7 +22,7 @@ class BaseController extends TelegramBaseController {
         return scope.user.load()
             .then(udata => scope)
             .catch(err => {
-                this.app.logger.error(err)
+                this.app.logger.error({model_user_load: err})
 
                 scope.sendMessage('Произошла ошибка')
 
