@@ -65,7 +65,7 @@ class OrderApiController extends BaseApiController
 
         if ($client->balance >= $ordersModels[0]->cost) {
             foreach ($ordersModels as $order) {
-                if ($this->goodsOrder->buyProcessingOrder($order) intanceof GoodsPurchase) {
+                if ($this->goodsOrder->buyProcessingOrder($order) instanceof GoodsPurchase) {
                     $orderIdsProcessed[] = $order->id;
                 }
             }
