@@ -6,7 +6,8 @@ use Validator;
 use App\{
     Client,
     GoodsOrder,
-    Purse
+    Purse,
+    GoodsPurchase
 };
 
 class OrderApiController extends BaseApiController
@@ -64,7 +65,7 @@ class OrderApiController extends BaseApiController
 
         if ($client->balance >= $ordersModels[0]->cost) {
             foreach ($ordersModels as $order) {
-                if ($this->goodsOrder->buyProcessingOrder($order)) {
+                if ($this->goodsOrder->buyProcessingOrder($order) intanceof GoodsPurchase) {
                     $orderIdsProcessed[] = $order->id;
                 }
             }
