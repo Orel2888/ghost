@@ -12,7 +12,7 @@ class BaseMenu {
         this.botScope = botScope
         this.params   = params || {}
 
-        let prevMessage = this.params.prev_message || null
+        let prevMessage = this.params.prev_message ? {prev_message: this.params.prev_message} : null
 
         this._commonButtons = {
             start: (params) => {

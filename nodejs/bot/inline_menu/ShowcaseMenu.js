@@ -167,7 +167,7 @@ class ShowcaseMenu extends BaseMenu {
 
                     if (!products.length)
                         return this.menuCountPackage(prevMessage, 'Нет товара или он кончился в самый неподходящий момент')
-                    else if (products.length < i)
+                    else if (products[0].count < i)
                         return this.menuCountPackage(prevMessage, 'Нет такого количества товара')
 
                     return this.menuPreOrder(prevMessage)
@@ -301,7 +301,7 @@ class ShowcaseMenu extends BaseMenu {
             let [orderProcessed, countPackage] = [response.data.order_processed, this.selectedItems.count_package]
 
             // Message about a created orders
-            if (orderProcessed) {
+            if (orderProcessed) {console.log('Success %, selected package %s', orderProcessed, countPackage)
                 tplData.message = `✅ Успешно выполненные заказы: *${orderProcessed}*`
 
                 if (orderProcessed < countPackage)
