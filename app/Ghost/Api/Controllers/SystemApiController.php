@@ -17,6 +17,7 @@ use App\Jobs\{
     MadePurchase,
     QiwiTransaction as JobQiwiTransaction
 };
+use App\Ghost\Repositories\Common\BlackListUser;
 use Validator,
     Queue;
 
@@ -26,21 +27,51 @@ class SystemApiController extends BaseApiController
 
     public function getProcessingGoodsOrders()
     {
+        $blackUserRepo = new BlackListUser();
+
         // Money transfer to client
         $newTransaction = QiwiTransaction::whereStatus(0)->orderBy('id', 'ASC')->get();
 
         $clientsIdsUpdatedBalance  = [];
         $numberNewTransactions     = $newTransaction->count();
         $numberSuccessfulTrans     = 0;
-        $transactions_ids_abuse    = [];
+        $transactionsIdsAbuse      = [];
+        $transactionsBlacklistIds  = [];
 
         foreach ($newTransaction as $transaction) {
             if ($transaction->comment) {
                 $amount = $transaction->amount;
 
+<<<<<<< HEAD
                 if ($amount > 300) {
                     $amount -= $amount % 100;
                 }
+=======
+            // Check on blacklist
+            $blackTransaction = false;
+
+            if ($transaction->comment) {
+                if ($blackUserRepo->checkUsername($transaction->comment)) $blackTransaction = true;
+            }
+            if (preg_match('/\+((7|3)\d+)/', $transaction->provider, $matches)) {
+                if (isset($matches[1])) {
+                    if ($blackUserRepo->checkPhone($matches[1])) $blackTransaction = true;
+                }
+            }
+            if ($blackTransaction) {
+                $transaction->update(['status' => 1, 'bl' => 1]);
+                $transactionsBlacklistIds[] = $transaction->id;
+                continue;
+            }
+
+            // Checking for existence user with this comment
+            if (!$transaction->comment || !$client = Client::whereComment($transaction->comment)->first()) {
+                $transactionsIdsAbuse[] = $transaction->id;
+
+                $transaction->update(['status' => 1]);
+                continue;
+            }
+>>>>>>> b51dd61... Blacklist for user by qiwi transactions
 
                 if ($client = Client::whereComment($transaction->comment)->first()) {
                     $clientsIdsUpdatedBalance[] = $client->id;
@@ -107,7 +138,8 @@ class SystemApiController extends BaseApiController
             'orders_ids_ended_goods'        => $ordersIdsEndedGoods,
             'orders_ids_not_enough_money'   => $ordersIdsNotEnoughMoney,
             'number_successfull_trans'      => $numberSuccessfulTrans,
-            'transactions_ids_abuse'        => $transactions_ids_abuse,
+            'transactions_ids_abuse'        => $transactionsIdsAbuse,
+            'transactions_ids_blacklist'    => $transactionsBlacklistIds,
             'purchases_ids'                 => $wasPurchasesIds
         ];
 
