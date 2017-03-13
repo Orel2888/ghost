@@ -63,7 +63,7 @@ class UserController extends TelegramBaseController {
 
                             priceMessage += `${' '.repeat(4)}${emoji.emojify(':package:')} ${weightForHumans(weight)} - 💰 ${goodsInfo.cost}\n`;
                             priceMessage += `${' '.repeat(4)}купить ${emoji.emojify(':point_right:')} /buy${goodsInfo.goods_id}\\_${weightInt}\n`;
-                            priceMessage += `${' '.repeat(4)}${'️❄️'.repeat(6)}\n`
+                            priceMessage += `${' '.repeat(4)}${'☘️️'.repeat(6)}\n`
                         }
 
                     }
