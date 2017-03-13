@@ -38,15 +38,9 @@ class SystemApiController extends BaseApiController
         $transactionsIdsAbuse      = [];
         $transactionsBlacklistIds  = [];
 
+        // Processing for news a transactions
         foreach ($newTransaction as $transaction) {
-            if ($transaction->comment) {
-                $amount = $transaction->amount;
 
-<<<<<<< HEAD
-                if ($amount > 300) {
-                    $amount -= $amount % 100;
-                }
-=======
             // Check on blacklist
             $blackTransaction = false;
 
@@ -71,21 +65,19 @@ class SystemApiController extends BaseApiController
                 $transaction->update(['status' => 1]);
                 continue;
             }
->>>>>>> b51dd61... Blacklist for user by qiwi transactions
 
-                if ($client = Client::whereComment($transaction->comment)->first()) {
-                    $clientsIdsUpdatedBalance[] = $client->id;
+            // Correction a amount
+            $amount = $transaction->amount;
 
-                    $client->increment('balance', $amount);
-
-                    $numberSuccessfulTrans++;
-                } else {
-                    $transactions_ids_abuse[] = $transaction->id;
-                }
-
-            } else {
-                $transactions_ids_abuse[] = $transaction->id;
+            if ($amount > 300) {
+                $amount -= $amount % 100;
             }
+
+            $client->increment('balance', $amount);
+
+            $numberSuccessfulTrans++;
+
+            $clientsIdsUpdatedBalance[] = $client->id;
 
             $transaction->update(['status' => 1]);
         }
@@ -110,7 +102,7 @@ class SystemApiController extends BaseApiController
                     try {
                         $purchase = $this->goodsOrder->buy($order);
 
-                        $wasPurchases[] = $purchase->id;
+                        $wasPurchasesIds[]     = $purchase->id;
                         $ordersIdsSuccessful[] = $order->id;
                     } catch (GoodsEndedException $e) {
                         $order->update(['status' => 2]);
@@ -126,8 +118,8 @@ class SystemApiController extends BaseApiController
         }
 
         // Insert abuse transactions
-        if (count($transactions_ids_abuse)) {
-            foreach ($transactions_ids_abuse as $transId) {
+        if (count($transactionsIdsAbuse)) {
+            foreach ($transactionsIdsAbuse as $transId) {
                 QiwiTransactionAbuse::create(['transaction_id' => $transId]);
             }
         }
