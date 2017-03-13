@@ -301,7 +301,7 @@ class ShowcaseMenu extends BaseMenu {
             let [orderProcessed, countPackage] = [response.data.order_processed, this.selectedItems.count_package]
 
             // Message about a created orders
-            if (orderProcessed) {console.log('Success %, selected package %s', orderProcessed, countPackage)
+            if (orderProcessed) {
                 tplData.message = `✅ Успешно выполненные заказы: *${orderProcessed}*`
 
                 if (orderProcessed < countPackage)
