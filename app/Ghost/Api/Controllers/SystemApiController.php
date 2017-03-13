@@ -17,6 +17,7 @@ use App\Jobs\{
     MadePurchase,
     QiwiTransaction as JobQiwiTransaction
 };
+use App\Ghost\Repositories\Common\BlackListUser;
 use Validator,
     Queue;
 
@@ -26,6 +27,8 @@ class SystemApiController extends BaseApiController
 
     public function getProcessingGoodsOrders()
     {
+        $blackUserRepo = new BlackListUser();
+
         // Money transfer to client
         $newTransaction = QiwiTransaction::whereStatus(0)->orderBy('id', 'ASC')->get();
 
@@ -33,9 +36,27 @@ class SystemApiController extends BaseApiController
         $numberNewTransactions     = $newTransaction->count();
         $numberSuccessfulTrans     = 0;
         $transactionsIdsAbuse      = [];
+        $transactionsBlacklistIds  = [];
 
         // Processing for news a transactions
         foreach ($newTransaction as $transaction) {
+
+            // Check on blacklist
+            $blackTransaction = false;
+
+            if ($transaction->comment) {
+                if ($blackUserRepo->checkUsername($transaction->comment)) $blackTransaction = true;
+            }
+            if (preg_match('/\+((7|3)\d+)/', $transaction->provider, $matches)) {
+                if (isset($matches[1])) {
+                    if ($blackUserRepo->checkPhone($matches[1])) $blackTransaction = true;
+                }
+            }
+            if ($blackTransaction) {
+                $transaction->update(['status' => 1, 'bl' => 1]);
+                $transactionsBlacklistIds[] = $transaction->id;
+                continue;
+            }
 
             // Checking for existence user with this comment
             if (!$transaction->comment || !$client = Client::whereComment($transaction->comment)->first()) {
@@ -110,6 +131,7 @@ class SystemApiController extends BaseApiController
             'orders_ids_not_enough_money'   => $ordersIdsNotEnoughMoney,
             'number_successfull_trans'      => $numberSuccessfulTrans,
             'transactions_ids_abuse'        => $transactionsIdsAbuse,
+            'transactions_ids_blacklist'    => $transactionsBlacklistIds,
             'purchases_ids'                 => $wasPurchasesIds
         ];
 
