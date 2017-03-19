@@ -29,12 +29,30 @@ class OrderApiController extends BaseApiController
 
         $client = Client::find($input['client_id']);
 
+        // Get limit order for client
+        $limitOrder = config('shop.order_count_user');
+
+        // Check to limit pending a orders for user
+        $ordersPending = GoodsOrder::whereClientId($client->id)->whereIn('status', [0, 2, 3])->count();
+
+        if (($ordersPending + $input['count']) > $limitOrder) {
+
+            $countOrderForRemove = ($ordersPending + $input['count']) - $limitOrder;
+
+            $message = "Вы можете хранить в корзине {$limitOrder} ". trans_choice('shop.order', $limitOrder)
+                .", у вас не хватает места. Удалите {$countOrderForRemove} "
+                . trans_choice('shop.order', $countOrderForRemove) ." из вашей корзины.";
+
+            return response()->json($this->apiResponse->fail(compact('message')));
+        }
+
+        // Check to available a product
         if (!$this->goodsManager->goodsPriceCheckExists($input['goods_id'], $input['weight'], $input['count'])) {
 
             if ($input['count'] > 1) {
-                $message = 'Не такого количества товара, попробуйте умерить пыл)';
+                $message = 'Не такого количества товара, попробуйте уменьшить количество';
             } else {
-                $message = 'Нет товара';
+                $message = 'Нет товара или он кончился в самый неподходящий момент';
             }
 
             return response()->json($this->apiResponse->fail(compact('message')));
@@ -68,6 +86,21 @@ class OrderApiController extends BaseApiController
                 if ($this->goodsOrder->buyProcessingOrder($order) instanceof GoodsPurchase) {
                     $orderIdsProcessed[] = $order->id;
                 }
+            }
+        }
+
+        // Cleaning early the successful a orders
+        if (count($orderIdsProcessed)) {
+            $clientSuccessfulOrders = GoodsOrder::whereClientId($client->id)->whereStatus(1);
+
+            $countSuccessfulOrders = $clientSuccessfulOrders->count();
+
+            $countSuccessfulOrderRemove = $countSuccessfulOrders > $limitOrder
+                ? $countSuccessfulOrders - $limitOrder
+                : false;
+
+            if ($countSuccessfulOrderRemove) {
+                $clientSuccessfulOrders->orderBy('id', 'ASC')->limit($countSuccessfulOrderRemove)->delete();
             }
         }
 
