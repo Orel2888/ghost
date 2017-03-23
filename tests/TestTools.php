@@ -35,7 +35,7 @@ class TestTools
         $this->goodsOrder   = new GoodsOrder();
     }
 
-    public function clientWithOrder()
+    public function clientWithOrder($countOrder = 1)
     {
         $miner  = Miner::first();
         $client = Client::whereNotNull('comment')->first();
@@ -50,18 +50,31 @@ class TestTools
             'cost'      => 1000
         ]);
 
-        $order = $this->goodsOrder->create([
-            'goods_id'  => $goods->id,
-            'client_id' => $client->id,
-            'weight'    => $goodsFromPrice->weight,
-            'comment'   => $client->comment,
-            'cost'      => $goodsFromPrice->cost
-        ]);
+        $orderModels = collect();
+
+        $i = 0;
+        while ($i < $countOrder) {
+            $order = $this->goodsOrder->create([
+                'goods_id' => $goods->id,
+                'client_id' => $client->id,
+                'weight' => $goodsFromPrice->weight,
+                'comment' => $client->comment,
+                'cost' => $goodsFromPrice->cost
+            ]);
+
+            $orderModels->push($order);
+
+            $this->storage->add('goods_orders', $order->id);
+
+            $i++;
+        }
 
         $this->storage->add('goods_price', $goodsFromPrice->id);
-        $this->storage->add('goods_orders', $order->id);
 
-        return (object)(compact('miner', 'client', 'goods', 'order') + ['goods_price' => $goodsFromPrice]);
+        return (object)(compact('miner', 'client', 'goods') + [
+            'goods_price' => $goodsFromPrice,
+            'order'       => $orderModels->count() > 1 ? $orderModels : $orderModels[0]
+        ]);
     }
 
     public function createGoodsToPrice($count = 1)
