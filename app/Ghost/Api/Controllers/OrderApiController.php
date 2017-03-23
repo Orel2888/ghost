@@ -164,7 +164,8 @@ class OrderApiController extends BaseApiController
     public function getList()
     {
         $valid = Validator::make(app('request')->all(), [
-            'client_id' => 'required|integer'
+            'client_id' => 'required|integer',
+            'status'    => 'in:pending,successful'
         ]);
 
         if ($valid->fails()) {
@@ -173,7 +174,25 @@ class OrderApiController extends BaseApiController
 
         $client = Client::findOrFail(app('request')->input('client_id'));
 
-        $orders = GoodsOrder::whereClientId($client->id)->orderBy('id', 'DESC')->take(10)->get();
+        $orderStatus = [0, 1, 2, 3];
+
+        if (app('request')->has('status')) {
+            switch (app('request')->input('status')) {
+                case 'pending':
+                    $orderStatus = [0, 2, 3];
+                break;
+
+                case 'successful':
+                    $orderStatus = [1];
+                break;
+            }
+        }
+
+        $orders = GoodsOrder::whereClientId($client->id)
+            ->whereIn('status', $orderStatus)
+            ->orderBy('id', 'ASC')
+            ->take(config('shop.order_count_user'))
+            ->get();
 
         $ordersData = [];
 
@@ -191,9 +210,12 @@ class OrderApiController extends BaseApiController
             ];
         }
 
-        $ordersData = array_reverse($ordersData);
+        $dataResponse = [
+            'data'  => $ordersData,
+            'count' => $orders->count()
+        ];
 
-        return response()->json($this->apiResponse->ok(['data' => $ordersData]));
+        return response()->json($this->apiResponse->ok($dataResponse));
     }
 
     public function postDelOrder()

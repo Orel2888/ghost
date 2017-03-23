@@ -134,7 +134,7 @@ class OrderApiTest extends TestCase
         $this->assertEquals($orderLimit, GoodsOrder::whereClientId($client->id)->whereStatus(1)->count());
 
         $purchases = GoodsOrder::whereClientId($client->id)->where('purchase_id', '>', 0)->each(function ($order) {
-            GoodsPurchase::find($order->purchase_id)->delete();
+            $this->testTools->storage->add('goods_purchases', $order->purchase_id);
         });
     }
 
@@ -177,13 +177,45 @@ class OrderApiTest extends TestCase
 
     public function test_list()
     {
-        $models = $this->testTools->clientWithOrder();
-        
-        $this->api->orderList($models->client->id, function ($responseJson, $e) {
+        $models = $this->testTools->clientWithOrder(6);
+
+        $models->order->take(3)->each(function ($item) {
+            $item->update(['status' => 1]);
+        });
+
+        // Check get pending a orders
+        $this->api->orderList($models->client->id, 'pending', function ($responseJson, $e) {
             BaseApi::throwException($e);
-            
+
+            $prevItem = null;
             foreach ($responseJson->data as $order) {
                 $this->checkOrderResponse($order);
+
+                $this->assertTrue(in_array($order->status, [0, 2, 3]));
+
+                if (!is_null($prevItem)) {
+                    $this->assertGreaterThan($prevItem->id, $order->id);
+                }
+
+                $prevItem = $order;
+            }
+        });
+
+        // Check get successful a orders
+        $this->api->orderList($models->client->id, 'successful', function ($responseJson, $e) {
+            BaseApi::throwException($e);
+
+            $prevItem = null;
+            foreach ($responseJson->data as $order) {
+                $this->checkOrderResponse($order);
+
+                $this->assertEquals(1, $order->status);
+
+                if (!is_null($prevItem)) {
+                    $this->assertGreaterThan($prevItem->id, $order->id);
+                }
+
+                $prevItem = $order;
             }
         });
     }

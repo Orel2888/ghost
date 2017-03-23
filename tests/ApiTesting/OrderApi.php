@@ -32,12 +32,19 @@ class OrderApi extends BaseApi
 
     /**
      * @param $client_id
+     * @param $status
      * @param Closure $closure
      * @return bool|mixed
      */
-    public function orderList($client_id, Closure $closure)
+    public function orderList($client_id, $status = null, Closure $closure)
     {
-        return $this->run('order.list', 'GET', compact('client_id'), $closure);
+        $formParams = compact('client_id');
+
+        if (!is_null($status)) {
+            $formParams += compact('status');
+        }
+
+        return $this->run('order.list', 'GET', $formParams, $closure);
     }
 
     /**
