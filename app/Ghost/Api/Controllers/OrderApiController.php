@@ -177,15 +177,7 @@ class OrderApiController extends BaseApiController
         $orderStatus = [0, 1, 2, 3];
 
         if (app('request')->has('status')) {
-            switch (app('request')->input('status')) {
-                case 'pending':
-                    $orderStatus = [0, 2, 3];
-                break;
-
-                case 'successful':
-                    $orderStatus = [1];
-                break;
-            }
+            $orderStatus = $this->goodsOrder->statusCategories[app('request')->input('status')];
         }
 
         $orders = GoodsOrder::whereClientId($client->id)
