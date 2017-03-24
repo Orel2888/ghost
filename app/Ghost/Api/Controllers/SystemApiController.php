@@ -89,7 +89,8 @@ class SystemApiController extends BaseApiController
         $ordersIdsSuccessful       = [];
         $ordersIdsEndedGoods       = [];
         $ordersIdsNotEnoughMoney   = [];
-        $wasPurchasesIds           = [];
+        $purchasesIds              = [];
+        $clientsWithPurchases      = [];
 
         if (count($usersWithBalances)) {
             foreach ($usersWithBalances as $clientWithBalance) {
@@ -102,8 +103,9 @@ class SystemApiController extends BaseApiController
                     try {
                         $purchase = $this->goodsOrder->buy($order);
 
-                        $wasPurchasesIds[]     = $purchase->id;
-                        $ordersIdsSuccessful[] = $order->id;
+                        $purchasesIds[]         = $purchase->id;
+                        $ordersIdsSuccessful[]  = $order->id;
+                        $clientsWithPurchases[] = $client->id;
                     } catch (GoodsEndedException $e) {
                         $order->update(['status' => 2]);
 
@@ -114,6 +116,13 @@ class SystemApiController extends BaseApiController
                         $ordersIdsNotEnoughMoney[] = $order->id;
                     }
                 }
+            }
+        }
+
+        // Cleaning old a orders to users by limit
+        if (count($clientsWithPurchases)) {
+            foreach ($clientsWithPurchases as $clientId) {
+                $this->goodsOrder->cleaningOrderToUser($clientId, 'successful');
             }
         }
 
@@ -132,7 +141,7 @@ class SystemApiController extends BaseApiController
             'number_successfull_trans'      => $numberSuccessfulTrans,
             'transactions_ids_abuse'        => $transactionsIdsAbuse,
             'transactions_ids_blacklist'    => $transactionsBlacklistIds,
-            'purchases_ids'                 => $wasPurchasesIds
+            'purchases_ids'                 => $purchasesIds
         ];
 
         // Add a job about purchase
