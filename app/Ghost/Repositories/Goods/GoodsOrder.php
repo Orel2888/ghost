@@ -192,6 +192,18 @@ class GoodsOrder extends Goods
     }
 
     /**
+     * Count orders to user by category
+     * @param $clientId
+     * @param string $typeOrder pending|successful
+     * @return mixed
+     */
+    public function countOrderToUser($clientId, $typeOrder = 'pending')
+    {
+        $orderStatus = $this->statusCategories[$typeOrder];
+
+        return $this->goodsOrder->whereClientId($clientId)->whereIn('status', $orderStatus)->count();
+    }
+    /**
      * Cleaning a orders by limit for user
      * @param $clientId
      * @param string $typeOrder pending|successful
@@ -202,7 +214,7 @@ class GoodsOrder extends Goods
         $orderStatus = $this->statusCategories[$typeOrder];
 
         $orderQuery = $this->goodsOrder->whereClientId($clientId)->whereIn('status', $orderStatus);
-        
+
         $countOrder = $orderQuery->count();
         $limitOrder = config('shop.order_count_user');
 
