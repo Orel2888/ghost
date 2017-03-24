@@ -203,7 +203,7 @@ class GoodsOrder extends Goods
 
         return $this->goodsOrder->whereClientId($clientId)->whereIn('status', $orderStatus)->count();
     }
-    
+
     /**
      * Cleaning a orders by limit for user
      * @param $clientId
