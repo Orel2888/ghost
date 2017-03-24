@@ -33,7 +33,7 @@ class OrderApiController extends BaseApiController
         $limitOrder = config('shop.order_count_user');
 
         // Check to limit pending a orders for user
-        $ordersPending = GoodsOrder::whereClientId($client->id)->whereIn('status', [0, 2, 3])->count();
+        $ordersPending = $this->goodsOrder->countOrderToUser($client->id, 'pending');
 
         if (($ordersPending + $input['count']) > $limitOrder) {
 
@@ -89,19 +89,9 @@ class OrderApiController extends BaseApiController
             }
         }
 
-        // Cleaning early the successful a orders
+        // Cleaning orders by limit
         if (count($orderIdsProcessed)) {
-            $clientSuccessfulOrders = GoodsOrder::whereClientId($client->id)->whereStatus(1);
-
-            $countSuccessfulOrders = $clientSuccessfulOrders->count();
-
-            $countSuccessfulOrderRemove = $countSuccessfulOrders > $limitOrder
-                ? $countSuccessfulOrders - $limitOrder
-                : false;
-
-            if ($countSuccessfulOrderRemove) {
-                $clientSuccessfulOrders->orderBy('id', 'ASC')->limit($countSuccessfulOrderRemove)->delete();
-            }
+            $this->goodsOrder->cleaningOrderToUser($client->id, 'successful');
         }
 
         // Information about a created orders
