@@ -29,12 +29,30 @@ class OrderApiController extends BaseApiController
 
         $client = Client::find($input['client_id']);
 
+        // Get limit order for client
+        $limitOrder = config('shop.order_count_user');
+
+        // Check to limit pending a orders for user
+        $ordersPending = $this->goodsOrder->countOrderToUser($client->id, 'pending');
+
+        if (($ordersPending + $input['count']) > $limitOrder) {
+
+            $countOrderForRemove = ($ordersPending + $input['count']) - $limitOrder;
+
+            $message = "Вы можете хранить в корзине {$limitOrder} ". trans_choice('shop.order', $limitOrder)
+                .", у вас не хватает места. Удалите {$countOrderForRemove} "
+                . trans_choice('shop.order', $countOrderForRemove) ." из вашей корзины.";
+
+            return response()->json($this->apiResponse->fail(compact('message')));
+        }
+
+        // Check to available a product
         if (!$this->goodsManager->goodsPriceCheckExists($input['goods_id'], $input['weight'], $input['count'])) {
 
             if ($input['count'] > 1) {
-                $message = 'Не такого количества товара, попробуйте умерить пыл)';
+                $message = 'Не такого количества товара, попробуйте уменьшить количество';
             } else {
-                $message = 'Нет товара';
+                $message = 'Нет товара или он кончился в самый неподходящий момент';
             }
 
             return response()->json($this->apiResponse->fail(compact('message')));
@@ -69,6 +87,11 @@ class OrderApiController extends BaseApiController
                     $orderIdsProcessed[] = $order->id;
                 }
             }
+        }
+
+        // Cleaning orders by limit
+        if (count($orderIdsProcessed)) {
+            $this->goodsOrder->cleaningOrderToUser($client->id, 'successful');
         }
 
         // Information about a created orders
@@ -131,7 +154,8 @@ class OrderApiController extends BaseApiController
     public function getList()
     {
         $valid = Validator::make(app('request')->all(), [
-            'client_id' => 'required|integer'
+            'client_id' => 'required|integer',
+            'status'    => 'in:pending,successful'
         ]);
 
         if ($valid->fails()) {
@@ -140,7 +164,17 @@ class OrderApiController extends BaseApiController
 
         $client = Client::findOrFail(app('request')->input('client_id'));
 
-        $orders = GoodsOrder::whereClientId($client->id)->orderBy('id', 'DESC')->take(10)->get();
+        $orderStatus = [0, 1, 2, 3];
+
+        if (app('request')->has('status')) {
+            $orderStatus = $this->goodsOrder->statusCategories[app('request')->input('status')];
+        }
+
+        $orders = GoodsOrder::whereClientId($client->id)
+            ->whereIn('status', $orderStatus)
+            ->orderBy('id', 'ASC')
+            ->take(config('shop.order_count_user'))
+            ->get();
 
         $ordersData = [];
 
@@ -158,9 +192,12 @@ class OrderApiController extends BaseApiController
             ];
         }
 
-        $ordersData = array_reverse($ordersData);
+        $dataResponse = [
+            'data'  => $ordersData,
+            'count' => $orders->count()
+        ];
 
-        return response()->json($this->apiResponse->ok(['data' => $ordersData]));
+        return response()->json($this->apiResponse->ok($dataResponse));
     }
 
     public function postDelOrder()

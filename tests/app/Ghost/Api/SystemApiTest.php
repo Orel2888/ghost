@@ -3,7 +3,9 @@
 use App\{
     Client,
     Admin,
-    Purse
+    Purse,
+    BlackListUser,
+    QiwiTransaction
 };
 
 class SystemApiTest extends TestCase
@@ -69,6 +71,50 @@ class SystemApiTest extends TestCase
 
             // Collect a trash
             $this->testTools->storage->add('goods_purchases', $responseJson->data->purchases_ids[0]);
+        });
+    }
+
+    public function test_processing_goods_orders_blacklist()
+    {
+        // Create black list
+        $blacklistUsername = 'test_test';
+        $blacklistPhone    = '79111113112';
+
+        $black1 = BlackListUser::create([
+            'username'  => $blacklistUsername,
+            'type'      => 'username'
+        ]);
+        $black2 = BlackListUser::create([
+            'phone'     => $blacklistPhone,
+            'type'      => 'phone'
+        ]);
+        $this->testTools->storage->add('black_list_users', $black1->id);
+        $this->testTools->storage->add('black_list_users', $black2->id);
+
+        // Create a transactions
+        $transAttr = [
+            'purse'     => 79123343434,
+            'qiwi_id'   => 1233332222444,
+            'amount'    => 1500,
+            'provider'  => 'Provider'
+        ];
+
+        $tr1 = QiwiTransaction::create($transAttr + [
+            'comment'   => $blacklistUsername,
+        ]);
+
+        $tr2 = QiwiTransaction::create(array_merge($transAttr, [
+            'provider'  => 'Provider provider +'. $blacklistPhone .' provider'
+        ]));
+
+        $this->testTools->storage->add('qiwi_transactions', $tr1->id);
+        $this->testTools->storage->add('qiwi_transactions', $tr2->id);
+
+        // Start test
+        $this->api->sysProcessingGoodsOrders(function ($responseJson, $e) {
+            BaseApi::throwException($e);
+
+            $this->assertCount(2, $responseJson->data->transactions_ids_blacklist);
         });
     }
 

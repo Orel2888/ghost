@@ -24,6 +24,15 @@ class GoodsOrder extends Goods
         3 => 'Недостаточно средств'
     ];
 
+    /**
+     * Category name => numeric status
+     * @var array
+     */
+    public $statusCategories = [
+        'pending'       => [0, 2, 3],
+        'successful'    => [1]
+    ];
+
     public function __construct()
     {
         parent::__construct();
@@ -177,6 +186,46 @@ class GoodsOrder extends Goods
             $order->update(['status' => 3]);
 
             return $e;
+        }
+
+        return false;
+    }
+
+    /**
+     * Count orders to user by category
+     * @param $clientId
+     * @param string $typeOrder pending|successful
+     * @return mixed
+     */
+    public function countOrderToUser($clientId, $typeOrder = 'pending')
+    {
+        $orderStatus = $this->statusCategories[$typeOrder];
+
+        return $this->goodsOrder->whereClientId($clientId)->whereIn('status', $orderStatus)->count();
+    }
+
+    /**
+     * Cleaning a orders by limit for user
+     * @param $clientId
+     * @param string $typeOrder pending|successful
+     * @return bool
+     */
+    public function cleaningOrderToUser($clientId, $typeOrder = 'pending')
+    {
+        $orderStatus = $this->statusCategories[$typeOrder];
+
+        $orderQuery = $this->goodsOrder->whereClientId($clientId)->whereIn('status', $orderStatus);
+
+        $countOrder = $orderQuery->count();
+        $limitOrder = config('shop.order_count_user');
+
+        if ($countOrder > $limitOrder) {
+
+            $countOrderForRemove = $countOrder - $limitOrder;
+
+            $orderQuery->orderBy('id', 'ASC')->limit($countOrderForRemove)->delete();
+
+            return $countOrderForRemove;
         }
 
         return false;

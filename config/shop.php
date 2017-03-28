@@ -26,5 +26,10 @@ return [
     'API_KEY'   => env('API_KEY'),
 
     'test_telegram_clients'     => env('TEST_TELEGRAM_CLIENTS'),
-    'test_execute_async_jobs'   => env('TEST_EXECUTE_ASYNC_JOBS', false)
+    'test_execute_async_jobs'   => env('TEST_EXECUTE_ASYNC_JOBS', false),
+
+    /**
+     * Config orders
+     */
+    'order_count_user'          => 15
 ];

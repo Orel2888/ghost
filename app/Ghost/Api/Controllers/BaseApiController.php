@@ -4,17 +4,19 @@ namespace App\Ghost\Api\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
-use App\Ghost\Repositories\Client\ClientManager;
+use App\Ghost\Repositories\Client\ClientRepository;
 use App\Ghost\Api\ApiResponse;
-use App\Ghost\Repositories\Goods\GoodsManager;
-use App\Ghost\Repositories\Goods\GoodsOrder;
+use App\Ghost\Repositories\Goods\{
+    GoodsManager,
+    GoodsOrder
+};
 
 class BaseApiController extends BaseController
 {
     /**
-     * @var ClientManager
+     * @var ClientRepository
      */
-    protected $clientManager;
+    protected $clientRepository;
 
     /**
      * @var ApiResponse
@@ -33,10 +35,10 @@ class BaseApiController extends BaseController
 
     public function __construct()
     {
-        $this->clientManager = new ClientManager();
-        $this->apiResponse   = new ApiResponse();
-        $this->goodsManager  = new GoodsManager();
-        $this->goodsOrder    = new GoodsOrder();
+        $this->clientRepository = new ClientRepository();
+        $this->apiResponse      = new ApiResponse();
+        $this->goodsManager     = new GoodsManager();
+        $this->goodsOrder       = new GoodsOrder();
     }
 
 }

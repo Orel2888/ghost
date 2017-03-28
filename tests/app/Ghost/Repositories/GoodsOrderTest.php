@@ -10,7 +10,8 @@ use App\{
     Client,
     GoodsPrice,
     Goods,
-    GoodsPurchase
+    GoodsPurchase,
+    GoodsOrder as GoodsOrderModel
 };
 
 class GoodsOrderTest extends TestCase
@@ -126,6 +127,35 @@ class GoodsOrderTest extends TestCase
         $this->assertInstanceOf(GoodsPurchase::class, $purchase);
 
         $purchase->delete();
+    }
+
+    public function test_cleaning_order_to_user()
+    {
+        $orderLimit = config('shop.order_count_user');
+
+        GoodsOrderModel::query()->delete();
+
+        // Cleaning a orders the pending category
+        $models = $this->testTools->clientWithOrder(config('shop.order_count_user') + 1);
+
+        $orderRemoved = $this->goodsOrder->cleaningOrderToUser($models->client->id);
+
+        $this->assertEquals(1, $orderRemoved);
+
+        $this->assertEquals($orderLimit, $this->goodsOrder->countOrderToUser($models->client->id));
+
+        // Cleaning a orders the successful category
+        $models = $this->testTools->clientWithOrder(config('shop.order_count_user') + 1);
+
+        $models->order->each(function ($item) {
+            $item->update(['status' => 1]);
+        });
+
+        $orderRemoved = $this->goodsOrder->cleaningOrderToUser($models->client->id, 'successful');
+
+        $this->assertEquals(1, $orderRemoved);
+
+        $this->assertEquals($orderLimit, $this->goodsOrder->countOrderToUser($models->client->id, 'successful'));
     }
 
     public function test_terminate()
