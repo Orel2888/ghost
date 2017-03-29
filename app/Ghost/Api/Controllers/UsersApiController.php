@@ -26,7 +26,7 @@ class UsersApiController extends BaseApiController
         }
 
         try {
-            $client = $this->clientManager->findByTgChatId(app('request')->input('tg_chatid'));
+            $client = $this->clientRepository->findByTgChatId(app('request')->input('tg_chatid'));
         } catch (ModelNotFoundException $e) {
             return response()->json($this->apiResponse->fail([
                 'message' => 'Client with this chat id not found. For a registration call request api method users.reg'
@@ -53,7 +53,7 @@ class UsersApiController extends BaseApiController
         }
 
         try {
-            $this->clientManager->findByTgChatId(app('request')->input('tg_chatid'));
+            $this->clientRepository->findByTgChatId(app('request')->input('tg_chatid'));
 
             return response()->json($this->apiResponse->fail(['message' => 'Client is already registered']), 400);
         } catch (ModelNotFoundException $e) {
@@ -85,7 +85,7 @@ class UsersApiController extends BaseApiController
         }
 
         try {
-            $this->clientManager->findByTgChatId(app('request')->input('tg_chatid'))
+            $this->clientRepository->findByTgChatId(app('request')->input('tg_chatid'))
                 ->update(app('request')->only('name', 'tg_username', 'tg_chatid') + ['comment' => app('request')->input('tg_username')]);
 
             return response()->json($this->apiResponse->ok());
