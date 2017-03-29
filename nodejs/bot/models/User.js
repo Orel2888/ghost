@@ -56,6 +56,8 @@ class User {
                     })
                 }
 
+                this.app.logger.error({user_model_get_user_data: err})
+
                 return err;
             })
         }
