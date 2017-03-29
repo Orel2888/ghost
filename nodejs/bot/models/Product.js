@@ -8,8 +8,55 @@ class Product {
         this.app      = app
         this.botScope = botScope
 
+        /**
+         * [{
+            id: 1,
+            name: 'City1'
+          },{
+            id: 2,
+            name: 'City2'
+          },{
+            id: 3,
+            name: 'City3'
+         }]
+         * @type {Array}
+         * @private
+         */
         this._cities   = []
+
+        /**
+         * {
+            'City1': [{
+                id: 1,
+                name: 'Ananas',
+                count: 2
+            }],
+            'City2': [{
+                id: 2,
+                name: 'Banan',
+                count: 1
+            }]
+        }
+         * @type {{}}
+         * @private
+         */
         this._goods    = {}
+        /**
+         * {
+            1: [{
+                weight: 0.5,
+                cost: 1500,
+                count: 2
+            },
+            {
+                weight: 1,
+                cost: 2500,
+                count: 4
+            }]
+        }
+         * @type {{}}
+         * @private
+         */
         this._products = {}
     }
 
