@@ -17,43 +17,6 @@ class StartMenu extends BaseMenu {
 
     run() {
 
-        /*let cities = [{
-            id: 1,
-            name: 'City1'
-          },{
-            id: 2,
-            name: 'City2'
-          },{
-            id: 3,
-            name: 'City3'
-         }]
-
-        let goods = {
-            'City1': [{
-                id: 1,
-                name: 'Ananas',
-                count: 2
-            }],
-            'City2': [{
-                id: 2,
-                name: 'Banan',
-                count: 1
-            }]
-        }
-
-        let productWeights = {
-            1: [{
-                weight: 0.5,
-                cost: 1500,
-                count: 2
-            },
-            {
-                weight: 1,
-                cost: 2500,
-                count: 4
-            }]
-        }*/
-
         let dataTpl = {
             product: this.product
         }
