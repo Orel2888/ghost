@@ -1,0 +1,11 @@
+{%- macro item(order) -%}
+🏡 {{ order.city_name }}
+🎁 {{ order.goods_name }}
+💰 {{ order.cost }}
+📦 {{ formatWeight(order.weight) }}
+📆 {{ order.date }}
+💬 {{ order.status_message }}
+{%- if order.status == 1 %}
+🚶 {{ order.address }}
+{%- endif %}
+{%- endmacro -%}

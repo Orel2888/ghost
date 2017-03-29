@@ -1,0 +1,9 @@
+{%- import './order_item.html' as order_tpl -%}
+
+{% if !orders.length %}⭕️ Нет заказов{% endif %}
+{%- for order in orders -%}
+{{  order_tpl.item(order) }}
+{%- if !loop.last %}
+{{ divider.repeat(6) }}
+{% endif -%}
+{%- endfor -%}
