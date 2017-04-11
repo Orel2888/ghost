@@ -46,7 +46,10 @@ class BaseMenu {
                 return {
                     text: textButton,
                     callback: (callbackQuery, message) => {
-                        return this.app.includeMenu('Orders', this.botScope, {prev_message: message})
+                        return this.app.includeMenu('Orders', this.botScope, {
+                            prev_message: message,
+                            type_order
+                        })
                     }
                 }
             },
