@@ -8,7 +8,7 @@ const Purse = require('../models/Purse')
 
 class ShowcaseMenu extends BaseMenu {
 
-    constructor(app, menuName, botScope, params) {
+    constructor() {
         super(...arguments)
 
         this.product = new Product(this.app, this.botScope)

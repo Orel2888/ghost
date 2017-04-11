@@ -9,7 +9,7 @@ const Product = require('../models/Product')
 
 class StartMenu extends BaseMenu {
 
-    constructor(app, menuName, botScope, params) {
+    constructor() {
         super(...arguments)
 
         this.product = new Product(this.app, this.botScope)
