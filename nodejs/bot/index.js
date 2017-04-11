@@ -24,9 +24,14 @@ const App = new app({
 })
 
 // Initialization bot
-const tg = new Telegram.Telegram(config.TGBOT_TOKEN, {
+let initializationBotParams = {
     logger: App.logger
-})
+}
+
+if (config.APP_ENV == 'local')
+    initializationBotParams.workers = 1
+
+const tg = new Telegram.Telegram(config.TGBOT_TOKEN, initializationBotParams)
 
 // Send message a user about required username
 let messageUsernameNotRegistered = userId => {

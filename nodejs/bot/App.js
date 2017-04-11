@@ -11,7 +11,7 @@ const GhostApi  = require('../ghost-api/GhostApi')
 
 class App {
 
-    constructor(config) {
+    constructor(params) {
         this.pathControllers = './controllers'
         this.mapControllers  = []
         /**
@@ -20,14 +20,26 @@ class App {
          * @private
          */
         this._controllers    = {}
+        /**
+         * Names a controllers to directory controllers
+         * @type {Array}
+         */
+        this.mapControllers  = params.mapControllers || []
+        /**
+         * Config app
+         * @type {Array}
+         */
+        this.config          = params.config || []
+        /**
+         * Templater
+         * @type {null}
+         */
         this.templatter      = null
-        this.logger          = null
-
-        if (Object.keys(config).length) {
-            for (let k in config) {
-                this[k] = config[k]
-            }
-        }
+        /**
+         * Logger
+         * @type {null}
+         */
+        this.logger          = params.logger || null
 
         this.api = null
 
