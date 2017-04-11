@@ -159,18 +159,18 @@ class ShowcaseMenu extends BaseMenu {
         for (let i = 1; i<=6; i++) {
             menuCountPackageButtons.push({
                 text: `📦 ${i.toString()}`,
-                callback: () => {
+                callback: (callbackQuery, message) => {
                     this.selectedItems.count_package = i
 
                     // Check count product
                     let products = this.product.getProduct(this.selectedItems.goods_id, this.selectedItems.weight)
 
                     if (!products.length)
-                        return this.menuCountPackage(prevMessage, 'Нет товара или он кончился в самый неподходящий момент')
+                        return this.menuCountPackage(message, 'Нет товара или он кончился в самый неподходящий момент')
                     else if (products[0].count < i)
-                        return this.menuCountPackage(prevMessage, 'Нет такого количества товара')
+                        return this.menuCountPackage(message, 'Нет такого количества товара')
 
-                    return this.menuPreOrder(prevMessage)
+                    return this.menuPreOrder(message)
                 }
             })
         }
