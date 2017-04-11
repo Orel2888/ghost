@@ -39,6 +39,17 @@ class BaseMenu {
                     }
                 }
             },
+            orders: (type_order = 'pending') => {
+
+                let textButton = type_order == 'pending' ? '🔋 Корзина' : '🎁 Покупки'
+
+                return {
+                    text: textButton,
+                    callback: (callbackQuery, message) => {
+                        return this.app.includeMenu('Orders', this.botScope, {prev_message: message})
+                    }
+                }
+            },
             shopping_cart: (params) => {
                 return {
                     text: '🔋 Корзина',

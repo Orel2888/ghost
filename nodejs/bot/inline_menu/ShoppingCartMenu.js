@@ -4,7 +4,7 @@ const Product = require('../models/Product')
 
 class ShoppingCartMenu extends BaseMenu {
 
-    constructor() {
+    constructor(app, menuName, botScope, params) {
         super(...arguments)
 
         this.product = new Product(this.app, this.botScope)
