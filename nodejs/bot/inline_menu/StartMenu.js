@@ -33,8 +33,8 @@ class StartMenu extends BaseMenu {
         let menuButtons = [
             this._commonButtons.showcase(this.params),
             this._commonButtons.lk(this.params),
-            this._commonButtons.shopping_cart(this.params),
-            this._commonButtons.purchases(this.params),
+            this._commonButtons.orders('pending'),
+            this._commonButtons.orders('successful'),
             this._commonButtons.payment(this.params),
             {
                 text: '🔄 Обновить',
