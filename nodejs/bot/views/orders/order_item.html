@@ -1,11 +1,12 @@
-{%- macro item(order) -%}
-🏡 {{ order.city_name }}
-🎁 {{ order.goods_name }}
-💰 {{ order.cost }}
-📦 {{ formatWeight(order.weight) }}
-📆 {{ order.date }}
+{%- macro item(order, index) -%}
+*{{ index }}*) 🏡 {{ order.city_name }}
+🔑 ID: {{ order.id }}
+🎁 Товар: {{ order.goods_name }}
+💰 Цена: {{ order.cost }}
+📦 Вес: {{ formatWeight(order.weight) }}
+📆 Дата: {{ order.date }}
 💬 {{ order.status_message }}
 {%- if order.status == 1 %}
-🚶 {{ order.address }}
+🚶 Адрес: {{ order.address }}
 {%- endif %}
 {%- endmacro -%}

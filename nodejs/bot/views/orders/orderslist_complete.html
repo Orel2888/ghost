@@ -1,0 +1,9 @@
+{% extends '../app.html' %}
+
+{% block content %}
+🎁 Покупки
+
+{% include './order_list.html' %}
+
+Заказов: *{{ count }}*
+{% endblock %}
