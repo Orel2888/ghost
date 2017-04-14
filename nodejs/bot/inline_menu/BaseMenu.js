@@ -18,8 +18,8 @@ class BaseMenu {
             start: (params) => {
                 return {
                     text: '❰ Главная',
-                    callback: () => {
-                        return this.app.includeMenu('Start', this.botScope, params).run()
+                    callback: (callbackQuery, message) => {
+                        return this.app.includeMenu('Start', this.botScope, {prev_message: message}).run()
                     }
                 }
             },
@@ -49,7 +49,7 @@ class BaseMenu {
                         return this.app.includeMenu('Orders', this.botScope, {
                             prev_message: message,
                             type_order
-                        })
+                        }).run()
                     }
                 }
             },
