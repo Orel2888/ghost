@@ -36,7 +36,8 @@ class OrdersMenu extends BaseMenu {
             return this.getMessage(tplData).then(content => {
                 return this.botScope.runInlineMenu(
                     this.makeMenu({message: content, count_order: tplData.count}),
-                    this.params.prev_message)
+                    this.params.prev_message
+                )
             }).catch(err => this.app.logger.error({order_menu_run: err}))
         })
     }
@@ -45,41 +46,79 @@ class OrdersMenu extends BaseMenu {
 
         let buttons = []
 
-        let parseNumIndex = (text) => {
-
-            if (text.test(/(\d+,*)/)) {
-                return text.split(',').map(item => parseInt(item))
-            }
-
-            return +text
-        }
-
         // Actions on orders
         if (data.count_order) {
+            // Remove orders by select
             buttons.push({
                 text: '❌ Удалить',
                 callback: (callbackQuery, message) => {
 
+                    // Help message to select order
                     this.botScope.sendMessage(
                         'Отправьте в ответ порядковый номер заказа, который вы хотите удалить. Если вам нужно удалить' +
                         ' несколько заказов одновременно, отправляйте порядковые номера через запятую, пример 1,2,3'
                     )
 
+                    // Waiting a answer with orders ids
                     this.botScope.waitForRequest.then($ => {
-                        let mess = parseNumIndex($.message.text)
 
-                        if (mess) {
-                            if (typeof mess == 'object' && this.orderIdsIndex.keys()) {
-                                return
+                        let ids = this.parseIdsFromMessage($.message.text)
+
+                        if (this.checkMessageOrderIds(ids)) {
+
+                            if (typeof ids == 'object') {
+                                let ordersIds = ids.map(id => this.orderIdsIndex.get(id))
+
+                                return this.menuConfirmation(`Подтвердите удаление заказов: ${$.message.text}`,
+                                    (callbackQuery, message) => {
+                                        this.params.prev_message = message
+
+                                        return this.apiRemoveOrders(ordersIds).then((res) => {
+                                            return this.run()
+                                        }).catch(err => {
+
+                                            this.app.logger.error({order_menu_remove_order: err})
+
+                                            return this.botScope.sendMessage('Произошла ошибка при удалении заказов')
+                                        })
+                                    },
+                                    (callbackQuery, message) => {
+                                        this.params.prev_message = message
+
+                                        return this.run()
+                                    }
+                                )
+                            } else {
+                                let orderId = this.orderIdsIndex.get(ids)
+
+                                return this.menuConfirmation(`Подтвердите удаление заказа: ${$.message.text}`,
+                                    (callbackQuery, message) => {
+                                        this.params.prev_message = message
+
+                                        return this.apiRemoveOrders([orderId]).then(res => {
+                                            return this.run()
+                                        }).catch(err => {
+
+                                            this.app.logger.error({order_menu_remove_order: err})
+
+                                            return this.botScope.sendMessage('Произошла ошибка при удалении заказов')
+                                        })
+                                    },
+                                    (callbackQuery, message) => {
+                                        this.params.prev_message = message
+
+                                        return this.run()
+                                    }
+                                )
                             }
-                            return this.botScope.sendMessage('Выбрано ' + this.orderIdsIndex.get(mess))
-                        } else {console.log('No pass')
-                            return this.run()
+                        } else {
+                            this.menuFailSelectOrder()
                         }
                     })
-
                 }
             })
+
+            // Remove all a orders
             buttons.push({
                 text: '❌ Удалить все',
                 callback: (callbackQuery, message) => {
@@ -105,6 +144,90 @@ class OrdersMenu extends BaseMenu {
         }
 
         return menuScheme
+    }
+
+    menuFailSelectOrder() {
+        let message = 'Ошибка, неверный формат ответа или порядковые номера'
+
+        let menu = [
+            this._commonButtons.orders(this.params.type_order),
+            this._commonButtons.start()
+        ]
+
+        return this.botScope.runInlineMenu({
+            layout: 2,
+            method: 'sendMessage',
+            params: [message, {parse_mode: 'markdown'}],
+            menu: menu
+        })
+    }
+
+    menuConfirmation(messageText, cbConfirmPassed, cbConfirmNotPassed) {
+
+        let menu = [
+            {
+                text: 'Да, удалить',
+                callback: cbConfirmPassed
+            },
+            {
+                text: 'Отмена',
+                callback: cbConfirmNotPassed
+            },
+            this._commonButtons.orders(this.params.type_order),
+            this._commonButtons.start()
+        ]
+
+        return this.botScope.runInlineMenu({
+            layout: 2,
+            method: 'sendMessage',
+            params: [messageText, {parse_mode: 'markdown'}],
+            menu: menu
+        })
+    }
+
+    apiRemoveOrders(ids = []) {
+
+        let removingOrders = ids.map((id => {
+            return new Promise((resolve, reject) => {
+                return this.app.api.api('order.del', 'POST', {
+                    client_id: this.botScope.user.userId,
+                    order_id: id
+                }).then(response => {
+                    if (response.status == 'ok') resolve(response)
+                    else
+                        reject()
+                })
+            })
+        }))
+
+        return Promise.all(removingOrders)
+    }
+
+    /**
+     * Parse ids from message id,id,id,id
+     * @param text
+     * @returns {Array.<*> | integer | boolean}
+     */
+    parseIdsFromMessage(text) {
+
+        if (/(\d+,\d+)/.test(text)) {
+            return text.split(',').map(item => parseInt(item)).filter(item => item != '')
+        }
+
+        text = +text
+
+        return text > 0 ? text : false
+    }
+
+    /**
+     * Check to exists in this.orderIdsIndex
+     * @param ids
+     * @returns {boolean}
+     */
+    checkMessageOrderIds(ids) {
+        return typeof ids == 'object'
+            ? ids.every(id => this.orderIdsIndex.has(id))
+            : this.orderIdsIndex.has(ids)
     }
 
     getMessage(tplData) {
