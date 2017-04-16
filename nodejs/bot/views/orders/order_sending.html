@@ -1,0 +1,9 @@
+{% extends '../app.html' %}
+
+{% block content %}
+🔋 {% if orders.length == 1 %}Заказ{% else %}Заказы{% endif %}
+
+{% include './order_list.html' %}
+
+{% if orders.length > 1 %}Количество: *{{ orders.length }}*{% endif %}
+{% endblock %}
