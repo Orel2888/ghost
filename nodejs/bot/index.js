@@ -40,6 +40,13 @@ let messageUsernameNotRegistered = userId => {
     })
 }
 
+// Message about disable bot
+let messageNotWorkBot = (userId) => {
+    return App.render('other.disabled_bot').then(content => {
+        return tg.api.sendMessage(userId, content, {parse_mode: 'markdown'})
+    })
+}
+
 // Before
 tg.before((update, cb) => {
 
@@ -62,6 +69,14 @@ tg.before((update, cb) => {
 
     // Check username for admin
     let isAdmin = App.getAdminUsernames().includes(telegramUsername);
+
+    // Is disabled bot for user
+    if (!isAdmin && !App.config.work) {
+
+        messageNotWorkBot(telegramUserId)
+
+        return cb(false)
+    }
 
     // Authentication and getting user data
     App.api.checkAuth(isAdmin).then(auth => {
