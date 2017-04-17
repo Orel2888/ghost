@@ -63,7 +63,7 @@ class User {
         }
 
         if (forceUpdate) {
-            return getUserDataSaveSession()
+            return getUserData()
         }
 
         return this.botScope.getUserSession('user_data').then(udata => {
