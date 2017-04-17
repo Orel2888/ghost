@@ -76,7 +76,7 @@ class OrdersMenu extends BaseMenu {
                                 (callbackQuery, message) => {
                                     this.params.prev_message = message
 
-                                    return this.removeOrders(ids)
+                                    return this.removeOrders(ordersIds)
                                 },
                                 (callbackQuery, message) => {
                                     this.params.prev_message = message
