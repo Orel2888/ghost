@@ -36,6 +36,7 @@ class StartMenu extends BaseMenu {
             this._commonButtons.orders('pending'),
             this._commonButtons.orders('successful'),
             this._commonButtons.payment(this.params),
+            this._commonButtons.help(),
             {
                 text: '🔄 Обновить',
                 callback: (continueQuery, message) => {
