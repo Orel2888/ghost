@@ -76,6 +76,14 @@ class BaseMenu {
                         return this.app.includeMenu('Payment', this.botScope, prevMessage || {prev_message: message}).run()
                     }
                 }
+            },
+            help: () => {
+                return {
+                    text: '📙 Помощь',
+                    callback: (callbackQuery, message) => {
+                        return this.app.includeMenu('Help', this.botScope, {prev_message: message}).run()
+                    }
+                }
             }
         }
     }
