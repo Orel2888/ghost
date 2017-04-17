@@ -4,8 +4,15 @@
 
 class Purse {
 
+    constructor(app, botScope) {
+        this.app      = app
+        this.botScope = botScope
+    }
+
     getPurse() {
-        return Promise.resolve('7911111111')
+        return this.app.api.api('users.purse', 'GET').then(response => {
+            return response.data.phone
+        })
     }
 }
 
