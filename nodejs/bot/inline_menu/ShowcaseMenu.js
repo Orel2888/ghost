@@ -231,7 +231,7 @@ class ShowcaseMenu extends BaseMenu {
 
         let menuOrderButtons = [{
             text: `✅ Оформить ${this.selectedItems.count_package == 1 ? 'заказ' : 'заказы'}`,
-            callback: () => {
+            callback: (callbackQuery, message) => {
                 return this.menuOrder(prevMessage)
             }
         }]
@@ -292,6 +292,10 @@ class ShowcaseMenu extends BaseMenu {
 
         return this.app.api.api('order.create', 'POST', sendData).then(response => {
 
+            if (response.status == 'fail') {
+                return this.menuFailOrderCreate(response.message, prevMessage)
+            }
+
             let tplData = {
                 status: response.status == 'ok',
                 message: response.message || null,
@@ -321,8 +325,8 @@ class ShowcaseMenu extends BaseMenu {
                 }
             })
 
-            buttons.push(this._commonButtons.purchases({prev_message: prevMessage}))
-            buttons.push(this._commonButtons.shopping_cart({prev_message: prevMessage}))
+            buttons.push(this._commonButtons.orders('successful'))
+            buttons.push(this._commonButtons.orders('pending'))
             buttons.push(this._commonButtons.start({prev_message: prevMessage}))
 
             return this.app.render('showcase.order', tplData).then(content => {
@@ -341,6 +345,23 @@ class ShowcaseMenu extends BaseMenu {
 
             return this.botScope.sendMessage('Произошла ошибка')
         })
+    }
+
+    menuFailOrderCreate(message, prevMessage) {
+
+        let buttons = [
+            this._commonButtons.orders('pending'),
+            this._commonButtons.start()
+        ]
+
+        let menuScheme = {
+            layout: 2,
+            message: message,
+            params: [{parse_mode: 'markdown'}],
+            menu: buttons
+        }
+
+        return this.botScope.runInlineMenu(menuScheme, prevMessage)
     }
 }
 
