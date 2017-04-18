@@ -58,12 +58,12 @@ class OrderApi extends BaseApi
     }
 
     /**
-     * @param $client_id
+     * @param $params
      * @param Closure $closure
      * @return bool|mixed
      */
-    public function orderDelAll($client_id, Closure $closure)
+    public function orderDelAll($params, Closure $closure)
     {
-        return $this->run('order.delall', 'POST', compact('client_id'), $closure);
+        return $this->run('order.delall', 'POST', $params, $closure);
     }
 }

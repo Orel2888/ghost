@@ -164,14 +164,38 @@ class OrderApiTest extends TestCase
 
     public function test_find()
     {
+        // Find one a order
         $models = $this->testTools->clientWithOrder();
 
-        $this->api->orderFind(['id' => $models->order->id, 'client_id' => $models->client->id], function ($responseJson, $e) use($models) {
+        $this->api->orderFind([
+            'id' => $models->order->id,
+            'client_id' => $models->client->id
+        ], function ($responseJson, $e) use($models) {
             BaseApi::throwException($e);
 
-            $this->assertEquals($responseJson->data->id, $models->order->id);
+            $this->assertEquals($responseJson->data[0]->id, $models->order->id);
 
-            $this->checkOrderResponse($responseJson->data);
+            $this->checkOrderResponse($responseJson->data[0]);
+        });
+
+        // Find a few a orders
+        $models = $this->testTools->clientWithOrder(2);
+
+        $ordersIdsCreated = $models->order->pluck('id')->toArray();
+
+        $this->api->orderFind([
+            'id' => implode(',', $ordersIdsCreated),
+            'client_id' => $models->client->id
+        ], function ($responseJson, $e) use($ordersIdsCreated) {
+            BaseApi::throwException($e);
+
+            $receivedOrdersIds = [];
+
+            foreach ($responseJson->data as $order) {
+                $this->assertContains($order->id, $ordersIdsCreated);
+            }
+
+            $this->assertCount(2, $responseJson->data);
         });
     }
 
@@ -222,9 +246,24 @@ class OrderApiTest extends TestCase
 
     public function test_del()
     {
+        // Deleting one a order
         $models = $this->testTools->clientWithOrder();
 
         $this->api->orderDel(['order_id' => $models->order->id, 'client_id' => $models->client->id], function ($responseJson, $e) {
+            BaseApi::throwException($e);
+
+            $this->assertEquals('del', $responseJson->method);
+        });
+
+        // Deleting a few orders
+        $models = $this->testTools->clientWithOrder(2);
+
+        $ordersIds = $models->order->pluck('id')->toArray();
+
+        $this->api->orderDel([
+            'order_id'  => implode(',', $ordersIds),
+            'client_id' => $models->client->id
+        ], function ($responseJson, $e) {
             BaseApi::throwException($e);
 
             $this->assertEquals('del', $responseJson->method);
@@ -233,9 +272,22 @@ class OrderApiTest extends TestCase
 
     public function test_delall()
     {
+        // Deleting all orders to user
         $models = $this->testTools->clientWithOrder();
 
-        $this->api->orderDelAll($models->client->id, function ($responseJson, $e) {
+        $this->api->orderDelAll(['client_id' => $models->client->id], function ($responseJson, $e) {
+            BaseApi::throwException($e);
+
+            $this->assertEquals('delall', $responseJson->method);
+        });
+
+        // Deleting by status pending
+        $models = $this->testTools->clientWithOrder(2);
+
+        $this->api->orderDelAll([
+            'client_id' => $models->client->id,
+            'status'    => 'pending'
+        ], function ($responseJson, $e) {
             BaseApi::throwException($e);
 
             $this->assertEquals('delall', $responseJson->method);

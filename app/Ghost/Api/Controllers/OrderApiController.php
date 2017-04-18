@@ -115,40 +115,51 @@ class OrderApiController extends BaseApiController
     public function getFind()
     {
         $valid = Validator::make(app('request')->all(), [
-            'id'        => 'required|integer',
+            'id'        => 'required|regex:/^\d+(,\d+)*$/',
             'client_id' => 'required|integer'
         ]);
+
+        $input     = app('request')->all();
+        $ordersIds = explode(',', $input['id']);
 
         if ($valid->fails()) {
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        $order = GoodsOrder::with(['goods.city', 'purchase'])
-            ->whereIdAndClientId(app('request')->input('id'), app('request')->input('client_id'))
-            ->first();
+        $orders = GoodsOrder::with(['goods.city', 'purchase'])
+            ->whereClientId($input['client_id'])
+            ->whereIn('id', $ordersIds)
+            ->get();
 
-        if (is_null($order)) {
-            return response()->json($this->apiResponse->fail(['message' => 'Заказ не найден']), 404);
+        if ($orders->isEmpty()) {
+            return response()->json($this->apiResponse->fail(['message' => 'Заказ(ы) не найден']), 404);
         }
 
-        list($weight, $cost, $id) = [$order->weight, $order->cost, $order->id];
+        $orderInfoCreator = function ($order) {
 
-        $orderInfo = [
-            'city_name'         => $order->goods->city->name,
-            'goods_name'        => $order->goods->name,
-            'weight'            => wcorrect($order->weight),
-            'cost'              => $order->cost,
-            'id'                => $order->id,
-            'status'            => $order->status,
-            'status_message'    => $this->goodsOrder->statusOrderMessages[$order->status],
-            'date'              => $order->created_at->isToday() ? $order->created_at->diffForHumans() : $order->created_at->format('d.m.y H:i'),
-        ];
+            $orderData =  [
+                'city_name'         => $order->goods->city->name,
+                'goods_name'        => $order->goods->name,
+                'weight'            => wcorrect($order->weight),
+                'cost'              => $order->cost,
+                'id'                => $order->id,
+                'status'            => $order->status,
+                'status_message'    => $this->goodsOrder->statusOrderMessages[$order->status],
+                'date'              => $order->created_at->isToday() ? $order->created_at->diffForHumans() : $order->created_at->format('d.m.y H:i'),
+            ];
 
-        $orderInfo = array_merge($orderInfo, [
-            'address'   => $order->status == 1 ? $order->purchase->address : null
-        ]);
+            $orderData = array_merge($orderData, [
+                'address'   => $order->status == 1 ? $order->purchase->address : null
+            ]);
 
-        return response()->json($this->apiResponse->ok(['data' => $orderInfo]));
+            return $orderData;
+        };
+
+        $ordersCollection = $orders->map(function ($order, $key) use($orderInfoCreator) {
+            return $orderInfoCreator($order);
+        });
+
+        return response()->json($this->apiResponse->ok(['data' => $ordersCollection->toArray()]));
     }
 
     public function getList()
@@ -204,7 +215,7 @@ class OrderApiController extends BaseApiController
     {
         $valid = Validator::make(app('request')->all(), [
             'client_id' => 'required|integer',
-            'order_id'  => 'required|integer'
+            'order_id'  => 'required|regex:/^\d+(,\d+)*$/'
         ]);
 
         if ($valid->fails()) {
@@ -213,13 +224,13 @@ class OrderApiController extends BaseApiController
 
         $input = app('request')->all();
 
-        $goodsOrder = GoodsOrder::whereId($input['order_id'])->whereClientId($input['client_id'])->first();
+        $ordersIds = explode(',', $input['order_id']);
 
-        if (is_null($goodsOrder)) {
+        $orderRemoved = GoodsOrder::whereClientId($input['client_id'])->whereIn('id', $ordersIds)->delete();
+
+        if (!$orderRemoved) {
             return response()->json($this->apiResponse->fail(), 400);
         }
-
-        $goodsOrder->delete();
 
         return response()->json($this->apiResponse->ok(['method' => 'del']));
     }
@@ -227,14 +238,20 @@ class OrderApiController extends BaseApiController
     public function postDelAllOrder()
     {
         $valid = Validator::make(app('request')->all(), [
-            'client_id' => 'required|integer'
+            'client_id' => 'required|integer',
+            'status'    => 'in:pending,successful'
         ]);
 
         if ($valid->fails()) {
             return response()->json($this->apiResponse->error($valid->messages()->getMessages()), 400);
         }
 
-        GoodsOrder::whereClientId(app('request')->input('client_id'))->delete();
+        if (app('request')->has('status'))
+            $orderStatus = $this->goodsOrder->statusCategories[app('request')->input('status')];
+        else
+            $orderStatus = [0, 1, 2, 3];
+
+        GoodsOrder::whereClientId(app('request')->input('client_id'))->whereIn('status', $orderStatus)->delete();
 
         return response()->json($this->apiResponse->ok(['method' => 'delall']));
     }
