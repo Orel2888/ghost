@@ -16,11 +16,15 @@ class User {
     load(forceUpdate = false) {
 
         const [usernick, username] = [
-            this.botScope.message.from.firstName +' '+ (this.botScope.message.from.lastName || ''),
+            this.botScope.message.from.firstName + (this.botScope.message.from.lastName ? ` ${this.botScope.message.from.lastName}` : ''),
             this.botScope.message.from.username
         ]
 
         let saveUserDataSession = (udata) => {
+
+            // Set time activity
+            udata.lastTimeActivity = Date.now()
+
             return this.botScope.setUserSession('user_data', udata).then(() => {
 
                 this.userData = udata
@@ -69,9 +73,16 @@ class User {
         return this.botScope.getUserSession('user_data').then(udata => {
 
             if (!Object.keys(this.userData).length && Object.keys(udata).length) {
+
+                // Set time activity
+                udata.lastTimeActivity = Date.now()
+
                 this.userData = udata
 
-                return udata
+                // Refresh last time to session and return user data
+                return this.botScope.setUserSession('user_data').then(() => {
+                    return udata
+                })
             }
 
             return getUserData()
