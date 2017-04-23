@@ -107,3 +107,26 @@ tg.router
             return App.getController('MainController').startHandler($);
         }
     })
+
+
+// Cleaning a users sessions not activity
+const checkLastActivityUsers = setInterval(() => {
+    if (tg._storage._storage.hasOwnProperty('userStorage')) {
+        for (let userSessionKey of Object.keys(tg._storage._storage.userStorage)) {
+
+            let userData = tg._storage._storage.userStorage[userSessionKey]
+            let lastTimeActionUser = userData.lastTimeActivity
+
+            if (Math.floor((Date.now() - lastTimeActionUser) / 1000) >= App.config.time_clean_users_sessions * 60) {
+                //tg._storage.remove('userStorage', userSessionKey)
+                delete tg._storage._storage.userStorage[userSessionKey]
+
+                console.log('Session destroy user', userData.name)
+            }
+        }
+    }
+}, 10 * 1000)
+
+setInterval(() => {
+    console.log(tg._storage._storage)
+}, 10 * 1000)
