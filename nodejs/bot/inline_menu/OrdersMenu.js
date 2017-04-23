@@ -99,7 +99,9 @@ class OrdersMenu extends BaseMenu {
                 menu: [
                     {
                         text: 'Удалить все ' + (this.params.type_order == 'pending' ? 'заказы' : 'покупки'),
-                        callback: () => {
+                        callback: (callbackQuery, message) => {
+                            this.params.prev_message = message
+
                             return this.removeAllOrders(this.params.type_order)
                         }
                     },
@@ -180,7 +182,7 @@ class OrdersMenu extends BaseMenu {
      * @returns {Promise.<T>}
      */
     removeOrders(ids) {
-        return this.apiRemoveOrders(ids).then((res) => {
+        return this.requestApiRemoveOrders(ids).then((res) => {
             return this.run()
         }).catch(err => {
 
@@ -190,8 +192,19 @@ class OrdersMenu extends BaseMenu {
         })
     }
 
+    /**
+     * Remove a orders by status
+     * @param type_order
+     * @returns {Promise.<TResult>}
+     */
     removeAllOrders(type_order) {
+        return this.requestApiRemoveOrdersByStatus(type_order).then(response => {
+            return this.run()
+        }).catch(err => {
+            this.app.logger.error({order_menu_remove_all_orders: err})
 
+            return this.botScope.sendMessage('Произошла ошибка при удалении всех заказов')
+        })
     }
 
     /**
@@ -249,22 +262,31 @@ class OrdersMenu extends BaseMenu {
      * @param ids
      * @returns {Promise.<*>}
      */
-    apiRemoveOrders(ids = []) {
+    requestApiRemoveOrders(ids = []) {
+        return this.app.api.api('order.del', 'POST', {
+            client_id: this.botScope.user.userId,
+            order_id: ids.join(',')
+        }).then(response => {
+            if (response.status == 'ok') return Promise.resolve(response)
+            else
+                return Promise.reject(response)
+        })
+    }
 
-        let removingOrders = ids.map((id => {
-            return new Promise((resolve, reject) => {
-                return this.app.api.api('order.del', 'POST', {
-                    client_id: this.botScope.user.userId,
-                    order_id: id
-                }).then(response => {
-                    if (response.status == 'ok') resolve(response)
-                    else
-                        reject(response)
-                })
-            })
-        }))
-
-        return Promise.all(removingOrders)
+    /**
+     * Remove a orders by status
+     * @param typeOrder = pending | successful
+     * @returns {*|Promise.<TResult>}
+     */
+    requestApiRemoveOrdersByStatus(typeOrder) {
+        return this.app.api.api('order.delall', 'POST', {
+            client_id: this.botScope.user.userId,
+            status: typeOrder
+        }).then(response => {
+            if (response.status == 'ok') return Promise.resolve(response)
+            else
+                return Promise.reject(response)
+        })
     }
 
     /**
@@ -331,21 +353,12 @@ class OrdersMenu extends BaseMenu {
      * @returns {Promise.<TResult>}
      */
     findOrders(ids = []) {
-
-        let requestsFindOrder = ids.map(id => {
-            return new Promise((resolve, reject) => {
-                return this.app.api.api('order.find', 'GET', {id, client_id: this.botScope.user.userId})
-                    .then(response => {
-                        if (response.status == 'ok') resolve(response)
-                        else
-                            reject(response)
-                    })
+        return this.app.api.api('order.find', 'GET', {id: ids.join(','), client_id: this.botScope.user.userId})
+            .then(response => {
+                if (response.status == 'ok') return response.data
+                else
+                    return Promise.reject(response)
             })
-        })
-
-        return Promise.all(requestsFindOrder).then(results => {
-            return results.map(item => item.data)
-        })
     }
 }
 
