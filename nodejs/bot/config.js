@@ -10,5 +10,5 @@ module.exports = {
     pricelist_sort_city: true,
     model_product_test_mode: false,
     work: true,
-    time_clean_users_sessions: 60
+    time_clean_users_sessions: 30
 };
