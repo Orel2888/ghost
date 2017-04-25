@@ -19,9 +19,43 @@ class MainController extends BaseController {
         })
     }
 
+    lkHandler($) {
+        return this.app.includeMenu('UserCabinet', $).run()
+    }
+
+    pricelistHandler($) {
+        return this.app.includeMenu('Showcase', $).run()
+    }
+
+    shoppingcartHandler($) {
+        return this.app.includeMenu('Orders', $, {type_order: 'pending'}).run()
+    }
+
+    purchasesHandler($) {
+        return this.app.includeMenu('Orders', $, {type_order: 'successful'}).run()
+    }
+
+    paymentHandler($) {
+        return this.app.includeMenu('Payment', $).run()
+    }
+
+    helpHandler($) {
+        return this.app.includeMenu('Help', $).run()
+    }
+
+    rejected() {
+        console.log(arguments)
+    }
+
     get routes() {
         return {
-            'startCommand': 'startHandler'
+            'startCommand': 'startHandler',
+            'lkCommand': 'lkHandler',
+            'pricelistCommand': 'pricelistHandler',
+            'shoppingcartCommand': 'shoppingcartHandler',
+            'purchasesCommand': 'purchasesHandler',
+            'paymentCommand': 'paymentHandler',
+            'helpCommand': 'helpHandler'
         }
     }
 }

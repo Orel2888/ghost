@@ -45,6 +45,11 @@ class PaymentMenu extends BaseMenu {
             menu: buttons
         }
 
+        if (!this.params.prev_message) {
+            menuScheme.method = 'sendMessage'
+            menuScheme.params = [content, {parse_mode: 'markdown'}]
+        }
+
         return this.botScope.runInlineMenu(menuScheme, this.params.prev_message)
     }
 }

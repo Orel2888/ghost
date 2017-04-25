@@ -46,6 +46,11 @@ class ShowcaseMenu extends BaseMenu {
                 menu: buttonsCities
             }
 
+            if (!this.params.prev_message) {
+                menuCitiesScheme.method = 'sendMessage'
+                menuCitiesScheme.params = [content, {parse_mode: 'markdown'}]
+            }
+
             return this.botScope.runInlineMenu(menuCitiesScheme, this.params.prev_message)
         }).catch(err => this.app.logger.error({showcase_menu_city: err}))
     }

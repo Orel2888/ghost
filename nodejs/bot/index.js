@@ -101,6 +101,12 @@ tg.before((update, cb) => {
 // Routes
 tg.router
     .when(new TextCommand('start', 'startCommand'), App.getController('MainController'))
+    .when(new TextCommand('lk', 'lkCommand'), App.getController('MainController'))
+    .when(new TextCommand('pricelist', 'pricelistCommand'), App.getController('MainController'))
+    .when(new TextCommand('shoppingcart', 'shoppingcartCommand'), App.getController('MainController'))
+    .when(new TextCommand('purchases', 'purchasesCommand'), App.getController('MainController'))
+    .when(new TextCommand('payment', 'paymentCommand'), App.getController('MainController'))
+    .when(new TextCommand('help', 'helpCommand'), App.getController('MainController'))
     .otherwise(new class OtherwiseController extends TelegramBaseController {
         // For any messages run main controller startHandler
         handle($) {

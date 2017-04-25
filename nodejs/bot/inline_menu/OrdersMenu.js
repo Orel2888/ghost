@@ -156,6 +156,11 @@ class OrdersMenu extends BaseMenu {
             menu: buttons
         }
 
+        if (!this.params.prev_message) {
+            menuScheme.method = 'sendMessage'
+            menuScheme.params = [data.message, {parse_mode: 'markdown'}]
+        }
+
         return menuScheme
     }
 
